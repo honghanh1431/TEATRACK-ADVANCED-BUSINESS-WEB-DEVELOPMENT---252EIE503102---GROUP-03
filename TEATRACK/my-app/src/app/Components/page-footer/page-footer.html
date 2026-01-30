@@ -24,11 +24,11 @@
     <nav class="col links">
       <h5 data-i18n="footer.links.title">Liên kết nhanh</h5>
       <ul>
-        <li><a routerLink="/blog" data-i18n="footer.links.home">Trang chủ</a></li>
-        <li><a routerLink="/aboutus" data-i18n="footer.links.about">Về chúng tôi</a></li>
-        <li><a routerLink="/menu" data-i18n="footer.links.menu">Menu thức uống</a></li>
-        <li><a routerLink="/contact" data-i18n="footer.links.contact">Liên hệ</a></li>
-        <li><a routerLink="/blog" data-i18n="footer.links.forum">Diễn đàn</a></li>
+        <li><a routerLink="/blog" (click)="scrollToTop()" data-i18n="footer.links.home">Trang chủ</a></li>
+        <li><a routerLink="/aboutus" (click)="scrollToTop()" data-i18n="footer.links.about">Về chúng tôi</a></li>
+        <li><a routerLink="/menu" (click)="scrollToTop()" data-i18n="footer.links.menu">Menu thức uống</a></li>
+        <li><a routerLink="/contact" (click)="scrollToTop()" data-i18n="footer.links.contact">Liên hệ</a></li>
+        <li><a routerLink="/blog" (click)="scrollToTop()" data-i18n="footer.links.forum">Diễn đàn</a></li>
       </ul>
     </nav>
 

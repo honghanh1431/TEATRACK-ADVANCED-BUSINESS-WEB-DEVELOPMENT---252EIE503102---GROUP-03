@@ -18,6 +18,10 @@ export class PageFooter implements OnInit, AfterViewInit {
 
   ngOnInit() {}
 
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   onRegisterClick() {
     if (!isPlatformBrowser(this.platformId)) return;
     const emailEl = document.getElementById('subEmail') as HTMLInputElement | null;
