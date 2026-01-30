@@ -1,0 +1,171 @@
+import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID, Renderer2 } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
+
+@Component({
+  selector: 'app-page-header',
+  standalone: true,
+  imports: [RouterModule],
+  templateUrl: './page-header.html',
+  styleUrl: './page-header.css',
+})
+export class PageHeader implements OnInit, AfterViewInit {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private renderer: Renderer2
+  ) {}
+
+  ngOnInit() {
+  }
+
+  ngAfterViewInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.initAdminHeaderLogic();
+  }
+
+  private initAdminHeaderLogic() {
+    const currentPath = window.location.pathname;
+    const isAdminPage =
+      currentPath.includes('admin-dashboard') || currentPath.includes('page-header-admin.html');
+    const isAccountPage = currentPath.includes('admin-account');
+    const isOrderPage = currentPath.includes('admin-order');
+
+    // 🟢 Logout
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+      this.renderer.listen(btnLogout, 'click', (e: Event) => {
+        e.preventDefault();
+        const confirmMsg =
+          (document.querySelector('[data-i18n="header.admin.logoutConfirm"]')?.textContent as string) ||
+          'Bạn có chắc muốn đăng xuất?';
+        if (confirm(confirmMsg)) {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('ngogia_user');
+          window.location.href = '/admin-login';
+        }
+      });
+    }
+
+    // 🟢 User menu toggle
+    const userBtn = document.getElementById('user-btn');
+    const userMenu = document.getElementById('user-menu');
+    const userBox = document.getElementById('user-box');
+
+    if (userBtn && userMenu) {
+      this.renderer.listen(userBtn, 'click', (e: Event) => {
+        e.stopPropagation();
+        const isExpanded = userBtn.getAttribute('aria-expanded') === 'true';
+        userBtn.setAttribute('aria-expanded', String(!isExpanded));
+        (userMenu as HTMLElement).hidden = isExpanded;
+      });
+
+      // Ẩn khi click ra ngoài
+      this.renderer.listen(document, 'click', (e: Event) => {
+        if (userBox && !userBox.contains(e.target as Node)) {
+          userBtn.setAttribute('aria-expanded', 'false');
+          (userMenu as HTMLElement).hidden = true;
+        }
+      });
+    }
+
+    // 🟢 Navigation logic
+    document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
+      const action = item.getAttribute('data-action');
+      const target = item.getAttribute('data-target');
+      const href = item.getAttribute('href');
+
+      this.renderer.listen(item, 'click', (e: Event) => {
+        // Case 1: Navigate
+        if (action === 'navigate') return;
+
+        // Case 2: Scroll
+        if (action === 'scroll') {
+          e.preventDefault();
+          if (!isAdminPage) {
+            window.location.href = `/admin-dashboard#${target}`;
+            return;
+          }
+
+          const targetSection = document.getElementById(target || '');
+          if (targetSection) {
+            const headerHeight = 80;
+            const top = targetSection.offsetTop - headerHeight;
+            window.scrollTo({ top, behavior: 'smooth' });
+
+            document
+              .querySelectorAll('.nav-bar .nav-item')
+              .forEach((i) => i.classList.remove('active'));
+            item.classList.add('active');
+          }
+        }
+      });
+    });
+
+    // 🟢 Active state on load
+    document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
+      const target = item.getAttribute('data-target');
+      const href = item.getAttribute('href');
+
+      if (isAccountPage && href?.includes('admin-account')) item.classList.add('active');
+      if (isOrderPage && href?.includes('admin-order')) item.classList.add('active');
+      if (isAdminPage) {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && hash === target) item.classList.add('active');
+        else if (!hash) {
+          const overview = item.querySelector('[data-i18n="header.admin.overview"]');
+          if (overview) item.classList.add('active');
+        }
+      }
+    });
+
+    // 🟢 Hash change scroll
+    if (isAdminPage) {
+      this.renderer.listen(window, 'hashchange', () => {
+        const hash = window.location.hash.replace('#', '');
+        const targetSection = document.getElementById(hash);
+        if (targetSection) {
+          const headerHeight = 80;
+          const top = targetSection.offsetTop - headerHeight;
+          window.scrollTo({ top, behavior: 'smooth' });
+
+          document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
+            const target = item.getAttribute('data-target');
+            if (target === hash) item.classList.add('active');
+            else item.classList.remove('active');
+          });
+        }
+      });
+
+      const initialHash = window.location.hash.replace('#', '');
+      if (initialHash) {
+        setTimeout(() => {
+          const targetSection = document.getElementById(initialHash);
+          if (targetSection) {
+            const headerHeight = 80;
+            const top = targetSection.offsetTop - headerHeight;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }, 500);
+      }
+    }
+
+    // 🟢 Lắng nghe sự kiện đổi ngôn ngữ
+    this.renderer.listen(window, 'storage', (e: StorageEvent) => {
+      if (
+        e.key === 'app.lang' &&
+        typeof (window as any).reloadTranslations === 'function'
+      ) {
+        const newLang = e.newValue || 'vi';
+        (window as any).reloadTranslations(newLang);
+      }
+    });
+
+    // 🟢 Load ngôn ngữ ban đầu
+    if (typeof (window as any).reloadTranslations === 'function') {
+      const savedLang = localStorage.getItem('app.lang') || 'vi';
+      (window as any).reloadTranslations(savedLang);
+    }
+
+    console.log('✅ Header navigation initialized');
+  }
+}
