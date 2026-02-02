@@ -34,12 +34,25 @@
   </div>
 
   <nav class="nav-bar">
-    <a routerLink="/" class="nav-item active"><img src="assets/icons/Home.png" alt=""> Trang chủ</a>
-    <a routerLink="/aboutus/"><img src="assets/icons/info.png" alt="">Về chúng tôi</a>
-    <a routerLink="/menu/" class="nav-item"><img src="assets/icons/menu.png" alt="">Menu thức uống</a>
-    <a routerLink="/contact/"><img src="assets/icons/lien_he.png" alt="">Liên hệ</a>
-    <a routerLink="/blog/"><img src="assets/icons/dien_dan.png" alt="">Diễn đàn</a>
-    <a routerLink="/agency/"><img src="assets/icons/chi_nhanh.png" alt="">Chi nhánh</a>
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-item"
+    >
+      <img src="assets/icons/Home.png" alt=""> Trang chủ
+    </a>
+    <a routerLink="/aboutus/" routerLinkActive="active">
+      <img src="assets/icons/info.png" alt="">Về chúng tôi
+    </a> 
+    <a routerLink="/menu/" routerLinkActive="active" class="nav-item">
+      <img src="assets/icons/menu.png" alt="">Menu thức uống
+    </a>
+    <a routerLink="/contact/" routerLinkActive="active">
+      <img src="assets/icons/lien_he.png" alt="">Liên hệ
+    </a>
+    <a routerLink="/blog" routerLinkActive="active">
+      <img src="assets/icons/dien_dan.png" alt="">Diễn đàn
+    </a>
+    <a routerLink="/agency/" routerLinkActive="active">
+      <img src="assets/icons/chi_nhanh.png" alt="">Chi nhánh
+    </a>
   </nav>
 </header>
-<link rel="stylesheet" routerLink="../page-header/page-header.css" />

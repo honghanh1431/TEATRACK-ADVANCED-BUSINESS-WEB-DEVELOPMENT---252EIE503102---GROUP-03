@@ -1,34 +1,46 @@
-<header class="shop-header">
+<header class="shop-header logged admin">
   <div class="header-top">
     <div class="brand">
-      <img src="assets/images/logo ngo gia.png" alt="Hồng Trà Ngô Gia" class="logo" />
+      <a href="/admin-dashboard">
+        <img src="/assets/images/logo ngo gia.png" alt="Hồng Trà Ngô Gia" class="logo" />
+      </a>
     </div>
 
     <div class="actions">
-      <a class="cart-link" routerLink="/cart/">
-        <span class="icon-wrap">
-          <img src="assets/icons/Cart.png" alt="Giỏ hàng">
-          <span class="cart-badge" data-cart-count>0</span>
-        </span>
-        <div class="cart-meta">
-          <span class="label">Giỏ hàng</span>
-          <span id="headerCartCount" class="header-cart-count">0</span>
-          <span id="headerCartTotal" class="header-cart-total">0đ</span>
+      <div class="user" id="user-box">
+        <button class="user-btn" id="user-btn" type="button">
+          <img class="avatar" id="user-avatar" src="/assets/icons/user.png" alt="User">
+          <span class="name" id="user-name" data-user-chip data-i18n="header.admin.account">Tài khoản</span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="menu" id="user-menu" role="menu" hidden>
+          <a role="menuitem" href="/admin-account" data-i18n="header.admin.profile">Hồ sơ</a>
+          <button role="menuitem" id="btn-logout" type="button" data-i18n="header.admin.logout">Đăng xuất</button>
         </div>
-      </a>
-      <a class="btn login-btn" routerLink="/login/">Đăng nhập</a>
-      <a class="btn signup-btn" routerLink="/register/">Đăng ký</a>
+      </div>
     </div>
   </div>
 
   <nav class="nav-bar">
-    <a routerLink="/" class="nav-item active"><img src="assets/icons/Home.png" alt=""> Trang chủ</a>
-    <a routerLink="/aboutus/"><img src="assets/icons/info.png" alt="">Về chúng tôi</a>
-    <a routerLink="/menu/" class="nav-item"><img src="assets/icons/menu.png" alt="">Menu thức uống</a>
-    <a routerLink="/contact/"><img src="assets/icons/lien_he.png" alt="">Liên hệ</a>
-    <a routerLink="/blog/"><img src="assets/icons/dien_dan.png" alt="">Diễn đàn</a>
-    <a routerLink="/agency/"><img src="assets/icons/chi_nhanh.png" alt="">Chi nhánh</a>
+    <a href="/admin-dashboard" class="nav-item" data-action="navigate">
+      <img src="/assets/icons/Home.png" alt="">
+      <span data-i18n="header.admin.overview">Tổng quan</span>
+    </a>
+    <a href="/admin-dashboard#productsPager" class="nav-item" data-action="scroll" data-target="productsPager">
+      <img src="/assets/icons/sanpham.png" alt="">
+      <span data-i18n="header.admin.products">Sản phẩm</span>
+    </a>
+    <a href="/admin-order" class="nav-item" data-action="navigate">
+      <img src="/assets/icons/Cart.png" alt="">
+      <span data-i18n="header.admin.orders">Đơn hàng</span>
+    </a>
+    <a href="/admin-account/" class="nav-item" data-action="navigate">
+      <img src="/assets/icons/account.png" alt="">
+      <span data-i18n="header.admin.account">Tài khoản</span>
+    </a>
+    <a href="/admin-blog/" class="nav-item" data-action="navigate">
+      <img src="/assets/icons/dien_dan.png" alt="">
+      <span data-i18n="header.admin.forums">Diễn đàn</span>
+    </a>
   </nav>
 </header>
-
-<link rel="stylesheet" routerLink="/src/app/Components/page-header/page-header.css" />

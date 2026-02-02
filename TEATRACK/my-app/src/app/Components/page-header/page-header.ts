@@ -26,7 +26,7 @@ export class PageHeader implements OnInit, AfterViewInit {
   private initAdminHeaderLogic() {
     const currentPath = window.location.pathname;
     const isAdminPage =
-      currentPath.includes('admin-dashboard') || currentPath.includes('page-header-admin.html');
+      currentPath.includes('admin-dashboard') || currentPath.includes('Admin.html');
     const isAccountPage = currentPath.includes('admin-account');
     const isOrderPage = currentPath.includes('admin-order');
 
@@ -75,81 +75,126 @@ export class PageHeader implements OnInit, AfterViewInit {
       const href = item.getAttribute('href');
 
       this.renderer.listen(item, 'click', (e: Event) => {
-        // Case 1: Navigate
-        if (action === 'navigate') return;
+        console.log('Clicked:', (item as HTMLElement).textContent?.trim(), 'Action:', action, 'Target:', target);
 
-        // Case 2: Scroll
+        // Case 1: Navigate to another page (Tổng quan, Tài khoản)
+        if (action === 'navigate') {
+          console.log('→ Navigate to:', href);
+          return;
+        }
+
+        // Case 2: Scroll to section (Sản phẩm, Đơn hàng, Báo cáo)
         if (action === 'scroll') {
           e.preventDefault();
+
+          // If not on Admin page, navigate to dashboard with hash
           if (!isAdminPage) {
+            console.log('→ Navigate to admin-dashboard with hash:', target);
             window.location.href = `/admin-dashboard#${target}`;
             return;
           }
 
+          // If on Admin page, smooth scroll to section
           const targetSection = document.getElementById(target || '');
           if (targetSection) {
+            console.log('→ Scroll to section:', target);
+            
             const headerHeight = 80;
-            const top = targetSection.offsetTop - headerHeight;
-            window.scrollTo({ top, behavior: 'smooth' });
+            const targetPosition = targetSection.offsetTop - headerHeight;
+            
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
 
+            // Update active state
             document
               .querySelectorAll('.nav-bar .nav-item')
               .forEach((i) => i.classList.remove('active'));
             item.classList.add('active');
+          } else {
+            console.error('Section not found:', target);
           }
         }
       });
     });
 
-    // 🟢 Active state on load
+    // 🟢 Set active state on load
     document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
       const target = item.getAttribute('data-target');
       const href = item.getAttribute('href');
 
-      if (isAccountPage && href?.includes('admin-account')) item.classList.add('active');
-      if (isOrderPage && href?.includes('admin-order')) item.classList.add('active');
+      // Active for account page
+      if (isAccountPage && href?.includes('admin-account')) {
+        item.classList.add('active');
+      }
+      
+      // Active for order page
+      if (isOrderPage && href?.includes('admin-order')) {
+        item.classList.add('active');
+      }
+      
+      // Active for admin page sections based on hash
       if (isAdminPage) {
         const hash = window.location.hash.replace('#', '');
-        if (hash && hash === target) item.classList.add('active');
-        else if (!hash) {
-          const overview = item.querySelector('[data-i18n="header.admin.overview"]');
-          if (overview) item.classList.add('active');
+        if (hash && hash === target) {
+          item.classList.add('active');
+        } else if (!hash) {
+          // Set "Tổng quan" active by default on dashboard
+          const overviewSpan = item.querySelector('[data-i18n="header.admin.overview"]');
+          if (overviewSpan) {
+            item.classList.add('active');
+          }
         }
       }
     });
 
-    // 🟢 Hash change scroll
+    // 🟢 Handle hash change for scroll sections
     if (isAdminPage) {
       this.renderer.listen(window, 'hashchange', () => {
         const hash = window.location.hash.replace('#', '');
         const targetSection = document.getElementById(hash);
+        
         if (targetSection) {
           const headerHeight = 80;
-          const top = targetSection.offsetTop - headerHeight;
-          window.scrollTo({ top, behavior: 'smooth' });
+          const targetPosition = targetSection.offsetTop - headerHeight;
+          
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
 
+          // Update active state
           document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
             const target = item.getAttribute('data-target');
-            if (target === hash) item.classList.add('active');
-            else item.classList.remove('active');
+            if (target === hash) {
+              item.classList.add('active');
+            } else {
+              item.classList.remove('active');
+            }
           });
         }
       });
 
+      // 🟢 Trigger scroll on page load if hash exists
       const initialHash = window.location.hash.replace('#', '');
       if (initialHash) {
         setTimeout(() => {
           const targetSection = document.getElementById(initialHash);
           if (targetSection) {
             const headerHeight = 80;
-            const top = targetSection.offsetTop - headerHeight;
-            window.scrollTo({ top, behavior: 'smooth' });
+            const targetPosition = targetSection.offsetTop - headerHeight;
+            
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
           }
         }, 500);
       }
     }
 
-    // 🟢 Lắng nghe sự kiện đổi ngôn ngữ
+    // 🟢 Lắng nghe sự kiện đổi ngôn ngữ từ trang admin-account
     this.renderer.listen(window, 'storage', (e: StorageEvent) => {
       if (
         e.key === 'app.lang' &&
@@ -160,12 +205,13 @@ export class PageHeader implements OnInit, AfterViewInit {
       }
     });
 
-    // 🟢 Load ngôn ngữ ban đầu
+    // 🟢 Load translations ngay khi header load
     if (typeof (window as any).reloadTranslations === 'function') {
       const savedLang = localStorage.getItem('app.lang') || 'vi';
       (window as any).reloadTranslations(savedLang);
     }
 
     console.log('✅ Header navigation initialized');
+    console.log('Current page:', isAdminPage ? 'Admin Dashboard' : isOrderPage ? 'Order Page' : 'Other');
   }
 }
