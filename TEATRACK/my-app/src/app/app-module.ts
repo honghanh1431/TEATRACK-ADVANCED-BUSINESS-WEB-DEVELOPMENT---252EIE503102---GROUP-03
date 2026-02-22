@@ -12,11 +12,13 @@ import { PageHeader } from './Components/page-header/page-header';
 import { Blog } from './Pages/blog/blog';
 import { BlogList } from './Pages/blog/blog-list/blog-list';
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
+import { Menu } from './Pages/menu/menu';
 
 @NgModule({
   declarations: [
     App,
-    Blog
+    Blog,
+    Menu
   ],
   imports: [
     BrowserModule,

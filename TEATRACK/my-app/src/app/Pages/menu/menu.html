@@ -1,0 +1,103 @@
+<main class="menu-page">
+<section class="menu-hero">
+    <div class="hero-content">
+    <p class="eyebrow">Menu thức uống</p>
+    <h1>Thoải mái chọn món yêu thích của bạn</h1>
+    <p class="tagline">Từ trà truyền thống, trà sữa đến những công thức mới lạ – mọi hương vị đều được pha chế tươi mới mỗi ngày.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+    <img src="assets/images/tra-sua.png" alt="" />
+    </div>
+</section>
+
+<section class="menu-toolbar">
+    <div class="search">
+    <span class="icon" aria-hidden="true">🔍</span>
+    <input type="search" id="menu-search" placeholder="Tìm thức uống bạn muốn..." aria-label="Tìm kiếm thức uống"
+           (input)="onSearchInput($event)" />
+    <div class="sorter">
+        <label for="menu-sort">Sắp xếp:</label>
+        <select id="menu-sort" aria-label="Sắp xếp kết quả"
+                (change)="onSortChange($event)">
+        <option value="featured">Nổi bật</option>
+        <option value="name-asc">Tên A → Z</option>
+        <option value="name-desc">Tên Z → A</option>
+        <option value="price-asc">Giá thấp → cao</option>
+        <option value="price-desc">Giá cao → thấp</option>
+        </select>
+    </div>
+    </div>
+    <div class="filters">
+    <button class="filter-chip" [class.active]="isCategoryActive('all')" data-cat="all"
+            (click)="onCategoryClick('all')">Tất cả</button>
+    <div id="category-filters" class="chip-list" role="list">
+        <button *ngFor="let cat of categories" class="filter-chip" [class.active]="isCategoryActive(cat)"
+                [attr.data-cat]="cat"
+                (click)="onCategoryClick(cat)">{{ cat }}</button>
+    </div>
+    </div>
+</section>
+
+<section class="menu-section" aria-live="polite">
+    <header class="section-head">
+    <div>
+        <h2 id="section-title">{{ sectionTitle }}</h2>
+        <p id="section-subtitle">{{ sectionSubtitle }}</p>
+    </div>
+    <div class="result-count">
+        <span id="result-count">{{ resultCount }}</span> sản phẩm
+    </div>
+    </header>
+    <div class="menu-grid" id="menu-grid">
+        <article *ngFor="let product of displayedProducts" class="menu-card"
+                 [attr.data-link]="getProductLink(product)" tabindex="0" role="link"
+                 [attr.aria-label]="'Xem chi tiết ' + product.name"
+                 (click)="onCardClick(product)"
+                 (keydown.enter)="onCardClick(product)"
+                 (keydown.space)="$event.preventDefault(); onCardClick(product)">
+            <figure>
+                <img [src]="getProductImg(product)" [alt]="product.name">
+            </figure>
+            <div class="card-body">
+                <div class="card-meta">
+                    <span class="star">★</span>
+                    <span>{{ getRating(product) }}</span>
+                    <span>•</span>
+                    <span>{{ getReviews(product) }} lượt đánh giá</span>
+                </div>
+                <h3>{{ product.name }}</h3>
+                <div class="price-row">
+                    <div class="price-col">
+                        <div class="line size-line">
+                            <span class="label">M</span>
+                            <span class="value">{{ formatVND(getPriceM(product)) }}đ</span>
+                        </div>
+                        <div class="line vip-line">
+                            <span class="label vip">VIP</span>
+                            <span class="value">{{ formatVND(getVipPriceM(product)) }}đ</span>
+                        </div>
+                    </div>
+                    <div class="price-col">
+                        <div class="line size-line">
+                            <span class="label">L</span>
+                            <span class="value">{{ formatVND(getPriceL(product)) }}đ</span>
+                        </div>
+                        <div class="line vip-line">
+                            <span class="label vip">VIP</span>
+                            <span class="value">{{ formatVND(getVipPriceL(product)) }}đ</span>
+                        </div>
+                    </div>
+                    <button class="price-cart" type="button" [attr.aria-label]="'Mở sản phẩm ' + product.name"
+                            (click)="onAddToCart($event, product)">
+                        <img src="assets/icons/Cart2.png" alt="" aria-hidden="true">
+                    </button>
+                </div>
+            </div>
+        </article>
+    </div>
+    <div class="empty-state" id="empty-state" [class.show]="isEmptyState">
+    <img src="assets/icons/menu.png" alt="" aria-hidden="true" />
+    <p>Không tìm thấy thức uống phù hợp, hãy thử từ khóa hoặc bộ lọc khác nhé!</p>
+    </div>
+</section>
+</main>
