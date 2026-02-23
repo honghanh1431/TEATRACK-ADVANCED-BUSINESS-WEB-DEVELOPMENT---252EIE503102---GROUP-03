@@ -13,14 +13,24 @@ import { Blog } from './Pages/blog/blog';
 import { BlogList } from './Pages/blog/blog-list/blog-list';
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
 import { Menu } from './Pages/menu/menu';
+<<<<<<< HEAD
 import { Product } from './Pages/product/product';
+=======
+import { Aboutus } from './Pages/aboutus/aboutus';
+import { Cart } from './Pages/cart/cart';
+>>>>>>> 3e328156c70e74cf227727e6f825c8e3d54f0321
 
 @NgModule({
   declarations: [
     App,
     Blog,
     Menu,
+<<<<<<< HEAD
     Product
+=======
+    Aboutus,
+    Cart,
+>>>>>>> 3e328156c70e74cf227727e6f825c8e3d54f0321
   ],
   imports: [
     BrowserModule,
