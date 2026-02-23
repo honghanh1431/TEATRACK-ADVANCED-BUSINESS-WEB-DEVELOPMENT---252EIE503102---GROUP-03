@@ -13,12 +13,16 @@ import { Blog } from './Pages/blog/blog';
 import { BlogList } from './Pages/blog/blog-list/blog-list';
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
 import { Menu } from './Pages/menu/menu';
+import { Aboutus } from './Pages/aboutus/aboutus';
+import { Cart } from './Pages/cart/cart';
 
 @NgModule({
   declarations: [
     App,
     Blog,
-    Menu
+    Menu,
+    Aboutus,
+    Cart,
   ],
   imports: [
     BrowserModule,
