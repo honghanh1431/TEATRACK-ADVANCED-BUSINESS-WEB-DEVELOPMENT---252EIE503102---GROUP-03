@@ -4,17 +4,21 @@ import { BlogList } from './Pages/blog/blog-list/blog-list'
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail'
 import { Menu } from './Pages/menu/menu';
 
+export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
+
 const routes: Routes = [
   { path: '', redirectTo: 'blog', pathMatch: 'full' },
   { path: "blog", component: BlogList },
   { path: "blog/:id", component: BlogDetail },
   { path: "menu", component: Menu },
-
-
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      scrollPositionRestoration: 'top',
+    }),
+  ],
+  exports: [RouterModule],
 })
 export class AppRoutingModule { }

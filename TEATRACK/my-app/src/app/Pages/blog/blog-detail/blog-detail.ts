@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { BLOG_DATA, RELATED_BLOGS } from '../blog-data';
+import { APP_TITLE_SUFFIX } from '../../../route-titles';
 
 @Component({
   selector: 'app-blog-detail',
@@ -24,7 +26,8 @@ export class BlogDetail implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private titleService: Title,
   ) {}
 
   ngOnInit() {
@@ -100,7 +103,7 @@ export class BlogDetail implements OnInit {
         headingColor: '#D33'
       };
       this.relatedBlogs = [];
-      document.title = 'Blog không tồn tại - Hồng Trà Ngô Gia';
+      this.titleService.setTitle(`Blog không tồn tại | ${APP_TITLE_SUFFIX}`);
       return;
     }
 
@@ -110,9 +113,8 @@ export class BlogDetail implements OnInit {
       .slice(0, 6);
     this.relatedIndex = 0;
 
-    // Cập nhật title trang giống script cũ
     if (this.blog.title) {
-      document.title = this.blog.title;
+      this.titleService.setTitle(`${this.blog.title} | ${APP_TITLE_SUFFIX}`);
     }
   }
 }
