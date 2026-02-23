@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ProductStateService } from '../../product-state.service';
 
 declare const window: Window & {
   NGCart?: {
@@ -66,10 +68,17 @@ export class Menu implements OnInit {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private productState: ProductStateService,
   ) {}
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
+    const categoryFromUrl = this.route.snapshot.queryParamMap.get('category');
+    if (categoryFromUrl != null && categoryFromUrl.trim() !== '') {
+      this.state.category = categoryFromUrl.trim();
+    }
     this.fetchProducts();
   }
 
@@ -243,8 +252,10 @@ export class Menu implements OnInit {
   }
 
   onCardClick(product: Product): void {
-    const url = this.getProductLink(product);
-    window.location.href = url;
+    const id = product.id != null ? String(product.id) : '';
+    const name = product.name != null ? String(product.name) : '';
+    this.productState.setNextProduct(product as any);
+    this.router.navigate(['/menu/product', id, name]);
   }
 
   onAddToCart(event: Event, product: Product): void {
