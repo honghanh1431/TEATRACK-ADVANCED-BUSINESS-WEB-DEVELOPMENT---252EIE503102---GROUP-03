@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 declare const window: Window & {
@@ -40,9 +40,9 @@ interface MenuState {
   standalone: false,
   templateUrl: './menu.html',
   styleUrls: ['./menu.css', '../../../styles.css'],
+  encapsulation: ViewEncapsulation.None, // Để không bị global CSS ảnh hưởng
 })
 export class Menu implements OnInit {
-  // Base URL cho data (public/ được serve từ root)
   private static readonly STATIC_BASE = '/';
 
   // ─── State ────────────────────────────────────────────────────────────────
@@ -63,7 +63,10 @@ export class Menu implements OnInit {
   sectionSubtitle = 'Danh sách đầy đủ các món tại Hồng Trà Ngô Gia.';
   loadError = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -84,6 +87,7 @@ export class Menu implements OnInit {
           )
         );
         this.updateProducts();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);

@@ -1,4 +1,3 @@
-
 :root {
   --font-main: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   --color-text: #0b1320;
@@ -16,7 +15,7 @@
 *::after {
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
+  padding: 0
 }
 
 html, body {
