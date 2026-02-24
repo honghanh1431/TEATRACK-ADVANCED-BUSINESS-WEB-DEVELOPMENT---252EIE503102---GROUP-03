@@ -40,11 +40,8 @@ import { Login } from './Pages/login/login';
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule,
-<<<<<<< HEAD
-    Login
-=======
-    Cart,
->>>>>>> ac7a78cff68d6368999da5ed6f8c35ed719d9e90
+    Login,
+    Cart
   ],
   providers: [
     provideBrowserGlobalErrorListeners()
