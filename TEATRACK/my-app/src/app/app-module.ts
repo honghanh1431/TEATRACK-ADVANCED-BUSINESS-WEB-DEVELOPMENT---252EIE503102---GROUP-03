@@ -16,6 +16,7 @@ import { Menu } from './Pages/menu/menu';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
+import { Login } from './Pages/login/login';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
     Blog,
     Menu,
     Product,
-    Aboutus
+    Aboutus,
+  
   ],
   imports: [
     BrowserModule,
@@ -36,7 +38,8 @@ export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    Login
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

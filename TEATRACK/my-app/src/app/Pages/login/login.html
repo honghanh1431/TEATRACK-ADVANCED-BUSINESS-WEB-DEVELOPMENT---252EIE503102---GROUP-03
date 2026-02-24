@@ -1,0 +1,112 @@
+<section class="auth">
+  <!-- BÊN TRÁI -->
+  <aside class="side-left">
+    <div class="inner">
+      <div class="brand">
+        <a routerLink="/" aria-label="Về trang chủ">
+          <img src="/assets/images/logo ngo gia.png" alt="Ngô Gia Logo">
+        </a>
+      </div>
+      <p class="desc">
+        Đăng nhập để đặt món nhanh hơn, lưu địa chỉ giao hàng và theo dõi đơn của bạn.
+      </p>
+    </div>
+  </aside>
+
+  <!-- BÊN PHẢI -->
+  <main class="side-right">
+    <div class="form-wrap">
+
+      <div class="welcome-header">
+        <h2>Ngô Gia xin chào</h2>
+        <p>Đăng nhập tài khoản của bạn</p>
+      </div>
+
+      <!-- Tiêu đề thay đổi theo mode -->
+      <h3 class="form-title">
+        {{ isAdmin ? 'Đăng nhập Quản lý' : 'Đăng nhập Khách hàng' }}
+      </h3>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label class="label">Tên đăng nhập <span class="req">*</span></label>
+        <div class="control">
+          <input
+            type="text"
+            class="input"
+            placeholder="Nhập tên đăng nhập của bạn"
+            autocomplete="username"
+            [(ngModel)]="username"
+            (keydown)="onKeydown($event)">
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="label">Mật khẩu <span class="req">*</span></label>
+        <div class="control">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="pwd"
+            class="input"
+            placeholder="Nhập mật khẩu của bạn"
+            autocomplete="current-password"
+            [(ngModel)]="password"
+            (keydown)="onKeydown($event)">
+          <button class="toggle-eye" type="button" (click)="togglePasswordVisibility()" aria-label="Hiện/ẩn mật khẩu">
+            <!-- Eye Off -->
+            <svg *ngIf="!showPassword" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"/>
+              <path d="M1 1l22 22"/>
+              <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24"/>
+              <path d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"/>
+            </svg>
+            <!-- Eye On -->
+            <svg *ngIf="showPassword" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="row-inline">
+        <label class="remember">
+          <input type="checkbox" [(ngModel)]="rememberMe">
+          <span>Ghi nhớ?</span>
+        </label>
+        <a href="#" class="link">Quên mật khẩu?</a>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" type="button" (click)="onLogin()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Đăng nhập</span>
+          <span *ngIf="isLoading">Đang xử lý...</span>
+        </button>
+      </div>
+
+      <div class="divider">Hoặc</div>
+      <a class="link-block" routerLink="/register">Tạo tài khoản mới</a>
+
+      <!-- Link chuyển mode -->
+      <a class="link-muted" [routerLink]="isAdmin ? '/login' : '/login-admin'">
+        {{ isAdmin ? 'Đăng nhập khách hàng' : 'Đăng nhập cho quản lý' }}
+      </a>
+    </div>
+  </main>
+</section>
+
+<!-- Error Modal -->
+<div class="error-overlay" *ngIf="showErrorModal" (click)="closeError()">
+  <div class="error-card" (click)="$event.stopPropagation()">
+    <div class="error-title">
+      {{ isAdmin ? 'Lỗi đăng nhập' : 'LỖI ĐĂNG NHẬP' }}
+    </div>
+    <div class="error-body">{{ errorMessage }}</div>
+    <div class="error-footer">
+      <button class="btn-ok" (click)="closeError()">OK</button>
+    </div>
+  </div>
+</div>
