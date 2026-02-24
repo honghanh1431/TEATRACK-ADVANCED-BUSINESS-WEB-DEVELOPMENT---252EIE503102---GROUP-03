@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Title } from '@angular/platform-browser';
@@ -43,11 +43,23 @@ export interface ProductItem {
   note?: string;
 }
 
+const REVIEW_PAGE_SIZE = 4;
+
+export interface ReviewItem {
+  name: string;
+  title: string;
+  content: string;
+  time: string;
+  rating: number;
+}
+
 @Component({
   selector: 'app-product',
   standalone: false,
   templateUrl: './product.html',
   styleUrl: './product.css',
+  encapsulation: ViewEncapsulation.None, // Để không bị global CSS ảnh hưởng
+
 })
 export class Product implements OnInit, OnDestroy {
   product: ProductItem | null = null;
@@ -55,10 +67,22 @@ export class Product implements OnInit, OnDestroy {
   allProducts: ProductItem[] = [];
   activeTab: 'desc' | 'review' | 'commit' = 'desc';
   selectedSize: 'M' | 'L' = 'M';
+  selectedSweetness: 'it' | 'vua' | 'nhieu' = 'it';
+  selectedIce: 'it' | 'vua' | 'nhieu' = 'it';
   qty = 1;
   mainImageIndex = 0;
   loadError = false;
   noteOpen = false;
+  toppingQtys: Record<string, number> = {};
+  currentPage = 1;
+  reviews: ReviewItem[] = [
+    { name: 'Hồng Hạnh', title: 'Tôi yêu HTVT!!!!!!!', content: 'HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!', time: '2 ngày trước', rating: 5 },
+    { name: 'Bảo Vy', title: 'So good, so yummy', content: 'HTVT rất ngon, tuyệt vời!', time: '3 ngày trước', rating: 5 },
+    { name: 'Trung Nhân', title: 'Đáng thử', content: 'Lần đầu uống thấy ổn, sẽ quay lại.', time: '5 ngày trước', rating: 4 },
+    { name: 'Hoàng Đức', title: 'Ngon đúng vị', content: 'Vị trà và vải hài hòa, không quá ngọt.', time: '1 tuần trước', rating: 5 },
+    { name: 'Thanh Thanh', title: 'Recommend', content: 'Bạn bè giới thiệu, uống xong ghiền.', time: '1 tuần trước', rating: 5 },
+    { name: 'Thế Hưng', title: 'Tạm được', content: 'Giá hơi cao nhưng chất lượng ổn.', time: '2 tuần trước', rating: 4 },
+  ];
   private subs: any[] = [];
 
   constructor(
@@ -121,6 +145,7 @@ export class Product implements OnInit, OnDestroy {
         }
         this.pickRelated();
         this.cdr.detectChanges();
+        setTimeout(() => this.logRatingStyles(), 150);
       },
       error: () => {
         this.loadError = true;
@@ -191,12 +216,67 @@ export class Product implements OnInit, OnDestroy {
     return Math.max(0, Math.min(100, (r / 5) * 100));
   }
 
+  // #region agent log
+  private logRatingStyles(): void {
+    const el = document.getElementById('prod-rating-text');
+    if (!el) return;
+    const cs = getComputedStyle(el);
+    const rect = el.getBoundingClientRect();
+    const parent = el.parentElement;
+    const pCs = parent ? getComputedStyle(parent) : null;
+    const payload = {
+      sessionId: '2dca64',
+      runId: 'run1',
+      hypothesisId: 'H1',
+      location: 'product.ts:logRatingStyles',
+      message: 'Rating text computed style and rect',
+      data: {
+        transform: cs.transform,
+        display: cs.display,
+        rectTop: rect.top,
+        rectLeft: rect.left,
+        height: rect.height,
+        parentDisplay: pCs?.display ?? null,
+        parentAlignItems: pCs?.alignItems ?? null,
+        parentOverflow: pCs?.overflow ?? null,
+      },
+      timestamp: Date.now(),
+    };
+    fetch('http://127.0.0.1:7466/ingest/4eac26d1-7e6d-41e3-8da1-1c8d157fd1de', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '2dca64' },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  }
+  // #endregion
+
   setMainImage(i: number): void {
     this.mainImageIndex = i;
   }
 
   selectSize(size: 'M' | 'L'): void {
     this.selectedSize = size;
+  }
+
+  selectSweetness(value: 'it' | 'vua' | 'nhieu'): void {
+    this.selectedSweetness = value;
+  }
+
+  selectIce(value: 'it' | 'vua' | 'nhieu'): void {
+    this.selectedIce = value;
+  }
+
+  getToppingQty(key: string): number {
+    return this.toppingQtys[key] ?? 0;
+  }
+
+  changeToppingQty(key: string, delta: number): void {
+    const current = this.toppingQtys[key] ?? 0;
+    this.toppingQtys = { ...this.toppingQtys, [key]: Math.max(0, current + delta) };
+  }
+
+  toggleNote(): void {
+    this.noteOpen = !this.noteOpen;
   }
 
   changeQty(delta: number): void {
@@ -232,6 +312,34 @@ export class Product implements OnInit, OnDestroy {
 
   setTab(tab: 'desc' | 'review' | 'commit'): void {
     this.activeTab = tab;
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.reviews.length / REVIEW_PAGE_SIZE));
+  }
+
+  get displayedReviews(): ReviewItem[] {
+    const start = (this.currentPage - 1) * REVIEW_PAGE_SIZE;
+    return this.reviews.slice(start, start + REVIEW_PAGE_SIZE);
+  }
+
+  get pageNumbers(): number[] {
+    if (this.totalPages <= 5) {
+      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    }
+    return [1, 2, 3, 4];
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) this.currentPage++;
+  }
+
+  goToPage(p: number): void {
+    if (p >= 1 && p <= this.totalPages) this.currentPage = p;
   }
 
   scrollToTop(): void {

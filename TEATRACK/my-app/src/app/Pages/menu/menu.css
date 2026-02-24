@@ -225,9 +225,9 @@
 }
 
 .menu-card .card-body {
-  padding: 16px 18px 20px;
+  padding: 12px 14px 14px;
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .menu-card .card-meta {
@@ -253,7 +253,7 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   font-size: 12px;
   color: #1f2937;
   padding-right: 52px;
@@ -263,22 +263,22 @@
 .menu-card .price-col {
   background: #fff;
   border-radius: 14px;
-  padding: 6px 12px 8px;
+  padding: 4px 8px 6px;
   display: grid;
-  gap: 6px;
+  gap: 4px;
   justify-items: center;
 }
 
 .menu-card .price-col .line {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .menu-card .price-col .label {
   background: #eef2ff;
   color: var(--menu-primary);
-  padding: 2px 9px;
+  padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
   font-size: 11px;

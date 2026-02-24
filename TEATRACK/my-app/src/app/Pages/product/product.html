@@ -24,7 +24,10 @@
             <button class="nav-arrow nav-next" aria-label="Ảnh kế">›</button>
           </div>
           <div class="thumbs">
-            <img class="thumb active" [src]="productImage" [alt]="product.name || 'thumb'" />
+            <img class="thumb" [class.active]="mainImageIndex === 0" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(0)" role="button" tabindex="0" />
+            <img class="thumb" [class.active]="mainImageIndex === 1" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(1)" role="button" tabindex="0" />
+            <img class="thumb" [class.active]="mainImageIndex === 2" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(2)" role="button" tabindex="0" />
+            <img class="thumb" [class.active]="mainImageIndex === 3" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(3)" role="button" tabindex="0" />
           </div>
         </div>
         <div class="info">
@@ -63,17 +66,18 @@
             {{ product.description || product.detail || 'Sự kết hợp giữa trà ủ đậm và trái cây tạo nên hương vị hài hòa, phù hợp với nhiều sở thích.' }}
           </p>
 
-          <div class="product-note">
+          <div class="product-note" [class.open]="noteOpen">
             <button
               class="note-toggle"
               type="button"
-              aria-expanded="false"
+              [attr.aria-expanded]="noteOpen"
               aria-controls="product-note"
+              (click)="toggleNote()"
             >
               <span>Chú thích sản phẩm tại đây</span>
               <span class="note-icon" aria-hidden="true"></span>
             </button>
-            <div class="note-content" id="product-note">
+            <div class="note-content" id="product-note" [class.active]="noteOpen">
               <p id="note-text">{{ getNote() }}</p>
               <section class="custom-options" aria-label="Tùy chọn đồ uống">
                 <div class="option-group">
@@ -93,18 +97,18 @@
                 <div class="option-group">
                   <div class="group-title">Độ ngọt</div>
                   <div class="pill-group" role="group" aria-label="Chọn độ ngọt" data-field="Ngọt">
-                    <button class="pill active" type="button">Ít</button>
-                    <button class="pill" type="button">Vừa</button>
-                    <button class="pill" type="button">Nhiều</button>
+                    <button class="pill" [class.active]="selectedSweetness === 'it'" type="button" (click)="selectSweetness('it')">Ít</button>
+                    <button class="pill" [class.active]="selectedSweetness === 'vua'" type="button" (click)="selectSweetness('vua')">Vừa</button>
+                    <button class="pill" [class.active]="selectedSweetness === 'nhieu'" type="button" (click)="selectSweetness('nhieu')">Nhiều</button>
                   </div>
                 </div>
 
                 <div class="option-group">
                   <div class="group-title">Đá</div>
                   <div class="pill-group" role="group" aria-label="Chọn lượng đá" data-field="Đá">
-                    <button class="pill active" type="button">Ít</button>
-                    <button class="pill" type="button">Vừa</button>
-                    <button class="pill" type="button">Nhiều</button>
+                    <button class="pill" [class.active]="selectedIce === 'it'" type="button" (click)="selectIce('it')">Ít</button>
+                    <button class="pill" [class.active]="selectedIce === 'vua'" type="button" (click)="selectIce('vua')">Vừa</button>
+                    <button class="pill" [class.active]="selectedIce === 'nhieu'" type="button" (click)="selectIce('nhieu')">Nhiều</button>
                   </div>
                 </div>
 
@@ -117,13 +121,9 @@
                         <span class="topping-price">3.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="suong-sao">
-                        <button type="button" class="qty-minus" aria-label="Bớt Sương sáo">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Sương sáo">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Sương sáo" (click)="changeToppingQty('suong-sao', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('suong-sao') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Sương sáo" (click)="changeToppingQty('suong-sao', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="3000">
@@ -132,21 +132,9 @@
                         <span class="topping-price">3.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="thach-dua">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Thạch dừa nguyên vị"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Thạch dừa nguyên vị"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch dừa nguyên vị" (click)="changeToppingQty('thach-dua', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-dua') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch dừa nguyên vị" (click)="changeToppingQty('thach-dua', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="3000">
@@ -155,9 +143,9 @@
                         <span class="topping-price">3.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="hat-e">
-                        <button type="button" class="qty-minus" aria-label="Bớt Hạt é">-</button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Hạt é">+</button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt é" (click)="changeToppingQty('hat-e', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-e') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt é" (click)="changeToppingQty('hat-e', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -166,21 +154,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="thach-dua-dao">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Thạch dứa hương đào"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Thạch dứa hương đào"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch dứa hương đào" (click)="changeToppingQty('thach-dua-dao', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-dua-dao') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch dứa hương đào" (click)="changeToppingQty('thach-dua-dao', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -189,13 +165,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="thach-aiyu">
-                        <button type="button" class="qty-minus" aria-label="Bớt Thạch aiyu">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Thạch aiyu">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch aiyu" (click)="changeToppingQty('thach-aiyu', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-aiyu') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch aiyu" (click)="changeToppingQty('thach-aiyu', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -204,13 +176,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="thach-soi-la-dua">
-                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sợi lá dứa">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sợi lá dứa">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sợi lá dứa" (click)="changeToppingQty('thach-soi-la-dua', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-soi-la-dua') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sợi lá dứa" (click)="changeToppingQty('thach-soi-la-dua', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -219,21 +187,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="thach-suong-sao-vien">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Thạch sương sáo viên"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Thạch sương sáo viên"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sương sáo viên" (click)="changeToppingQty('thach-suong-sao-vien', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-suong-sao-vien') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sương sáo viên" (click)="changeToppingQty('thach-suong-sao-vien', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -242,21 +198,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="tran-chau-hoang-kim">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Trân châu hoàng kim"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Trân châu hoàng kim"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu hoàng kim" (click)="changeToppingQty('tran-chau-hoang-kim', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-hoang-kim') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu hoàng kim" (click)="changeToppingQty('tran-chau-hoang-kim', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -265,21 +209,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="tran-chau-duong-den">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Trân châu đường đen"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Trân châu đường đen"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu đường đen" (click)="changeToppingQty('tran-chau-duong-den', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-duong-den') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu đường đen" (click)="changeToppingQty('tran-chau-duong-den', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -288,13 +220,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="tran-chau-3q">
-                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu 3Q">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu 3Q">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu 3Q" (click)="changeToppingQty('tran-chau-3q', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-3q') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu 3Q" (click)="changeToppingQty('tran-chau-3q', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -303,21 +231,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="tran-chau-khoai-mon">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Trân châu khoai môn"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Trân châu khoai môn"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu khoai môn" (click)="changeToppingQty('tran-chau-khoai-mon', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-khoai-mon') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu khoai môn" (click)="changeToppingQty('tran-chau-khoai-mon', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -326,21 +242,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="hat-thuy-tinh-cu-nang">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Hạt thủy tinh củ năng"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Hạt thủy tinh củ năng"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt thủy tinh củ năng" (click)="changeToppingQty('hat-thuy-tinh-cu-nang', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-thuy-tinh-cu-nang') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt thủy tinh củ năng" (click)="changeToppingQty('hat-thuy-tinh-cu-nang', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -349,21 +253,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="hat-thuy-tinh-lua-mach">
-                        <button
-                          type="button"
-                          class="qty-minus"
-                          aria-label="Bớt Hạt thủy tinh lúa mạch"
-                        >
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button
-                          type="button"
-                          class="qty-plus"
-                          aria-label="Thêm Hạt thủy tinh lúa mạch"
-                        >
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt thủy tinh lúa mạch" (click)="changeToppingQty('hat-thuy-tinh-lua-mach', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-thuy-tinh-lua-mach') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt thủy tinh lúa mạch" (click)="changeToppingQty('hat-thuy-tinh-lua-mach', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -372,13 +264,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="dao-mieng">
-                        <button type="button" class="qty-minus" aria-label="Bớt Đào miếng">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Đào miếng">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Đào miếng" (click)="changeToppingQty('dao-mieng', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('dao-mieng') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Đào miếng" (click)="changeToppingQty('dao-mieng', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="5000">
@@ -387,13 +275,9 @@
                         <span class="topping-price">5.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="khoai-mon-nghien">
-                        <button type="button" class="qty-minus" aria-label="Bớt Khoai môn nghiền">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Khoai môn nghiền">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Khoai môn nghiền" (click)="changeToppingQty('khoai-mon-nghien', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('khoai-mon-nghien') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Khoai môn nghiền" (click)="changeToppingQty('khoai-mon-nghien', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="7000">
@@ -402,9 +286,9 @@
                         <span class="topping-price">7.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="hat-sen">
-                        <button type="button" class="qty-minus" aria-label="Bớt Hạt sen">-</button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Hạt sen">+</button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt sen" (click)="changeToppingQty('hat-sen', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-sen') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt sen" (click)="changeToppingQty('hat-sen', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="7000">
@@ -413,13 +297,9 @@
                         <span class="topping-price">7.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="kem-tuoi-vani">
-                        <button type="button" class="qty-minus" aria-label="Bớt Kem tươi vani">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Kem tươi vani">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Kem tươi vani" (click)="changeToppingQty('kem-tuoi-vani', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('kem-tuoi-vani') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Kem tươi vani" (click)="changeToppingQty('kem-tuoi-vani', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="7000">
@@ -428,13 +308,9 @@
                         <span class="topping-price">7.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="kem-cheese">
-                        <button type="button" class="qty-minus" aria-label="Bớt Kem cheese">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Kem cheese">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Kem cheese" (click)="changeToppingQty('kem-cheese', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('kem-cheese') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Kem cheese" (click)="changeToppingQty('kem-cheese', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="7000">
@@ -443,13 +319,9 @@
                         <span class="topping-price">7.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="pudding-trung">
-                        <button type="button" class="qty-minus" aria-label="Bớt Pudding trứng">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Pudding trứng">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Pudding trứng" (click)="changeToppingQty('pudding-trung', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('pudding-trung') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Pudding trứng" (click)="changeToppingQty('pudding-trung', 1)">+</button>
                       </div>
                     </li>
                     <li class="topping-row" data-price="7000">
@@ -458,13 +330,9 @@
                         <span class="topping-price">7.000đ</span>
                       </div>
                       <div class="topping-qty" data-topping="thach-sua-vien">
-                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sữa viên">
-                          -
-                        </button>
-                        <span class="qty-value" aria-live="polite">0</span>
-                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sữa viên">
-                          +
-                        </button>
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sữa viên" (click)="changeToppingQty('thach-sua-vien', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-sua-vien') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sữa viên" (click)="changeToppingQty('thach-sua-vien', 1)">+</button>
                       </div>
                     </li>
                   </ul>
@@ -487,7 +355,10 @@
                 />
                 <button type="button" id="qty-plus" (click)="changeQty(1)">+</button>
               </div>
-              <button class="btn btn-outline" id="btn-add-cart" type="button" (click)="addToCart()">Thêm vào giỏ</button>
+              <button class="btn btn-outline" id="btn-add-cart" type="button" (click)="addToCart()">
+                <img src="assets/icons/cart_product_detail.png" alt="" class="btn-cart-icon" aria-hidden="true" />
+                Thêm vào giỏ
+              </button>
               <button class="btn btn-primary" id="btn-buy-now" type="button" (click)="buyNow()">Mua ngay</button>
             </div>
           </div>
@@ -564,64 +435,62 @@
           <div class="review-header">
             <h3 class="reviews-title" id="reviews-title">Đánh giá sản phẩm</h3>
           </div>
-          <div class="review">
+          <div *ngFor="let r of displayedReviews" class="review">
             <img class="avatar" src="/assets/icons/user.png" alt="avatar" />
             <div>
               <div class="name">
-                Hồng Hạnh <span class="stars"><span class="fill" style="width: 100%"></span></span>
+                {{ r.name }} <span class="stars"><span class="fill" [style.width.%]="(r.rating / 5) * 100"></span></span>
               </div>
-              <div class="title">Tôi yêu HTVT!!!!!!!</div>
-              <div class="content">HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!</div>
+              <div class="title">{{ r.title }}</div>
+              <div class="content">{{ r.content }}</div>
               <div class="review-actions">
                 <button
                   type="button"
                   class="review-like"
-                  aria-label="Thích đánh giá của Hồng Hạnh"
+                  [attr.aria-label]="'Thích đánh giá của ' + r.name"
                 >
                   <span class="icon" aria-hidden="true">♡</span>
                   Thích
                 </button>
-                <div class="review-stars-inline" aria-label="Đánh giá 5 trên 5">
+                <div class="review-stars-inline" [attr.aria-label]="'Đánh giá ' + r.rating + ' trên 5'">
                   <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
                 </div>
               </div>
             </div>
-            <div class="time">2 ngày trước</div>
+            <div class="time">{{ r.time }}</div>
           </div>
-          <div class="review">
-            <img class="avatar" src="/assets/icons/user.png" alt="avatar" />
-            <div>
-              <div class="name">
-                Bảo Vy <span class="stars"><span class="fill" style="width: 100%"></span></span>
-              </div>
-              <div class="title">So good, so yummy</div>
-              <div class="content">HTVT rất ngon, tuyệt vời!</div>
-              <div class="review-actions">
-                <button
-                  type="button"
-                  class="review-like"
-                  aria-label="Thích đánh giá của Bảo Vy"
-                >
-                  <span class="icon" aria-hidden="true">♡</span>
-                  Thích
-                </button>
-                <div class="review-stars-inline" aria-label="Đánh giá 5 trên 5">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-              </div>
-            </div>
-            <div class="time">3 ngày trước</div>
-          </div>
-          <div class="review-pagination" role="navigation" aria-label="Trang đánh giá">
-            <button type="button" class="page-btn icon-btn" aria-label="Trang trước">‹</button>
-            <button type="button" class="page-btn active">1</button>
-            <button type="button" class="page-btn">2</button>
-            <button type="button" class="page-btn">3</button>
-            <button type="button" class="page-btn">4</button>
-            <span class="page-dots" aria-hidden="true">...</span>
-            <button type="button" class="page-btn">10</button>
-            <button type="button" class="page-btn icon-btn" aria-label="Trang sau">›</button>
-          </div>
+          <nav class="pagination-wrap" *ngIf="totalPages > 1">
+            <button
+              type="button"
+              class="pagination-btn"
+              (click)="prevPage()"
+              [disabled]="currentPage <= 1"
+              [attr.aria-disabled]="currentPage <= 1"
+              aria-label="Trang trước"
+            >
+              ‹
+            </button>
+            <button
+              *ngFor="let p of pageNumbers"
+              type="button"
+              class="pagination-num"
+              [class.active]="p === currentPage"
+              (click)="goToPage(p)"
+            >
+              {{ p }}
+            </button>
+            <span class="pagination-ellipsis" *ngIf="totalPages > 5">...</span>
+            <button
+              type="button"
+              class="pagination-btn"
+              (click)="nextPage()"
+              [disabled]="currentPage >= totalPages"
+              [attr.aria-disabled]="currentPage >= totalPages"
+              aria-label="Trang sau"
+            >
+              ›
+            </button>
+          </nav>
           <form class="review-form" action="#" method="post" aria-label="Gửi đánh giá sản phẩm">
             <div class="rating-field">
               <span class="label">Chất lượng sản phẩm:</span>
@@ -667,7 +536,7 @@
       </section>
 
       <section class="related-section" id="related">
-        <h3 class="related-title">Có thể bạn sẽ thích</h3>
+        <h2 class="related-title">Có thể bạn sẽ thích</h2>
         <div class="menu-grid" id="related-list">
           <article *ngFor="let p of relatedProducts" class="menu-card"
                    tabindex="0" role="link"
