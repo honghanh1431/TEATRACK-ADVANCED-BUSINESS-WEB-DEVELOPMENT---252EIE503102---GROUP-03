@@ -313,10 +313,17 @@
   margin: 0 auto;
 }
 
+/* Thống nhất font-size: tiêu đề 18px, nội dung 14px */
 .totals {
   border-top: 1px dashed rgba(13, 110, 253, 0.2);
   padding-top: 16px;
-  
+}
+
+.totals h3 {
+  margin: 0 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0088FF;
 }
 
 .coupon-tools {
@@ -333,7 +340,7 @@
   color: #0088FF;
   border-radius: 999px;
   padding: 6px 16px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
@@ -346,25 +353,19 @@
   color: #0088FF;
 }
 
- .coupon-btn:focus-visible {
+.coupon-btn:focus-visible {
   outline: 2px solid #0088FF;
   outline-offset: 2px;
 }
 
 .coupon-status {
-  font-size: 13px;
+  font-size: 14px;
   color: rgba(15, 23, 42, 0.66);
 }
+
 .coupon-status.invalid {
   color: #ff6b6b;
   font-weight: 600;
-}
-
-.totals h3 {
-  margin: 0 0 14px;
-  font-size: 17px;
-  font-weight: 700;
-  color: #0088FF;
 }
 
 .totals dl {
@@ -401,7 +402,7 @@
 .totals dl div.grand dd {
   font-weight: 800;
   color: #0088FF;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .payment-method {
@@ -410,20 +411,22 @@
 }
 
 .payment-method h3 {
-  color: #0088FF;
+  margin: 0 0 8px;
+  font-size: 18px;
   font-weight: 700;
-  margin-bottom: 8px;
+  color: #0088FF;
 }
 
 .payment-method label {
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1.5px solid rgba(13,110,253,.35);
+  border: 1.5px solid rgba(13, 110, 253, 0.35);
   border-radius: 999px;
   padding: 12px 18px;
+  font-size: 14px;
   cursor: pointer;
-  transition: .25s ease;
+  transition: 0.25s ease;
   background: #fff;
 }
 
@@ -736,6 +739,7 @@
   display: block;
   margin-top: 8px;
   font-size: 14px;
+  font-weight: normal;
   color: #4d4d4d;
   background: #E7EBED;
   border: none;
