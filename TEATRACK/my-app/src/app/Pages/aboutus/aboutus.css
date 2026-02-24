@@ -3,7 +3,10 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Inter, system-ui, Segoe UI, Arial, sans-serif; color: #0f172a; }
 main { flex: 1; }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
+.aboutus-page{
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+  min-height: 100vh;
+}
 /* Hero */
 .about-hero { 
   background: linear-gradient(90deg, #7BB2FF 0%, #D9D9D9 100%);
@@ -68,20 +71,27 @@ main { flex: 1; }
   margin: 20px auto;        
 }
 .vision-wrap > img { width: 100%; height: clamp(420px, 52vh, 640px); object-fit: cover; filter: saturate(1.05); display: block; }
-.vision-box { position: absolute; inset: auto 24px 24px 24px; background: rgba(2,6,23,.55); color: #fff; padding: 18px 20px; border-radius: 12px; backdrop-filter: blur(2px); }
+.vision-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(2,6,23,.55);
+  color: #fff;
+  padding: 28px 36px;
+  border-radius: 14px;
+  backdrop-filter: blur(4px);
+  max-width: 70%;
+  text-align: center;
+}
 .vision-box h3 { margin: 0 0 6px; font-size: 28px; }
-.vision-box p { margin: 0; opacity: .95; line-height: 1.7; }
+.vision-box p { margin: 0;  font-weight: 500; font-size: 15px; opacity: .95; line-height: 1.7; color: #fff; }
 .vision-box .line{
-  flex: 0 0 auto;
   width: 35%;
   height: 6px;
   background: #FFF8E9;
-  border-radius: 2px;
-  border: 0;
-  margin-top: 12px;
-  margin-bottom: 18px;
-  opacity: .9;
-  align-self: center;
+  border-radius: 3px;
+  margin: 12px auto 18px;
 }
 
 /* Mosaic */
@@ -208,7 +218,13 @@ main { flex: 1; }
   height: 200px;   
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);align-items: center;
 }
-.customers .customers-card { border-radius: 12px; padding: 40px; text-align: center; height: 100%; }
+.customers .customers-card{
+  background: url("/assets/images/back.png") center/cover no-repeat;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  height: 100%;
+}
 .customers .customers-card h3 { margin: 0 0 6px; color: #D02222; font-size: 28px; font-weight: 700; letter-spacing: .3px; }
 .customers .customers-card p { margin: 10px auto; color: #374151; line-height: 1.6; }
 

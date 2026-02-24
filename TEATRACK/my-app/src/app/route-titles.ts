@@ -7,6 +7,7 @@ export const ROUTE_TITLES: Record<string, string> = {
   '/product': 'Chi tiết sản phẩm',
   '/contact': 'Liên hệ',
   '/aboutus': 'Về chúng tôi',
+  '/cart': 'Giỏ hàng',
   '/agency': 'Chi nhánh',
 };
 

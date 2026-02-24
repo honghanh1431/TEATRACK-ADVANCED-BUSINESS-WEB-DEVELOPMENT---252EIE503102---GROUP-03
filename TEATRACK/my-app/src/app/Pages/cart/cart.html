@@ -1,0 +1,206 @@
+<div class="cart-body">
+  <div class="cart-page">
+  <section class="breadcrumb-banner">
+    <h1 class="breadcrumb-title">Thanh toán</h1>
+    <p class="breadcrumb-path">
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/cart" (click)="scrollToTop()">Giỏ hàng</a>
+    </p>
+  </section>
+    <section class="checkout-layout">
+      <article class="panel shipping-panel">
+        <div class="panel-head">
+          <h2>Thông tin giao hàng</h2>
+        </div>
+        <dl class="shipping-info" id="shipping-info">
+          <ng-container *ngFor="let field of shippingFields">
+            <div class="shipping-row">
+              <div class="row-body">
+                <dt>{{ field.label }}</dt>
+                <dd [innerHTML]="field.value"></dd>
+              </div>
+              <button class="row-edit" type="button" (click)="editShippingField(field.key)" attr.aria-label="Sửa {{ field.label }}">
+                <img src="/assets/icons/edit.png" alt="" aria-hidden="true">
+              </button>
+            </div>
+          </ng-container>
+        </dl>
+      </article>
+
+      <article class="panel cart-panel">
+        <div class="panel-head">
+          <h2>Giỏ hàng của bạn</h2>
+          <span class="count" id="cart-count">{{ cartCount }} món</span>
+        </div>
+
+        <div class="cart-list" id="cart-list" aria-live="polite">
+          <ng-container *ngIf="cartItems.length === 0; else cartItemsList">
+            <div class="cart-empty">
+              <img src="/assets/icons/menu.png" alt="" aria-hidden="true">
+              <p>Giỏ hàng hiện đang trống, hãy thêm vài món yêu thích nhé!</p>
+            </div>
+          </ng-container>
+          <ng-template #cartItemsList>
+            <article *ngFor="let item of cartItems; let i = index" class="cart-item" [attr.data-idx]="i">
+              <img [src]="getImageUrl(item.image)" [alt]="item.name || 'Do uong'">
+              <div class="info">
+                <h4>{{ item.name || 'Do uong' }}</h4>
+                <p *ngIf="getItemDetails(item)">{{ getItemDetails(item) }}</p>
+                <div class="price">{{ formatPrice(item.price * item.qty) }}đ</div>
+              </div>
+              <div class="item-controls">
+                <div class="qty-shell" role="group" [attr.aria-label]="'So luong ' + (item.name || '')">
+                  <button class="qty-minus" type="button" (click)="updateQuantity(i, item.qty - 1)" aria-label="Giam so luong">-</button>
+                  <span>{{ item.qty || 1 }}</span>
+                  <button class="qty-plus" type="button" (click)="updateQuantity(i, item.qty + 1)" aria-label="Tang so luong">+</button>
+                </div>
+                <button class="remove-item" type="button" (click)="removeItem(i)" [attr.aria-label]="'Xoa ' + (item.name || '')">
+                  <img src="/assets/icons/delete.png" alt="" aria-hidden="true">
+                </button>
+              </div>
+            </article>
+          </ng-template>
+        </div>
+
+        <section class="totals" aria-label="Thông tin thanh toán">
+          <h3>Thông tin thanh toán</h3>
+          <div class="coupon-tools">
+            <button type="button" class="coupon-btn" (click)="openCouponModal()">Nhập mã giảm giá</button>
+            <span class="coupon-status" [class.invalid]="!coupon.valid" id="coupon-label">
+              {{ coupon.code ? (coupon.valid ? 'Đã áp dụng: ' + coupon.code + ' (-' + formatPrice(totals.discount) + 'đ)' : coupon.code + ' (' + (coupon.message || 'Chưa đáp ứng điều kiện') + ')') : 'Chưa áp dụng' }}
+            </span>
+          </div>
+          <dl>
+            <div>
+              <dt>Tổng tiền tạm tính</dt>
+              <dd id="total-sub">{{ formatPrice(totals.subtotal) }}đ</dd>
+            </div>
+            <div>
+              <dt>Phí vận chuyển</dt>
+              <dd id="total-ship">{{ formatPrice(totals.shipping) }}đ</dd>
+            </div>
+            <div>
+              <dt>Mã giảm giá</dt>
+              <dd id="total-discount">{{ totals.discount ? '- ' + formatPrice(totals.discount) + 'đ' : '0đ' }}</dd>
+            </div>
+            <div class="grand">
+              <dt>Tổng cộng</dt>
+              <dd id="total-grand">{{ formatPrice(totals.grand) }}đ</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="payment-method" aria-label="Phương thức thanh toán">
+          <h3>Phương thức thanh toán</h3>
+          <label *ngFor="let method of paymentMethods">
+            <input
+              type="radio"
+              name="payment"
+              [value]="method.value"
+              [(ngModel)]="selectedPayment"
+            />
+            <span>{{ method.label }}</span>
+          </label>
+        </section>
+
+        <label class="terms">
+          <input type="checkbox" [(ngModel)]="termsAgreed">
+          <span>Tôi đã đọc, hiểu và đồng ý với tất cả các điều khoản, điều kiện và chính sách liên quan</span>
+        </label>
+
+        <button class="checkout-btn" (click)="checkout()" type="button">Tiến hành thanh toán</button>
+      </article>
+    </section>
+
+    <!-- Modal Container -->
+    <div class="cart-modal" *ngIf="showModal" (click)="closeModalOnOverlay($event)">
+      <div class="cart-modal__dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="'cart-modal-title-' + modalId">
+        <button type="button" class="cart-modal__close" (click)="closeModal()" aria-label="Dong">&times;</button>
+        <h3 class="cart-modal__title" [id]="'cart-modal-title-' + modalId">{{ modalTitle }}</h3>
+        
+        <form class="cart-modal__form" (ngSubmit)="submitModal()" #modalForm="ngForm">
+          <ng-container [ngSwitch]="modalType">
+            <!-- Address Modal -->
+            <div *ngSwitchCase="'address'" class="cart-modal__address">
+              <label class="cart-modal__search">
+                <span class="sr-only">Nhập địa chỉ nhận hàng mới</span>
+                <input name="address" type="text" required placeholder="Vui lòng nhập địa chỉ nhận hàng" [(ngModel)]="modalData.address" #addressInput="ngModel">
+                <span class="cart-modal__search-icon" aria-hidden="true">
+                </span>
+              </label>
+              <p class="cart-modal__current"><span>Địa chỉ hiện tại:</span> {{ shippingInfo.address || 'Chưa có thông tin' }}</p>
+              <p class="cart-modal__note cart-modal__note--accent">Cảnh báo: thay đổi địa chỉ có thể làm thay đổi phí hoặc thời gian giao hàng.</p>
+              <p class="cart-modal__error" [style.color]="'#d93025'" *ngIf="addressInput.invalid && addressInput.touched">Vui lòng nhập địa chỉ nhận hàng.</p>
+            </div>
+
+            <!-- Receiver Modal -->
+            <div *ngSwitchCase="'receiver'">
+              <label>
+                <span>Họ tên người nhận</span>
+                <input name="receiver" type="text" required maxlength="80" [(ngModel)]="modalData.receiver" #receiverInput="ngModel">
+              </label>
+              <label>
+                <span>Số điện thoại</span>
+                <input name="phone" type="tel" required maxlength="20" pattern="[0-9\s\+\-]{9,20}" [(ngModel)]="modalData.phone" #phoneInput="ngModel">
+                <span class="cart-modal__hint">Số điện thoại có thể gồm khoảng trắng</span>
+              </label>
+              <p class="cart-modal__error" [style.color]="'#d93025'" *ngIf="(receiverInput.invalid || phoneInput.invalid) && (receiverInput.touched || phoneInput.touched)">
+                Vui lòng nhập đầy đủ thông tin người nhận.
+              </p>
+            </div>
+
+            <!-- Time Modal -->
+            <div *ngSwitchCase="'time'" class="cart-modal__row">
+              <label>
+                <span>Ngày nhận hàng</span>
+                <input name="deliveryDate" type="date" required [min]="minDate" [(ngModel)]="modalData.deliveryDate" #dateInput="ngModel">
+              </label>
+              <label>
+                <span>Thời gian</span>
+                <select name="deliveryTime" required [(ngModel)]="modalData.deliveryTime" #timeInput="ngModel">
+                  <option *ngFor="let opt of timeOptions" [value]="opt">{{ opt }}</option>
+                </select>
+              </label>
+              <span class="cart-modal__hint">Cửa hàng sẽ giao trong vòng +/-30 phút quanh thời gian bạn chọn.</span>
+            </div>
+
+            <!-- Note Modal -->
+            <div *ngSwitchCase="'note'">
+              <label>
+                <span>Ghi chú</span>
+                <textarea name="note" rows="4" placeholder="Ví dụ: Nhớ để thêm đá" [(ngModel)]="modalData.note"></textarea>
+              </label>
+            </div>
+
+            <!-- Coupon Modal -->
+            <div *ngSwitchCase="'coupon'">
+              <label>
+                <span>Mã giảm giá</span>
+                <input name="coupon" type="text" autocomplete="off" placeholder="Nhập mã giảm giá hoặc Số điện thoại VIP" [(ngModel)]="modalData.code">
+              </label>
+              <p class="cart-modal__hint">{{ couponHint }}</p>
+            </div>
+          </ng-container>
+
+          <div class="cart-modal__actions">
+            <button type="button" class="cart-modal__btn cart-modal__btn--ghost" (click)="closeModal()">Đóng</button>
+            <button *ngIf="modalType === 'coupon' && coupon.code" type="button" class="cart-modal__btn cart-modal__btn--ghost" (click)="clearCoupon()">Bỏ mã</button>
+            <button type="submit" class="cart-modal__btn cart-modal__btn--primary">Xác nhận</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="alert-overlay" [class.show]="showAlert" (click)="closeAlertOnOverlay($event)" role="dialog" aria-modal="true">
+      <div class="alert-dialog" [class]="'alert-' + alertType">
+        <div class="alert-icon" [innerHTML]="alertIcon"></div>
+        <h3 class="alert-title">{{ alertTitle }}</h3>
+        <p class="alert-message">{{ alertMessage }}</p>
+        <div class="alert-actions">
+          <button *ngIf="alertConfirm" type="button" class="alert-btn alert-btn-secondary" (click)="closeAlert(false)">Hủy</button>
+          <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlert(true)">{{ alertConfirm ? 'Xác nhận' : 'OK' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

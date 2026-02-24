@@ -15,6 +15,7 @@ import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
 import { Menu } from './Pages/menu/menu';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
+import { Cart } from './Pages/cart/cart';
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 import { Login } from './Pages/login/login';
 
@@ -39,7 +40,11 @@ import { Login } from './Pages/login/login';
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule,
+<<<<<<< HEAD
     Login
+=======
+    Cart,
+>>>>>>> ac7a78cff68d6368999da5ed6f8c35ed719d9e90
   ],
   providers: [
     provideBrowserGlobalErrorListeners()
