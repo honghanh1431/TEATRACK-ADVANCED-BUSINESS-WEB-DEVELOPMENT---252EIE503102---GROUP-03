@@ -13,19 +13,18 @@ import { HttpClient } from '@angular/common/http';
 })
 export class Login implements OnInit {
 
-  // Mode
   isAdmin = false;
-
-  // Form fields
   username = '';
   password = '';
   rememberMe = false;
-
-  // UI state
   showPassword = false;
   isLoading = false;
   errorMessage = '';
   showErrorModal = false;
+
+  // i18n
+  currentLang = 'vi';
+  t: any = {};
 
   constructor(
     private http: HttpClient,
@@ -37,6 +36,27 @@ export class Login implements OnInit {
     this.route.data.subscribe(data => {
       this.isAdmin = data['isAdmin'] === true;
     });
+
+    // Load ngôn ngữ đã lưu hoặc mặc định vi
+    const savedLang = localStorage.getItem('lang') || 'vi';
+    this.loadLang(savedLang);
+  }
+
+  loadLang(lang: string): void {
+  this.currentLang = lang;
+  localStorage.setItem('lang', lang);
+  this.http.get(`/lang/${lang}.json`).subscribe({
+    next: (data) => { 
+      console.log('Loaded lang:', lang, data); // thêm dòng này
+      this.t = data; 
+      this.currentLang = lang;
+    },
+    error: () => { console.warn('Không load được file ngôn ngữ'); }
+  });
+}
+
+  setLang(lang: string): void {
+    this.loadLang(lang);
   }
 
   togglePasswordVisibility(): void {
@@ -54,55 +74,62 @@ export class Login implements OnInit {
   }
 
   onLogin(): void {
-  const u = this.username.trim();
-  const p = this.password.trim();
+    const u = this.username.trim();
+    const p = this.password.trim();
 
-  if (!u || !p) {
-    this.showError('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
-    return;
-  }
-
-  this.isLoading = true;
-
-  this.http.get<any>('/data/login.json').subscribe({
-    next: (data) => {
-      this.isLoading = false;
-
-      const user = data.users.find(
-        (x: any) => x.username === u && x.password === p
-      );
-
-      if (!user) {
-        this.showError('Tên đăng nhập hoặc mật khẩu không đúng.');
-        return;
-      }
-
-      // Kiểm tra đúng role chưa
-      if (this.isAdmin && user.role !== 'admin') {
-        this.showError('Tài khoản này không có quyền quản lý.');
-        return;
-      }
-
-      if (!this.isAdmin && user.role !== 'customer') {
-        this.showError('Vui lòng đăng nhập tại trang quản lý.');
-        return;
-      }
-
-      // Lưu thông tin và redirect
-      localStorage.setItem('ngogia_user', JSON.stringify(user));
-      if (this.isAdmin) {
-        localStorage.setItem('authAdmin', '1');
-        this.router.navigate(['/blog']);
-      } else {
-        this.router.navigate(['/blog']);
-      }
-    },
-    error: () => {
-      this.isLoading = false;
-      this.showError('Không thể đọc dữ liệu. Vui lòng thử lại.');
+    if (!u || !p) {
+      this.showError(this.currentLang === 'vi'
+        ? 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.'
+        : 'Please enter your username and password.');
+      return;
     }
-  });
-}
+
+    this.isLoading = true;
+
+    this.http.get<any>('/data/login.json').subscribe({
+      next: (data) => {
+        this.isLoading = false;
+        const user = data.users.find(
+          (x: any) => x.username === u && x.password === p
+        );
+
+        if (!user) {
+          this.showError(this.currentLang === 'vi'
+            ? 'Tên đăng nhập hoặc mật khẩu không đúng.'
+            : 'Incorrect username or password.');
+          return;
+        }
+
+        if (this.isAdmin && user.role !== 'admin') {
+          this.showError(this.currentLang === 'vi'
+            ? 'Tài khoản này không có quyền quản lý.'
+            : 'This account does not have admin access.');
+          return;
+        }
+
+        if (!this.isAdmin && user.role !== 'customer') {
+          this.showError(this.currentLang === 'vi'
+            ? 'Vui lòng đăng nhập tại trang quản lý.'
+            : 'Please login at the admin page.');
+          return;
+        }
+
+        localStorage.setItem('ngogia_user', JSON.stringify(user));
+        if (this.isAdmin) {
+          localStorage.setItem('authAdmin', '1');
+          window.location.href = '/admin-dashboard';
+        } else {
+          window.location.href = '/home';
+        }
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showError(this.currentLang === 'vi'
+          ? 'Không thể đọc dữ liệu. Vui lòng thử lại.'
+          : 'Cannot load data. Please try again.');
+      }
+    });
+  }
 
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') this.onLogin();
