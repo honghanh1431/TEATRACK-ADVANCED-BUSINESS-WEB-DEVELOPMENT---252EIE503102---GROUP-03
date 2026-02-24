@@ -1,16 +1,11 @@
 <div class="cart-body">
   <div class="cart-page">
-    <section class="page-hero">
-      <div class="hero-content">
-        <h1>Thanh toán</h1>
-        <nav class="breadcrumb" aria-label="breadcrumbs">
-          <a href="/">Trang chủ</a>
-          <span aria-hidden="true">/</span>
-          <span>Giỏ hàng</span>
-        </nav>
-      </div>
-    </section>
-
+  <section class="breadcrumb-banner">
+    <h1 class="breadcrumb-title">Thanh toán</h1>
+    <p class="breadcrumb-path">
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/cart" (click)="scrollToTop()">Giỏ hàng</a>
+    </p>
+  </section>
     <section class="checkout-layout">
       <article class="panel shipping-panel">
         <div class="panel-head">
@@ -50,7 +45,7 @@
               <div class="info">
                 <h4>{{ item.name || 'Do uong' }}</h4>
                 <p *ngIf="getItemDetails(item)">{{ getItemDetails(item) }}</p>
-                <div class="price">{{ formatPrice(item.price * item.qty) }}d</div>
+                <div class="price">{{ formatPrice(item.price * item.qty) }}đ</div>
               </div>
               <div class="item-controls">
                 <div class="qty-shell" role="group" [attr.aria-label]="'So luong ' + (item.name || '')">
@@ -71,25 +66,25 @@
           <div class="coupon-tools">
             <button type="button" class="coupon-btn" (click)="openCouponModal()">Nhập mã giảm giá</button>
             <span class="coupon-status" [class.invalid]="!coupon.valid" id="coupon-label">
-              {{ coupon.code ? (coupon.valid ? 'Đã áp dụng: ' + coupon.code + ' (-' + formatPrice(totals.discount) + 'd)' : coupon.code + ' (' + (coupon.message || 'Chưa đáp ứng điều kiện') + ')') : 'Chưa áp dụng' }}
+              {{ coupon.code ? (coupon.valid ? 'Đã áp dụng: ' + coupon.code + ' (-' + formatPrice(totals.discount) + 'đ)' : coupon.code + ' (' + (coupon.message || 'Chưa đáp ứng điều kiện') + ')') : 'Chưa áp dụng' }}
             </span>
           </div>
           <dl>
             <div>
               <dt>Tổng tiền tạm tính</dt>
-              <dd id="total-sub">{{ formatPrice(totals.subtotal) }}d</dd>
+              <dd id="total-sub">{{ formatPrice(totals.subtotal) }}đ</dd>
             </div>
             <div>
               <dt>Phí vận chuyển</dt>
-              <dd id="total-ship">{{ formatPrice(totals.shipping) }}d</dd>
+              <dd id="total-ship">{{ formatPrice(totals.shipping) }}đ</dd>
             </div>
             <div>
               <dt>Mã giảm giá</dt>
-              <dd id="total-discount">{{ totals.discount ? '- ' + formatPrice(totals.discount) + 'd' : '0d' }}</dd>
+              <dd id="total-discount">{{ totals.discount ? '- ' + formatPrice(totals.discount) + 'đ' : '0đ' }}</dd>
             </div>
             <div class="grand">
               <dt>Tổng cộng</dt>
-              <dd id="total-grand">{{ formatPrice(totals.grand) }}d</dd>
+              <dd id="total-grand">{{ formatPrice(totals.grand) }}đ</dd>
             </div>
           </dl>
         </section>
@@ -140,7 +135,7 @@
             <!-- Receiver Modal -->
             <div *ngSwitchCase="'receiver'">
               <label>
-                <span>Họ tên nguời nhận</span>
+                <span>Họ tên người nhận</span>
                 <input name="receiver" type="text" required maxlength="80" [(ngModel)]="modalData.receiver" #receiverInput="ngModel">
               </label>
               <label>

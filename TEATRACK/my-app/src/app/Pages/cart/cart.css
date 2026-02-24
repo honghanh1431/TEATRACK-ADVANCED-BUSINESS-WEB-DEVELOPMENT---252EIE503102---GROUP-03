@@ -1,6 +1,4 @@
-
 .cart-body {
-  background: linear-gradient(180deg, rgba(207, 227, 255, 0.35) 0%, rgba(255, 255, 255, 0.4) 22%, #f3f8ff 100%);
   color: #0f172a;
   font-family: 'Inter', 'Segoe UI', sans-serif;
 }
@@ -11,43 +9,33 @@
   gap: 36px;
 }
 
-.page-hero {
-  background: #e6f0ff;
-  border-bottom: 1px solid rgba(13, 110, 253, 0.18);
-  padding: 36px 6vw 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Breadcrumb Banner */
+.breadcrumb-banner {
+  background: #D4EDFC;
+  padding: 20px 20px;
   text-align: center;
-  box-shadow: 0 16px 32px rgba(13, 110, 253, 0.08);
+  position: relative;
+  z-index: 1;
 }
 
-.page-hero h1 {
+.breadcrumb-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.breadcrumb-path {
+  font-size: 15px;
   margin: 0;
-  font-size: 34px;
-  font-weight: 800;
-  color: #000;
-  letter-spacing: 0.4px;
-}
-
-.breadcrumb {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.breadcrumb a {
-  color: #0d6efd;
-  text-decoration: none;
   font-weight: 600;
 }
 
-.breadcrumb a:hover {
+.breadcrumb-path a {
+  text-decoration: none;
+  color:#808080 !important
+}
+
+.breadcrumb-path a:hover {
   text-decoration: underline;
 }
 
@@ -109,7 +97,7 @@
 
 .shipping-info dt {
   font-weight: 700;
-  color: #1045b5;
+  color: #0088FF;
   margin-bottom: 6px;
   font-size: 15px;
 }
@@ -163,7 +151,7 @@
 }
 
 .hero-meta .value {
-  color: #0d6efd;
+  color: #0088FF;
 }
 
 .cart-list {
@@ -328,6 +316,7 @@
 .totals {
   border-top: 1px dashed rgba(13, 110, 253, 0.2);
   padding-top: 16px;
+  
 }
 
 .coupon-tools {
@@ -339,9 +328,9 @@
 }
 
 .coupon-btn {
-  border: 1.5px solid #0d6efd;
+  border: 1.5px solid #0088FF;
   background: #fff;
-  color: #0d6efd;
+  color: #0088FF;
   border-radius: 999px;
   padding: 6px 16px;
   font-size: 13px;
@@ -354,11 +343,11 @@
   transform: translateY(-1px);
   box-shadow: 0 8px 16px rgba(29, 78, 216, 0.18);
   background: rgba(29, 78, 216, 0.1);
-  color: #0d6efd;
+  color: #0088FF;
 }
 
  .coupon-btn:focus-visible {
-  outline: 2px solid #0d6efd;
+  outline: 2px solid #0088FF;
   outline-offset: 2px;
 }
 
@@ -375,7 +364,7 @@
   margin: 0 0 14px;
   font-size: 17px;
   font-weight: 700;
-  color: #0d6efd;
+  color: #0088FF;
 }
 
 .totals dl {
@@ -411,7 +400,7 @@
 .totals dl div.grand dt,
 .totals dl div.grand dd {
   font-weight: 800;
-  color: #0d6efd;
+  color: #0088FF;
   font-size: 16px;
 }
 
@@ -421,7 +410,7 @@
 }
 
 .payment-method h3 {
-  color: #0d6efd;
+  color: #0088FF;
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -440,14 +429,14 @@
 
 /* Hover nhẹ */
 .payment-method label:hover {
-  border-color: #0d6efd;
+  border-color: #0088FF;
   background: rgba(13,110,253,.04);
 }
 
 /* Checked: chỉ đổi viền */
 .payment-method input:checked + span,
 .payment-method input:checked {
-  accent-color: #0d6efd;
+  accent-color: #0088FF;
 }
 
 /* Ẩn radio mặc định → dùng accent-color */
@@ -476,7 +465,7 @@
 .terms input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #0d6efd;
+  accent-color: #0088FF;
   margin-top: 2px;
   cursor: pointer;
 }
@@ -551,7 +540,7 @@
   padding: 12px 20px;
   border-radius: 16px;
   background: #fff;
-  color: #0d6efd;
+  color: #0088FF;
   font-weight: 700;
   cursor: pointer;
 }
@@ -587,7 +576,7 @@
   margin: 0;
   font-size: 20px;
   font-weight: 800;
-  color: #0d6efd;
+  color: #0088FF;
   text-align: center;
 }
 
@@ -675,15 +664,18 @@
   font-weight: 700;
 }
 
+/* Note / ghi chú theo mẫu: hộp bo góc, nền xám xanh nhạt, chữ nghiêng, bóng nhẹ */
 .cart-modal__note--accent {
   margin: 0;
-  font-size: 13px;
-  color: #475569;
-  background: rgba(226, 232, 240, 0.6);
-  border-radius: 14px;
-  padding: 10px 14px;
+  font-size: 14px;
+  color: #4d4d4d;
+  background: #E7EBED;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
   font-style: italic;
   line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .cart-modal__form input,
@@ -722,7 +714,7 @@
 
 .cart-modal__btn--ghost {
   background: rgba(148, 163, 184, 0.16);
-  color: #475569;
+  color: #6b7280;
 }
 
 .cart-modal__btn--ghost:hover {
@@ -731,7 +723,7 @@
 }
 
 .cart-modal__btn--primary {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  background: #0088FF;
   color: #fff;
   box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
 }
@@ -741,9 +733,21 @@
 }
 
 .cart-modal__hint {
-  font-size: 13px;
-  color: #64748b;
-  margin-top: -4px;
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #4d4d4d;
+  background: #E7EBED;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-style: italic;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.cart-modal__row .cart-modal__hint {
+  grid-column: 1 / -1;
 }
 
 .cart-modal__row {
