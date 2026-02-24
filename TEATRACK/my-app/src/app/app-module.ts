@@ -13,12 +13,13 @@ import { Blog } from './Pages/blog/blog';
 import { BlogList } from './Pages/blog/blog-list/blog-list';
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
 import { Menu } from './Pages/menu/menu';
+import { Homepage } from './Pages/homepage/homepage'
 
 @NgModule({
   declarations: [
     App,
     Blog,
-    Menu
+    Menu,
   ],
   imports: [
     BrowserModule,
@@ -31,7 +32,8 @@ import { Menu } from './Pages/menu/menu';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    Homepage
   ],
   providers: [
     provideBrowserGlobalErrorListeners()
