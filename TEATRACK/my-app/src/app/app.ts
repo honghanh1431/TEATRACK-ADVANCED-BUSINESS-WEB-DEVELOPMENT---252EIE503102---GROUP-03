@@ -14,10 +14,19 @@ import { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 export class App implements OnInit, OnDestroy {
   private sub?: Subscription;
 
+  showLayout = true;
   constructor(
     private router: Router,
     private titleService: Title,
-  ) {}
+  ) {
+    this.router.events.subscribe(event => {
+    if (event instanceof NavigationEnd) {
+      // Ẩn header/footer ở trang login
+      const hideRoutes = ['/login', '/login-admin', '/register'];
+      this.showLayout = !hideRoutes.includes(event.urlAfterRedirects);
+    }
+  });
+  }
 
   private updateTitle(path: string): void {
     if (/^\/blog\/[^/]+$/.test(path)) return;
