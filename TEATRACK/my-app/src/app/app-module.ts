@@ -15,6 +15,7 @@ import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
 import { Menu } from './Pages/menu/menu';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
+import { Cart } from './Pages/cart/cart';
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 
 @NgModule({
@@ -36,7 +37,8 @@ export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    Cart,
   ],
   providers: [
     provideBrowserGlobalErrorListeners()
