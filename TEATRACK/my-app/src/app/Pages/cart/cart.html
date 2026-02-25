@@ -41,10 +41,14 @@
           </ng-container>
           <ng-template #cartItemsList>
             <article *ngFor="let item of cartItems; let i = index" class="cart-item" [attr.data-idx]="i">
-              <img [src]="getImageUrl(item.image)" [alt]="item.name || 'Do uong'">
+              <a class="cart-item-img-link" [routerLink]="['/product']" [queryParams]="{ pid: item.id, name: item.name }" [attr.aria-label]="'Xem chi tiết ' + (item.name || 'sản phẩm')">
+                <img [src]="getImageUrl(item.image)" [alt]="item.name || 'Do uong'">
+              </a>
               <div class="info">
                 <h4>{{ item.name || 'Do uong' }}</h4>
-                <p *ngIf="getItemDetails(item)">{{ getItemDetails(item) }}</p>
+                <div class="item-details" *ngIf="getItemDetailLines(item).length">
+                  <p *ngFor="let line of getItemDetailLines(item)" class="item-detail-line">{{ line }}</p>
+                </div>
                 <div class="price">{{ formatPrice(item.price * item.qty) }}đ</div>
               </div>
               <div class="item-controls">
@@ -193,7 +197,13 @@
     <!-- Alert Modal -->
     <div class="alert-overlay" [class.show]="showAlert" (click)="closeAlertOnOverlay($event)" role="dialog" aria-modal="true">
       <div class="alert-dialog" [class]="'alert-' + alertType">
-        <div class="alert-icon" [innerHTML]="alertIcon"></div>
+        <div class="alert-icon">
+          <ng-container [ngSwitch]="alertType">
+            <svg *ngSwitchCase="'warning'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <svg *ngSwitchCase="'info'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>
+            <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>
+          </ng-container>
+        </div>
         <h3 class="alert-title">{{ alertTitle }}</h3>
         <p class="alert-message">{{ alertMessage }}</p>
         <div class="alert-actions">

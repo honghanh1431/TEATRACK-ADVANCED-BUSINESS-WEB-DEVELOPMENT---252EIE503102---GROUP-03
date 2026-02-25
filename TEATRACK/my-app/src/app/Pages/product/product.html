@@ -405,7 +405,7 @@
             <div class="stars" aria-label="Đánh giá" style="margin-top: 6px">
               <span class="fill" id="score-stars" [style.width.%]="ratingPct"></span>
             </div>
-            <div class="count" id="score-count">({{ product.reviews ?? 0 }} lượt đánh giá)</div>
+            <div class="count" id="score-count">({{ reviews.length }} lượt đánh giá)</div>
           </div>
           <div class="col-right">
             <div class="bar-row">
@@ -491,17 +491,30 @@
               ›
             </button>
           </nav>
-          <form class="review-form" action="#" method="post" aria-label="Gửi đánh giá sản phẩm">
+          <form class="review-form" (ngSubmit)="submitReview()" aria-label="Gửi đánh giá sản phẩm">
             <div class="rating-field">
               <span class="label">Chất lượng sản phẩm:</span>
+              <div class="rating-stars" role="group" aria-label="Chọn 1 đến 5 sao">
+                <button
+                  *ngFor="let star of [1,2,3,4,5]; let i = index"
+                  type="button"
+                  class="star"
+                  [class.filled]="(i + 1) <= reviewFormRating"
+                  (click)="setReviewRating(i + 1)"
+                  [attr.aria-label]="(i + 1) + ' sao'"
+                  [attr.aria-pressed]="(i + 1) <= reviewFormRating"
+                >★</button>
+              </div>
             </div>
+            <p class="review-form-title">Để lại đánh giá chi tiết tại đây</p>
             <textarea
               name="note"
-              rows="3"
+              rows="4"
+              [(ngModel)]="reviewFormContent"
               placeholder="Hãy để lại nhận xét cho sản phẩm này bạn nhé! Ngô Gia xin chân thành cảm ơn."
             ></textarea>
             <div class="form-actions">
-              <button type="button" class="btn btn-primary submit-review">Đánh giá</button>
+              <button type="submit" class="btn btn-primary submit-review">Đánh giá</button>
             </div>
           </form>
         </section>

@@ -661,11 +661,12 @@ body {
 }
 .score {
   font-size: 38px;
+  font-weight: 700;
 }
 .score .unit {
   font-size: 18px;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 600;
 }
 .count {
   color: var(--muted);
@@ -821,6 +822,34 @@ body {
 }
 .review-form .rating-field .label {
   min-width: 160px;
+}
+.review-form .rating-stars {
+  display: inline-flex;
+  gap: 4px;
+}
+.review-form .rating-stars .star {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 24px;
+  line-height: 1;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.review-form .rating-stars .star:hover,
+.review-form .rating-stars .star.filled {
+  color: #f59e0b;
+}
+.review-form .rating-stars .star:focus {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+.review-form-title {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
 }
 .review-form textarea {
   width: 100%;

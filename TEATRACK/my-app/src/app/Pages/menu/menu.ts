@@ -286,7 +286,6 @@ export class Menu implements OnInit, AfterViewInit {
       size: 'M',
       qty: 1,
     });
-    alert(`Đã thêm ${product.name || 'sản phẩm'} vào giỏ hàng!`);
   }
 
   isCategoryActive(cat: string): boolean {

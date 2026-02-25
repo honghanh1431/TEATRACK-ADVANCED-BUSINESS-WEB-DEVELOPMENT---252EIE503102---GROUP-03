@@ -1,6 +1,8 @@
-import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID, Renderer2 } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, Renderer2 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
+
+const CART_KEY = 'cart_items';
 
 @Component({
   selector: 'app-page-header',
@@ -9,7 +11,9 @@ import { isPlatformBrowser } from '@angular/common';
   templateUrl: './page-header.html',
   styleUrl: './page-header.css',
 })
-export class PageHeader implements OnInit, AfterViewInit {
+export class PageHeader implements OnInit, AfterViewInit, OnDestroy {
+  private cartUpdatedHandler = () => this.updateCartBadge();
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private renderer: Renderer2,
@@ -27,7 +31,43 @@ export class PageHeader implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
+    this.updateCartBadge();
+    window.addEventListener('cart:updated', this.cartUpdatedHandler);
     this.initAdminHeaderLogic();
+  }
+
+  ngOnDestroy() {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('cart:updated', this.cartUpdatedHandler);
+    }
+  }
+
+  /** Cập nhật số lượng và tổng tiền giỏ hàng trên badge (đồng bộ với CartService / localStorage) */
+  private updateCartBadge() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    let count = 0;
+    let total = 0;
+    try {
+      const raw = localStorage.getItem(CART_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          for (const it of arr) {
+            const qty = Math.max(0, Number((it as any).qty ?? 1));
+            const price = Number((it as any).price ?? 0);
+            count += qty;
+            total += qty * price;
+          }
+        }
+      }
+    } catch (_) {}
+    const totalStr = total.toLocaleString('vi-VN') + 'đ';
+    document.querySelectorAll('[data-cart-count], #headerCartCount, .header-cart-count').forEach((el) => {
+      (el as HTMLElement).textContent = String(count);
+    });
+    document.querySelectorAll('[data-cart-total], #headerCartTotal, .header-cart-total').forEach((el) => {
+      (el as HTMLElement).textContent = totalStr;
+    });
   }
 
   private initAdminHeaderLogic() {

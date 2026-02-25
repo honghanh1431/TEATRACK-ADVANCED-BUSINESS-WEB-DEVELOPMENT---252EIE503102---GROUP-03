@@ -273,10 +273,18 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // Actions
-  goCart(e: MouseEvent): void {
+  /** Thêm sản phẩm vào giỏ, hiện toast và cập nhật badge */
+  addToCart(e: MouseEvent, p: Product): void {
     e.preventDefault();
     e.stopPropagation();
-    this.router.navigateByUrl('/cart');
+    if (!(window as any).NGCart) return;
+    (window as any).NGCart.addItem({
+      id: p.id ?? '',
+      name: p.name ?? '',
+      price: Number(p.price) || 0,
+      image: p.image ?? '',
+      size: 'M',
+      qty: 1,
+    });
   }
 }

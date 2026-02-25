@@ -1,0 +1,30 @@
+/* Toast thông báo thêm vào giỏ: góc phải, nền xanh dương, chữ trắng */
+.cart-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 14px 20px;
+  background: var(--color-primary);
+  color:white;
+  font-size: 14px;
+  line-height: 1.4;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(29, 78, 216, 0.35);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  max-width: min(360px, calc(100vw - 48px));
+}
+
+.cart-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cart-toast .cart-toast-name {
+  font-weight: 800;
+  color:white;
+  font-size: 16px;
+}

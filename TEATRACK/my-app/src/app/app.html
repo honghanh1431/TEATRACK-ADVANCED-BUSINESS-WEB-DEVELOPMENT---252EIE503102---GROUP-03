@@ -1,3 +1,7 @@
 <app-page-header *ngIf="showLayout"></app-page-header>
 <router-outlet></router-outlet>
 <app-page-footer *ngIf="showLayout"></app-page-footer>
+
+<div class="cart-toast" [class.visible]="toastVisible" role="status" aria-live="polite">
+  {{ toastPre }}<strong class="cart-toast-name">{{ toastName }}</strong>{{ toastPost }}
+</div>

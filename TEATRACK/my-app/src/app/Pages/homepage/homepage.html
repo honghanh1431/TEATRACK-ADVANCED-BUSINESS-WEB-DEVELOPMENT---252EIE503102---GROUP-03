@@ -120,8 +120,12 @@
               <img [src]="normSrc(p.image)" [alt]="p.name" />
             </figure>
             <div class="card-body">
-              <div class="stars"><span class="fill" [style.width.%]="ratingPct(p)"></span></div>
-              <span class="rating-text">{{ (p.rating ?? 5) | number:'1.1-1' }} ({{ p.reviews ?? 0 }} lượt đánh giá)</span>
+              <div class="card-meta">
+                <span class="star">★</span>
+                <span>{{ (p.rating ?? 5) | number:'1.1-1' }}</span>
+                <span>•</span>
+                <span>{{ p.reviews ?? 0 }} lượt đánh giá</span>
+              </div>
               <h3 class="product-name">{{ p.name }}</h3>
               <div class="price-row">
                 <div class="price-col">
@@ -144,7 +148,7 @@
                     <span class="value">{{ priceVN(vipPrice((p.price || 0) + 3000)) }}đ</span>
                   </div>
                 </div>
-                <button type="button" class="price-cart" (click)="goCart($event)" [attr.aria-label]="'Mở sản phẩm ' + p.name">
+                <button type="button" class="price-cart" (click)="addToCart($event, p)" [attr.aria-label]="'Thêm ' + p.name + ' vào giỏ'">
                   <img src="assets/icons/Cart2.png" alt="" aria-hidden="true" />
                 </button>
               </div>
