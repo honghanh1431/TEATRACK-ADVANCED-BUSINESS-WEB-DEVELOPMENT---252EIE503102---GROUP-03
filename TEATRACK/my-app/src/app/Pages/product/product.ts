@@ -44,6 +44,43 @@ export interface ProductItem {
 }
 
 const REVIEW_PAGE_SIZE = 4;
+/** Base URL API đánh giá (my-server port 3100); bỏ trống nếu chỉ dùng local */
+const REVIEWS_API_BASE = 'http://localhost:3100';
+
+/** Tên hiển thị topping trong giỏ (key data-topping -> "Tên x1") */
+const TOPPING_LABELS: Record<string, string> = {
+  'suong-sao': 'Sương sáo',
+  'thach-dua': 'Thạch dừa nguyên vị',
+  'hat-e': 'Hạt é',
+  'thach-dua-dao': 'Thạch dứa hương đào',
+  'thach-aiyu': 'Thạch aiyu',
+  'thach-soi-la-dua': 'Thạch sợi lá dứa',
+  'thach-suong-sao-vien': 'Thạch sương sáo viên (8)',
+  'tran-chau-hoang-kim': 'Trân châu hoàng kim',
+  'tran-chau-duong-den': 'Trân châu đường đen',
+  'tran-chau-3q': 'Trân châu 3Q trắng/đen',
+  'tran-chau-khoai-mon': 'Trân châu khoai môn',
+  'hat-thuy-tinh-cu-nang': 'Hạt thủy tinh củ năng',
+  'hat-thuy-tinh-lua-mach': 'Hạt thủy tinh lúa mạch',
+  'dao-mieng': 'Đào miếng',
+  'khoai-mon-nghien': 'Khoai môn nghiền',
+  'hat-sen': 'Hạt sen',
+  'kem-tuoi-vani': 'Kem tươi vani',
+  'kem-cheese': 'Kem cheese',
+  'pudding-trung': 'Pudding trứng',
+  'thach-sua-vien': 'Thạch sữa viên (8)',
+};
+
+/** Giá từng topping (đồng) để cộng vào giá món */
+const TOPPING_PRICES: Record<string, number> = {
+  'suong-sao': 3000, 'thach-dua': 3000, 'hat-e': 3000,
+  'thach-dua-dao': 5000, 'thach-aiyu': 5000, 'thach-soi-la-dua': 5000,
+  'thach-suong-sao-vien': 5000, 'tran-chau-hoang-kim': 5000, 'tran-chau-duong-den': 5000,
+  'tran-chau-3q': 5000, 'tran-chau-khoai-mon': 5000, 'hat-thuy-tinh-cu-nang': 5000,
+  'hat-thuy-tinh-lua-mach': 5000, 'dao-mieng': 5000, 'khoai-mon-nghien': 5000,
+  'hat-sen': 7000, 'kem-tuoi-vani': 7000, 'kem-cheese': 7000, 'pudding-trung': 7000,
+  'thach-sua-vien': 7000,
+};
 
 export interface ReviewItem {
   name: string;
@@ -51,6 +88,8 @@ export interface ReviewItem {
   content: string;
   time: string;
   rating: number;
+  /** Timestamp (ms) để sắp xếp mới nhất lên trước */
+  createdAt?: number;
 }
 
 @Component({
@@ -75,13 +114,17 @@ export class Product implements OnInit, OnDestroy {
   noteOpen = false;
   toppingQtys: Record<string, number> = {};
   currentPage = 1;
+  /** Số sao đang chọn trong form (0 = chưa chọn, 1–5) */
+  reviewFormRating = 0;
+  /** Nội dung đánh giá trong form */
+  reviewFormContent = '';
   reviews: ReviewItem[] = [
-    { name: 'Hồng Hạnh', title: 'Tôi yêu HTVT!!!!!!!', content: 'HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!', time: '2 ngày trước', rating: 5 },
-    { name: 'Bảo Vy', title: 'So good, so yummy', content: 'HTVT rất ngon, tuyệt vời!', time: '3 ngày trước', rating: 5 },
-    { name: 'Trung Nhân', title: 'Đáng thử', content: 'Lần đầu uống thấy ổn, sẽ quay lại.', time: '5 ngày trước', rating: 4 },
-    { name: 'Hoàng Đức', title: 'Ngon đúng vị', content: 'Vị trà và vải hài hòa, không quá ngọt.', time: '1 tuần trước', rating: 5 },
-    { name: 'Thanh Thanh', title: 'Recommend', content: 'Bạn bè giới thiệu, uống xong ghiền.', time: '1 tuần trước', rating: 5 },
-    { name: 'Thế Hưng', title: 'Tạm được', content: 'Giá hơi cao nhưng chất lượng ổn.', time: '2 tuần trước', rating: 4 },
+    { name: 'Hồng Hạnh', title: 'Tôi yêu HTVT!!!!!!!', content: 'HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!', time: '2 ngày trước', rating: 5, createdAt: 0 },
+    { name: 'Bảo Vy', title: 'So good, so yummy', content: 'HTVT rất ngon, tuyệt vời!', time: '3 ngày trước', rating: 5, createdAt: 0 },
+    { name: 'Trung Nhân', title: 'Đáng thử', content: 'Lần đầu uống thấy ổn, sẽ quay lại.', time: '5 ngày trước', rating: 4, createdAt: 0 },
+    { name: 'Hoàng Đức', title: 'Ngon đúng vị', content: 'Vị trà và vải hài hòa, không quá ngọt.', time: '1 tuần trước', rating: 5, createdAt: 0 },
+    { name: 'Thanh Thanh', title: 'Recommend', content: 'Bạn bè giới thiệu, uống xong ghiền.', time: '1 tuần trước', rating: 5, createdAt: 0 },
+    { name: 'Thế Hưng', title: 'Tạm được', content: 'Giá hơi cao nhưng chất lượng ổn.', time: '2 tuần trước', rating: 4, createdAt: 0 },
   ];
   private subs: any[] = [];
 
@@ -96,6 +139,13 @@ export class Product implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     document.body.style.overflow = '';
+    // Gán createdAt cho review mẫu (mới nhất trước khi sort)
+    const day = 24 * 60 * 60 * 1000;
+    this.reviews.forEach((r, i) => {
+      if (r.createdAt == null || r.createdAt === 0) {
+        r.createdAt = Date.now() - (i + 2) * day * 2;
+      }
+    });
     const snapshot = this.route.snapshot;
     const sub = combineLatest([
       this.route.paramMap.pipe(startWith(snapshot.paramMap)),
@@ -145,6 +195,7 @@ export class Product implements OnInit, OnDestroy {
           this.titleService.setTitle(`${found.name || 'Sản phẩm'} | ${ROUTE_TITLES['/product']}`);
         }
         this.pickRelated();
+        if (found) this.loadReviewsForProduct(String(found.id));
         this.cdr.detectChanges();
         setTimeout(() => this.logRatingStyles(), 150);
       },
@@ -284,19 +335,45 @@ export class Product implements OnInit, OnDestroy {
     this.qty = Math.max(1, Math.min(99, this.qty + delta));
   }
 
+  private getSelectedToppings(): string[] {
+    const out: string[] = [];
+    for (const key of Object.keys(this.toppingQtys)) {
+      const q = this.toppingQtys[key] || 0;
+      if (q <= 0) continue;
+      const label = TOPPING_LABELS[key] || key;
+      out.push(`${label} x${q}`);
+    }
+    return out;
+  }
+
+  /** Giá gốc + tổng tiền topping (cho 1 phần) */
+  private getTotalPriceWithToppings(): number {
+    const base = this.selectedSize === 'L' ? this.getPriceL(this.product!) : this.getPriceM(this.product!);
+    let add = 0;
+    for (const key of Object.keys(this.toppingQtys)) {
+      const q = this.toppingQtys[key] || 0;
+      if (q <= 0) continue;
+      add += q * (TOPPING_PRICES[key] ?? 0);
+    }
+    return base + add;
+  }
+
   addToCart(): void {
     if (!this.product || !window.NGCart) return;
-    const price = this.selectedSize === 'L' ? this.getPriceL(this.product) : this.getPriceM(this.product);
-    window.NGCart.addItem({
+    const sweetnessLabel = this.selectedSweetness === 'it' ? 'Ít' : this.selectedSweetness === 'vua' ? 'Vừa' : 'Nhiều';
+    const iceLabel = this.selectedIce === 'it' ? 'Ít' : this.selectedIce === 'vua' ? 'Vừa' : 'Nhiều';
+    const toppings = this.getSelectedToppings();
+    (window.NGCart.addItem as any)({
       id: String(this.product.id || ''),
       name: String(this.product.name || ''),
-      price,
+      price: this.getTotalPriceWithToppings(),
       image: this.product.image || '',
       size: this.selectedSize,
+      sweetness: sweetnessLabel,
+      ice: iceLabel,
+      toppings: toppings.length ? toppings : undefined,
       qty: this.qty,
     });
-    window.dispatchEvent(new CustomEvent('cart:updated'));
-    alert('Đã thêm sản phẩm vào giỏ hàng!');
   }
 
   buyNow(): void {
@@ -319,9 +396,15 @@ export class Product implements OnInit, OnDestroy {
     return Math.max(1, Math.ceil(this.reviews.length / REVIEW_PAGE_SIZE));
   }
 
+  /** Danh sách review đã sắp theo thời gian (mới nhất trước) */
+  get sortedReviews(): ReviewItem[] {
+    return [...this.reviews].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+  }
+
   get displayedReviews(): ReviewItem[] {
+    const sorted = this.sortedReviews;
     const start = (this.currentPage - 1) * REVIEW_PAGE_SIZE;
-    return this.reviews.slice(start, start + REVIEW_PAGE_SIZE);
+    return sorted.slice(start, start + REVIEW_PAGE_SIZE);
   }
 
   get pageNumbers(): number[] {
@@ -341,6 +424,54 @@ export class Product implements OnInit, OnDestroy {
 
   goToPage(p: number): void {
     if (p >= 1 && p <= this.totalPages) this.currentPage = p;
+  }
+
+  /** Chọn số sao trong form đánh giá (1–5) */
+  setReviewRating(star: number): void {
+    this.reviewFormRating = Math.min(5, Math.max(1, star));
+  }
+
+  /** Tải đánh giá theo productId từ API (nếu có server); thất bại thì giữ danh sách hiện tại */
+  private loadReviewsForProduct(productId: string): void {
+    if (!REVIEWS_API_BASE) return;
+    this.http.get<ReviewItem[]>(`${REVIEWS_API_BASE}/reviews?productId=${encodeURIComponent(productId)}`).subscribe({
+      next: (list) => {
+        if (Array.isArray(list)) {
+          list.forEach((r) => { if (r.createdAt == null) r.createdAt = 0; });
+          this.reviews = list;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  /** Gửi đánh giá: gửi lên API (nếu có), thêm vào danh sách (mới nhất lên đầu) và reset form */
+  submitReview(): void {
+    const rating = this.reviewFormRating;
+    if (rating < 1) return;
+    const content = (this.reviewFormContent || '').trim();
+    const user = Product.getCurrentUser();
+    const name = user?.username || 'Khách';
+    const title = content ? content.split('\n')[0].slice(0, 80) || 'Đánh giá' : 'Đánh giá';
+    const createdAt = Date.now();
+    const newReview: ReviewItem = {
+      name,
+      title,
+      content: content || '(Không có nội dung)',
+      time: 'Vừa xong',
+      rating,
+      createdAt,
+    };
+    this.reviews.unshift(newReview);
+    this.reviewFormRating = 0;
+    this.reviewFormContent = '';
+    this.currentPage = 1;
+    this.cdr.detectChanges();
+    if (REVIEWS_API_BASE && this.product?.id) {
+      const body = { productId: String(this.product.id), name, title, content: newReview.content, time: newReview.time, rating, createdAt };
+      this.http.post(`${REVIEWS_API_BASE}/reviews`, body).subscribe({ error: () => {} });
+    }
   }
 
   scrollToTop(): void {
@@ -390,6 +521,5 @@ export class Product implements OnInit, OnDestroy {
       size: 'M',
       qty: 1,
     });
-    window.dispatchEvent(new CustomEvent('cart:updated', { detail: { silent: true } }));
   }
 }

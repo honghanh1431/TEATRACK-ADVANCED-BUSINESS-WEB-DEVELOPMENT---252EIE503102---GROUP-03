@@ -9,6 +9,9 @@ interface CartItem {
   price: number;
   image: string;
   size?: string;
+  sweetness?: string;
+  ice?: string;
+  toppings?: string[];
   note?: string;
   options?: string[];
   qty: number;
@@ -52,7 +55,7 @@ interface Totals {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './cart.html',
-  styleUrls: ['./cart.css']
+  styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit, OnDestroy {
   // Storage keys
@@ -85,11 +88,34 @@ export class Cart implements OnInit, OnDestroy {
 
   // Time options
   readonly timeOptions = [
-    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-    '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-    '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
-    '20:00', '20:30', '21:00', '21:30',
+    '08:00',
+    '08:30',
+    '09:00',
+    '09:30',
+    '10:00',
+    '10:30',
+    '11:00',
+    '11:30',
+    '12:00',
+    '12:30',
+    '13:00',
+    '13:30',
+    '14:00',
+    '14:30',
+    '15:00',
+    '15:30',
+    '16:00',
+    '16:30',
+    '17:00',
+    '17:30',
+    '18:00',
+    '18:30',
+    '19:00',
+    '19:30',
+    '20:00',
+    '20:30',
+    '21:00',
+    '21:30',
   ];
 
   readonly minDate = new Date().toISOString().split('T')[0];
@@ -117,12 +143,12 @@ export class Cart implements OnInit, OnDestroy {
     deliveryTime: '19:30',
     note: 'Ghi chu: Quan de ly 2 voi 2 ben rieng giup nhe!',
   };
-  
+
   getImageUrl(imagePath: string): string {
-  if (!imagePath) return '';
-  // Xử lý đường dẫn ảnh
-  return '/' + imagePath.replace(/^\//, '');
-};
+    if (!imagePath) return '';
+    // Xử lý đường dẫn ảnh
+    return '/' + imagePath.replace(/^\//, '');
+  }
 
   // State variables
   cartItems: CartItem[] = [];
@@ -157,7 +183,9 @@ export class Cart implements OnInit, OnDestroy {
     if (!stored || !stored.code) {
       return { code: '', amount: 0, description: '', valid: false, message: 'Chưa áp dụng' };
     }
-    const code = String(stored.code || '').trim().toUpperCase();
+    const code = String(stored.code || '')
+      .trim()
+      .toUpperCase();
     const rule = this.couponRules[code];
     if (!rule) {
       this.clearCouponData();
@@ -183,7 +211,13 @@ export class Cart implements OnInit, OnDestroy {
       amount = Number(rule.value) || 0;
     }
     amount = Math.min(Math.max(amount, 0), subtotal);
-    return { code, amount, description: rule.description || '', valid: amount > 0, message: rule.description || '' };
+    return {
+      code,
+      amount,
+      description: rule.description || '',
+      valid: amount > 0,
+      message: rule.description || '',
+    };
   }
 
   get totals(): Totals {
@@ -253,12 +287,18 @@ export class Cart implements OnInit, OnDestroy {
         this.shippingInfo = this.normalizeShipping(parsed);
       } else {
         this.shippingInfo = { ...this.defaultShipping };
-        this.shippingInfo.time = this.buildTimeText(this.shippingInfo.deliveryDate, this.shippingInfo.deliveryTime);
+        this.shippingInfo.time = this.buildTimeText(
+          this.shippingInfo.deliveryDate,
+          this.shippingInfo.deliveryTime,
+        );
       }
     } catch (err) {
       console.warn('Cannot parse shipping info', err);
       this.shippingInfo = { ...this.defaultShipping };
-      this.shippingInfo.time = this.buildTimeText(this.shippingInfo.deliveryDate, this.shippingInfo.deliveryTime);
+      this.shippingInfo.time = this.buildTimeText(
+        this.shippingInfo.deliveryDate,
+        this.shippingInfo.deliveryTime,
+      );
     }
   }
 
@@ -319,20 +359,48 @@ export class Cart implements OnInit, OnDestroy {
     }
   }
 
+  /** Một dòng gọn (tương thích cũ) */
   getItemDetails(item: CartItem): string {
-    const details = [
-      item.size ? `Size ${item.size}` : '',
-      Array.isArray(item.options) && item.options.length ? item.options.join(', ') : '',
-      item.note || '',
-    ];
-    return details.filter(Boolean).join(' - ');
+    const parts: string[] = [];
+    if (item.size) parts.push(`Size ${item.size}`);
+    if (item.sweetness) parts.push(`Ngọt: ${item.sweetness}`);
+    if (item.ice) parts.push(`Đá: ${item.ice}`);
+    if (Array.isArray(item.options) && item.options.length) parts.push(item.options.join(', '));
+    if (item.note) parts.push(item.note);
+    return parts.join(' - ');
+  }
+
+  /** Nhiều dòng mô tả đúng như hình: "Size M - Ngọt: Ít, Đá: Ít" rồi "Topping: ..." */
+  getItemDetailLines(item: CartItem): string[] {
+    const lines: string[] = [];
+    const ngot = item.sweetness || 'Ít';
+    const da = item.ice || 'Ít';
+    if (item.size) {
+      const first = `Size ${item.size} - Ngọt: ${ngot} - Đá: ${da}`;
+      lines.push(Array.isArray(item.toppings) && item.toppings.length ? first + ',' : first);
+    } else if (item.sweetness || item.ice) {
+      const part = [item.sweetness && `Ngọt: ${item.sweetness}`, item.ice && `Đá: ${item.ice}`]
+        .filter(Boolean)
+        .join(', ');
+      lines.push(part);
+    }
+    if (Array.isArray(item.toppings) && item.toppings.length) {
+      lines.push('Topping:');
+      item.toppings.forEach((t) => lines.push(t));
+    }
+    if (lines.length === 0 && Array.isArray(item.options) && item.options.length) {
+      lines.push(item.options.join(', '));
+    }
+    if (item.note && !lines.some((l) => l.includes(item.note!))) lines.push(item.note);
+    return lines;
   }
 
   private buildTimeText(dateValue: string, timeValue: string): string {
     if (!dateValue && !timeValue) return '';
     const parts = String(dateValue || '').split('-');
     const [year, month = '', day = ''] = parts;
-    const displayDate = parts.length === 3 ? `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}` : '';
+    const displayDate =
+      parts.length === 3 ? `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}` : '';
     if (displayDate && timeValue) return `Nhận hàng ngày ${displayDate} - Vào lúc ${timeValue}`;
     if (displayDate) return `Nhận hàng ngày ${displayDate}`;
     if (timeValue) return `Nhận hàng vào lúc ${timeValue}`;
@@ -368,7 +436,10 @@ export class Cart implements OnInit, OnDestroy {
     if (data.deliveryDate && data.deliveryTime) {
       data.time = this.buildTimeText(data.deliveryDate, data.deliveryTime);
     } else if (!data.time) {
-      data.time = this.buildTimeText(this.defaultShipping.deliveryDate, this.defaultShipping.deliveryTime);
+      data.time = this.buildTimeText(
+        this.defaultShipping.deliveryDate,
+        this.defaultShipping.deliveryTime,
+      );
     }
     data.note = (data.note || '').trim();
     return data;
@@ -410,14 +481,14 @@ export class Cart implements OnInit, OnDestroy {
         this.modalTitle = 'Cập nhật người nhận';
         this.modalData = {
           receiver: this.shippingInfo.receiver,
-          phone: this.shippingInfo.phone
+          phone: this.shippingInfo.phone,
         };
         break;
       case 'time':
         this.modalTitle = 'Thời gian nhận hàng';
         this.modalData = {
           deliveryDate: this.shippingInfo.deliveryDate || this.minDate,
-          deliveryTime: this.shippingInfo.deliveryTime || this.timeOptions[0]
+          deliveryTime: this.shippingInfo.deliveryTime || this.timeOptions[0],
         };
         break;
       case 'note':
@@ -467,7 +538,10 @@ export class Cart implements OnInit, OnDestroy {
         if (this.modalData.deliveryDate && this.modalData.deliveryTime) {
           this.shippingInfo.deliveryDate = this.modalData.deliveryDate;
           this.shippingInfo.deliveryTime = this.modalData.deliveryTime;
-          this.shippingInfo.time = this.buildTimeText(this.modalData.deliveryDate, this.modalData.deliveryTime);
+          this.shippingInfo.time = this.buildTimeText(
+            this.modalData.deliveryDate,
+            this.modalData.deliveryTime,
+          );
           this.saveShippingInfo();
         }
         break;
@@ -488,12 +562,19 @@ export class Cart implements OnInit, OnDestroy {
   }
 
   private applyCoupon(code: string): void {
-    const normalized = String(code || '').trim().toUpperCase();
+    const normalized = String(code || '')
+      .trim()
+      .toUpperCase();
     const evaluation = this.evaluateCoupon(normalized);
     if (!evaluation.success) {
       if (evaluation.reason === 'minSubtotal') {
         this.setCouponData(normalized);
-        this.showAlertModal('warning', 'Thông báo', evaluation.error || 'Mã chưa đáp ứng điều kiện', false);
+        this.showAlertModal(
+          'warning',
+          'Thông báo',
+          evaluation.error || 'Mã chưa đáp ứng điều kiện',
+          false,
+        );
       } else {
         this.showAlertModal('warning', 'Lỗi', evaluation.error || 'Mã không hợp lệ', false);
       }
@@ -504,7 +585,9 @@ export class Cart implements OnInit, OnDestroy {
   }
 
   private evaluateCoupon(rawCode: string): any {
-    const code = String(rawCode || '').trim().toUpperCase();
+    const code = String(rawCode || '')
+      .trim()
+      .toUpperCase();
     if (!code) {
       return { success: false, reason: 'empty', error: 'Vui lòng nhập mã giảm giá.' };
     }
@@ -531,22 +614,33 @@ export class Cart implements OnInit, OnDestroy {
     }
     amount = Math.min(Math.max(amount, 0), this.subtotal);
     if (!amount) {
-      return { success: false, reason: 'noDiscount', error: 'Mã chưa áp dụng được cho đơn hiện tại.' };
+      return {
+        success: false,
+        reason: 'noDiscount',
+        error: 'Mã chưa áp dụng được cho đơn hiện tại.',
+      };
     }
     return { success: true, code, amount, description: rule.description || '' };
   }
 
   // Alert methods
-  private showAlertModal(type: 'warning' | 'info' | 'confirm', title: string, message: string, isConfirm: boolean): Promise<boolean> {
+  private showAlertModal(
+    type: 'warning' | 'info' | 'confirm',
+    title: string,
+    message: string,
+    isConfirm: boolean,
+  ): Promise<boolean> {
     this.alertType = type;
     this.alertTitle = title;
     this.alertMessage = message;
     this.alertConfirm = isConfirm;
 
     const icons = {
-      warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
-      info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
-      confirm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>'
+      warning:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+      info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>',
+      confirm:
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>',
     };
     this.alertIcon = icons[type] || icons.info;
 
@@ -578,18 +672,13 @@ export class Cart implements OnInit, OnDestroy {
         'warning',
         'Chưa đồng ý điều khoản',
         'Vui lòng đồng ý với các điều khoản trước khi thanh toán.',
-        false
+        false,
       );
       return;
     }
 
     if (!this.cartItems.length) {
-      await this.showAlertModal(
-        'info',
-        'Giỏ hàng trống',
-        'Giỏ hàng hiện đang trống.',
-        false
-      );
+      await this.showAlertModal('info', 'Giỏ hàng trống', 'Giỏ hàng hiện đang trống.', false);
       return;
     }
 
@@ -611,7 +700,7 @@ export class Cart implements OnInit, OnDestroy {
         shipping: this.totals.shipping,
         discount: this.totals.discount,
         total: this.totals.grand,
-        items: this.cartItems.map(item => ({
+        items: this.cartItems.map((item) => ({
           id: item.id,
           name: item.name,
           price: item.price,
@@ -639,7 +728,11 @@ export class Cart implements OnInit, OnDestroy {
     }
 
     // Other payment methods
-    const methodMap: Record<string, string> = { momo: 'momo', zalopay: 'zalopay', ewallet: 'payoo' };
+    const methodMap: Record<string, string> = {
+      momo: 'momo',
+      zalopay: 'zalopay',
+      ewallet: 'payoo',
+    };
     const method = methodMap[this.selectedPayment] || 'momo';
     window.location.href = '/payment/?method=' + method;
   }

@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
+import { CartService } from './cart.service';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,14 @@ import { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 })
 export class App implements OnInit, OnDestroy {
   private sub?: Subscription;
+  private toastSub?: Subscription;
 
   showLayout = true;
+  /** Toast: pre + name (in đậm) + post */
+  toastPre = '';
+  toastName = '';
+  toastPost = '';
+  toastVisible = false;
 
   /** Màu nền dải phía trên footer: khớp với aboutus/menu để không bị tách màu */
   @HostBinding('style.--footer-overlap-bg') get footerOverlapBg(): string {
@@ -27,11 +34,15 @@ export class App implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private titleService: Title,
+    private cartService: CartService,
   ) {
     this.router.events.subscribe(event => {
     if (event instanceof NavigationEnd) {
       const path = event.urlAfterRedirects?.split('?')[0] || '';
       this.showLayout = !this.hideLayoutPaths.includes(path);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('routeChange', { detail: { path: path } }));
+      }
     }
   });
   }
@@ -54,9 +65,25 @@ export class App implements OnInit, OnDestroy {
     this.sub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => this.updateTitle((e.urlAfterRedirects || '/').split('?')[0]));
+
+    (window as any).NGCart = {
+      addItem: (item: any) => this.cartService.addItem(item),
+    };
+
+    this.toastSub = this.cartService.toastMessage$.subscribe((data) => {
+      this.toastPre = data.pre;
+      this.toastName = data.name;
+      this.toastPost = data.post;
+      this.toastVisible = true;
+      setTimeout(() => {
+        this.toastVisible = false;
+        this.toastPre = this.toastName = this.toastPost = '';
+      }, 3200);
+    });
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.toastSub?.unsubscribe();
   }
 }

@@ -176,12 +176,27 @@ const WEATHER_RECOMMENDATIONS = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+// Chạy sau khi DOM + Angular đã render (popup inject vào body)
+function bootWeather() {
+    if (!document.body) return;
     initializeWeatherPopup();
     loadHCMCWeather();
-});
+}
+function scheduleWeatherPopup() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function run() {
+            setTimeout(bootWeather, 400);
+        });
+    } else {
+        setTimeout(bootWeather, 400);
+    }
+}
+if (typeof document !== 'undefined') {
+    scheduleWeatherPopup();
+}
 
 function initializeWeatherPopup() {
+    if (document.getElementById('weatherToggleBtn')) return;
     // Tạo HTML cho popup
     const popupHTML = `
         <style>
@@ -564,7 +579,7 @@ function initializeWeatherPopup() {
             }
         </style>
 
-        <div class="weather-popup-container">
+        <div class="weather-popup-container" id="weatherPopupContainer">
             <button class="weather-toggle-btn" id="weatherToggleBtn" aria-label="Xem thời tiết">
                 🌤️
             </button>
@@ -590,6 +605,23 @@ function initializeWeatherPopup() {
 
     // Thêm popup vào body
     document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+    // Ẩn popup trên login, signup, pagenotfound; hiện trên tất cả trang còn lại
+    var container = document.getElementById('weatherPopupContainer');
+    function updateWeatherVisibility() {
+        if (!container) return;
+        var path = (window.location.pathname || '').split('?')[0];
+        var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/404';
+        container.style.display = hide ? 'none' : '';
+    }
+    updateWeatherVisibility();
+    window.addEventListener('routeChange', function(e) {
+        if (e.detail && e.detail.path !== undefined) {
+            var hide = e.detail.path === '/login' || e.detail.path === '/login-admin' || e.detail.path === '/register' || e.detail.path === '/404';
+            container.style.display = hide ? 'none' : '';
+        }
+    });
+    window.addEventListener('popstate', updateWeatherVisibility);
 
     // Xử lý sự kiện
     const toggleBtn = document.getElementById('weatherToggleBtn');
