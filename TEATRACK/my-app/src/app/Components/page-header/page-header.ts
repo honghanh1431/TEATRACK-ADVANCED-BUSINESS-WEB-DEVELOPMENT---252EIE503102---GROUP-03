@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID, Renderer2 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
@@ -12,8 +12,15 @@ import { isPlatformBrowser } from '@angular/common';
 export class PageHeader implements OnInit, AfterViewInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public router: Router
   ) {}
+
+  /** True khi đang ở /menu hoặc /product (chi tiết sản phẩm) → hiện underline "Menu thức uống" */
+  get isMenuOrProductActive(): boolean {
+    const path = this.router.url.split('?')[0];
+    return path.startsWith('/menu') || path.startsWith('/product');
+  }
 
   ngOnInit() {
   }

@@ -19,6 +19,7 @@ import { Aboutus } from './Pages/aboutus/aboutus';
 import { Cart } from './Pages/cart/cart';
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 import { Login } from './Pages/login/login';
+import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { Login } from './Pages/login/login';
     Menu,
     Product,
     Aboutus,
+    Pagenotfound,
   ],
   
   imports: [

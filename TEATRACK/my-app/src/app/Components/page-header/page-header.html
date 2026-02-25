@@ -32,7 +32,7 @@
     <a routerLink="/aboutus" routerLinkActive="active">
       <img src="assets/icons/info.png" alt="">Về chúng tôi
     </a> 
-    <a routerLink="/menu" routerLinkActive="active" class="nav-item">
+    <a routerLink="/menu" routerLinkActive="active" [class.active]="isMenuOrProductActive" class="nav-item">
       <img src="assets/icons/menu.png" alt="">Menu thức uống
     </a>
     <a routerLink="/contact" routerLinkActive="active">

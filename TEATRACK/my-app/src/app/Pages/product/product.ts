@@ -95,6 +95,7 @@ export class Product implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    document.body.style.overflow = '';
     const snapshot = this.route.snapshot;
     const sub = combineLatest([
       this.route.paramMap.pipe(startWith(snapshot.paramMap)),

@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { Subscription, firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import Swiper from 'swiper';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -33,6 +34,12 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   vipPrice(n: number): number {
     return Math.max(0, n - 3000);
   }
+  /** Phần trăm rating (0–100) cho thanh sao kiểu product page */
+  ratingPct(p: Product): number {
+    const r = typeof p.rating === 'number' && !Number.isNaN(p.rating) ? p.rating : 5;
+    return Math.min(100, Math.max(0, (r / 5) * 100));
+  }
+  @ViewChild('heroSwiper') heroSwiperEl?: ElementRef<HTMLElement>;
   @ViewChild('drinksSwiperEl') drinksSwiperEl?: ElementRef<HTMLElement>;
 
   // data
@@ -48,6 +55,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   // swipers
   private heroSwiper: Swiper | null = null;
   private drinksSwiper: Swiper | null = null;
+  private routerSub?: Subscription;
 
   // category map
   private readonly CAT_MAP: Record<string, string> = {
@@ -55,7 +63,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     'tra-latte': 'Loại Trà Latte',
     'tra-sua': 'Loại Trà Sữa',
     'mon-moi': 'Thức Uống Mới',
-    'mon-hot': 'Thức UỐng Hot',
+    'mon-hot': 'Thức Uống Hot',
     'tra-trai-cay': 'Loại Trà Trái Cây',
   };
 
@@ -66,10 +74,17 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly NAME_TO_SLUG: Record<string, string>;
 
-  // backend api base 
-  private readonly API_PRODUCTS = '/api/products/';
+  private readonly API_PRODUCTS = '/data/products.json';
 
-  constructor(private http: HttpClient, private router: Router) {
+  getSelectedCategoryName(): string {
+    return this.selectedSlug ? (this.CAT_MAP[this.selectedSlug] || '') : '';
+  }
+
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {
     this.NAME_TO_SLUG = Object.fromEntries(
       Object.entries(this.CAT_MAP).map(([slug, name]) => [this.normalize(name), slug])
     );
@@ -79,38 +94,58 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     await this.ensureProducts();
     this.renderTopHot();
     this.renderHotMenu();
+    this.cdr.detectChanges();
+    // Re-init hero Swiper khi quay lại trang chủ (nếu component bị reuse)
+    this.routerSub = this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(() => {
+        const path = this.router.url.split('?')[0];
+        if ((path === '/' || path === '/homepage') && !this.heroSwiper && this.heroSwiperEl?.nativeElement) {
+          setTimeout(() => this.initHeroSwiper(), 0);
+        }
+      });
   }
 
   ngAfterViewInit(): void {
-    // Swiper hero
-    this.heroSwiper = new Swiper('.mySwiper', {
+    setTimeout(() => this.initHeroSwiper(), 0);
+  }
+
+  /** Khởi tạo hero Swiper bằng element ref để pagination luôn đúng container, tránh bullet mất */
+  private initHeroSwiper(): void {
+    const el = this.heroSwiperEl?.nativeElement;
+    if (!el) return;
+    this.heroSwiper?.destroy(true, true);
+    this.heroSwiper = null;
+    const paginationEl = el.querySelector<HTMLElement>('.swiper-pagination');
+    this.heroSwiper = new Swiper(el, {
       loop: true,
       slidesPerView: 1,
       direction: 'horizontal',
-      grabCursor: true,        
-      simulateTouch: true,     
-      allowTouchMove: true,    
-      pagination: { el: '.swiper-pagination', clickable: true },
+      grabCursor: true,
+      simulateTouch: true,
+      allowTouchMove: true,
+      pagination: paginationEl ? { el: paginationEl, clickable: true } : false,
       autoplay: { delay: 3000, disableOnInteraction: false },
     });
   }
 
   ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
     this.heroSwiper?.destroy(true, true);
     this.drinksSwiper?.destroy(true, true);
     this.heroSwiper = null;
     this.drinksSwiper = null;
+    document.body.style.overflow = '';
   }
 
-  // backend load products
   private async ensureProducts(): Promise<void> {
     if (this.ALL_PRODUCTS.length) return;
 
     try {
-      const data = await this.http.get<Product[]>(this.API_PRODUCTS).toPromise();
+      const data = await firstValueFrom(this.http.get<Product[]>(this.API_PRODUCTS));
       this.ALL_PRODUCTS = Array.isArray(data) ? data : [];
     } catch (err) {
-      console.error('Cannot load products from API', err);
+      console.error('Cannot load products', err);
       this.ALL_PRODUCTS = [];
     }
   }

@@ -9,7 +9,7 @@
   --color-primary-hover: #1d4ed8;
   --color-danger: #e11d48;
   --color-border: #e5e7eb;
-  --bg-light: #f9fafb;
+  --bg-light: #f3f9fe;
   --radius: 12px;
 }
 
@@ -24,7 +24,7 @@
 html, body {
   font-family: var(--font-main);
   color: var(--color-text);
-  background: #F2F9FE;
+  background: #ffffff;
   scroll-behavior: smooth;
 }
 body {
@@ -122,6 +122,21 @@ input:focus, select:focus, textarea:focus {
 .text-center { text-align: center; }
 .text-muted { color: var(--color-muted); }
 .mt-2 { margin-top: 8px; }
+/* Ghi đè kích thước mũi tên < > trong modal drinks (Swiper nav) */
+.drinks-right .swiper-button-prev::after,
+.drinks-right .swiper-button-next::after {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+.drinks-right .swiper-button-prev svg,
+.drinks-right .swiper-button-next svg {
+  width: 12px !important;
+  height: 12px !important;
+  max-width: 12px !important;
+  max-height: 12px !important;
+}
+
 .mt-3 { margin-top: 12px; }
 .mt-4 { margin-top: 20px; }
-

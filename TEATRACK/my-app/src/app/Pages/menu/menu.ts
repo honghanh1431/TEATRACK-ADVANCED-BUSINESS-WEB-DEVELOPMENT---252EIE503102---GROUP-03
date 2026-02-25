@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProductStateService } from '../../product-state.service';
@@ -44,7 +44,7 @@ interface MenuState {
   styleUrls: ['./menu.css', '../../../styles.css'],
   encapsulation: ViewEncapsulation.None, // Để không bị global CSS ảnh hưởng
 })
-export class Menu implements OnInit {
+export class Menu implements OnInit, AfterViewInit {
   private static readonly STATIC_BASE = '/';
 
   // ─── State ────────────────────────────────────────────────────────────────
@@ -80,6 +80,22 @@ export class Menu implements OnInit {
       this.state.category = categoryFromUrl.trim();
     }
     this.fetchProducts();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.state.category && this.state.category !== 'all') {
+      this.scrollToContent();
+    }
+  }
+
+  /** Cuộn thẳng tới khúc filter (menu-search / section-title), không scroll to top trước */
+  private scrollToContent(): void {
+    requestAnimationFrame(() => {
+      const el = document.getElementById('menu-search') || document.getElementById('section-title');
+      if (el) {
+        el.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    });
   }
 
   // ─── Fetch ────────────────────────────────────────────────────────────────

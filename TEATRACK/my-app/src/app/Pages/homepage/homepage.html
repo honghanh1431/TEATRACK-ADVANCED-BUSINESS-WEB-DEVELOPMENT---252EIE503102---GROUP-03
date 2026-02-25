@@ -4,16 +4,22 @@
     <section class="hero">
       <!-- HERO TOP -->
       <div class="hero-top">
-        <div class="swiper mySwiper">
+        <div class="swiper mySwiper" #heroSwiper>
           <div class="swiper-wrapper">
             <div class="swiper-slide">
-              <img src="assets/images/banner1.png" alt="Banner 1" />
+              <a routerLink="/blog/blog_2">
+                <img src="assets/images/banner1.png" alt="Banner 1" />
+              </a>
             </div>
             <div class="swiper-slide">
-              <img src="assets/images/banner2.jpeg" alt="Banner 2" />
+              <a routerLink="/blog/blog_4">
+                <img src="assets/images/banner2.jpeg" alt="Banner 2" />
+              </a>
             </div>
             <div class="swiper-slide">
-              <img src="assets/images/banner3.jpeg" alt="Banner 3" />
+              <a routerLink="/blog/blog_7">
+                <img src="assets/images/banner3.jpeg" alt="Banner 3" />
+              </a>
             </div>
           </div>
           <div class="swiper-pagination"></div>
@@ -42,9 +48,9 @@
               <p>Loại Trà Latte</p>
             </div>
 
-            <div class="drink-item" (click)="openDrinksModal('Thức UỐng Hot')">
+            <div class="drink-item" (click)="openDrinksModal('Thức Uống Hot')">
               <img src="assets/images/cac-mon-hot.png" alt="Thức uống hot" />
-              <p>Thức UỐng Hot</p>
+              <p>Thức Uống Hot</p>
             </div>
 
             <div class="drink-item" (click)="openDrinksModal('Thức Uống Mới')">
@@ -73,39 +79,27 @@
 
         <!-- 4 món random từ “Thức Uống Mới” -->
         <div class="product-grid">
-          <a class="product-card" routerLink="/product">
+          <a
+            class="product-card"
+            *ngFor="let p of hotMenuItems"
+            [routerLink]="['/product']"
+            [queryParams]="{ pid: p.id ?? '', name: p.name ?? '' }"
+            [attr.aria-label]="p.name"
+          >
             <figure>
-              <img src="assets/images/products/hong-tra-trung-khung-long.png" alt="Món 1">
+              <img [src]="normSrc(p.image)" [alt]="p.name" />
             </figure>
-            <h3 class="product-name">Hồng trà trứng khủng long</h3>
+            <h3 class="product-name">{{ p.name }}</h3>
           </a>
-
-          <a class="product-card" routerLink="/product">
-            <figure>
-              <img src="assets/images/products/o-long-o-mai-chanh-day.png" alt="Món 2">
-            </figure>
-            <h3 class="product-name">Ô long ô mai chanh dây</h3>
-          </a>
-
-          <a class="product-card" routerLink="/product">
-            <figure>
-              <img src="assets/images/products/tra-xanh-o-mai-chanh-day.png" alt="Món 3">
-            </figure>
-            <h3 class="product-name">Trà xanh ô mai chanh dây</h3>
-          </a>
-
-          <a class="product-card" routerLink="/product">
-            <figure>
-              <img src="assets/images/products/tra-sua-khoai-mon-nghien.png" alt="Món 4">
-            </figure>
-            <h3 class="product-name">Trà sữa khoai môn nghiền</h3>
-          </a>
-
         </div>
 
-        <div class="promo-banner">
+        <div class="actions">
+          <a class="btn-outline" routerLink="/menu" [queryParams]="{ category: 'Thức Uống Mới' }">Xem thêm</a>
+        </div>
+
+        <a class="promo-banner" routerLink="/blog/blog_1" aria-label="Xem bài viết khuyến mãi Ngô Gia">
           <img src="assets/images/banner_monmoi.png" alt="Khuyến mãi Ngô Gia" />
-        </div>
+        </a>
       </div>
     </section>
 
@@ -120,50 +114,39 @@
             *ngFor="let p of topHotItems"
             [routerLink]="['/product']"
             [queryParams]="{ pid: p.id ?? '', name: p.name ?? '' }"
-            [attr.aria-label]="p.name"
+            [attr.aria-label]="'Xem chi tiết ' + p.name"
           >
             <figure>
               <img [src]="normSrc(p.image)" [alt]="p.name" />
             </figure>
-
             <div class="card-body">
+              <div class="stars"><span class="fill" [style.width.%]="ratingPct(p)"></span></div>
+              <span class="rating-text">{{ (p.rating ?? 5) | number:'1.1-1' }} ({{ p.reviews ?? 0 }} lượt đánh giá)</span>
               <h3 class="product-name">{{ p.name }}</h3>
-
-              <div class="meta">
-                <span class="star">★</span>
-                {{ (p.rating ?? 4.8) | number:'1.1-1' }}
-                <span class="sep">•</span>
-                {{ p.reviews ?? 500 }} đánh giá
-              </div>
-
               <div class="price-row">
-                <span>
-                  <span class="lbl">M</span>
-                  <span class="val">{{ priceVN(p.price || 0) }}₫</span>
-                </span>
-
-                <span>
-                  <span class="lbl">L</span>
-                  <span class="val">{{ priceVN((p.price || 0) + 3000) }}₫</span>
-                </span>
-
-                <button type="button" class="cart2-btn" (click)="goCart($event)">
-                  <img src="assets/icons/Cart2.png" alt="Giỏ hàng" />
+                <div class="price-col">
+                  <div class="line size-line">
+                    <span class="label">M</span>
+                    <span class="value">{{ priceVN(p.price || 0) }}đ</span>
+                  </div>
+                  <div class="line vip-line">
+                    <span class="label vip">VIP</span>
+                    <span class="value">{{ priceVN(vipPrice(p.price || 0)) }}đ</span>
+                  </div>
+                </div>
+                <div class="price-col">
+                  <div class="line size-line">
+                    <span class="label">L</span>
+                    <span class="value">{{ priceVN((p.price || 0) + 3000) }}đ</span>
+                  </div>
+                  <div class="line vip-line">
+                    <span class="label vip">VIP</span>
+                    <span class="value">{{ priceVN(vipPrice((p.price || 0) + 3000)) }}đ</span>
+                  </div>
+                </div>
+                <button type="button" class="price-cart" (click)="goCart($event)" [attr.aria-label]="'Mở sản phẩm ' + p.name">
+                  <img src="assets/icons/Cart2.png" alt="" aria-hidden="true" />
                 </button>
-              </div>
-
-              <div class="vip-row">
-                <span>
-                  <span class="vip">VIP</span>
-                  {{ priceVN(vipPrice(p.price || 0)) }}₫
-                </span>
-
-                <span>
-                  <span class="vip">VIP</span>
-                  {{ priceVN(vipPrice((p.price || 0) + 3000)) }}₫
-                </span>
-
-                <span class="vip-spacer"></span>
               </div>
             </div>
           </a>
@@ -176,12 +159,11 @@
       <div class="zalo-content">
         <div class="zalo-text">
           <h2>
-            Liên kết <span class="highlight-blue">Zalo</span> để nhận<br />
+            Liên kết <span class="highlight-blue">Zalo</span><br/> để nhận
             <span class="highlight-yellow">ưu đãi khách hàng VIP</span>
           </h2>
           <p>
-            Chỉ cần nhập thông tin, bạn sẽ trở thành khách hàng VIP<br />
-            với ưu đãi giảm <strong>3.000₫</strong> cho mỗi ly tại Ngô Gia.
+            Chỉ cần nhập thông tin, bạn sẽ trở thành khách hàng VIP với ưu đãi giảm <strong>3.000đ</strong> mỗi ly nước tại Ngô Gia!
           </p>
         </div>
         <div class="zalo-qr">
@@ -200,14 +182,14 @@
   <div class="drinks-card" role="dialog" aria-modal="true">
     <button class="drinks-close" (click)="closeDrinksModal()" aria-label="Đóng">×</button>
 
-    <div class="drinks-left">
-      <img *ngIf="selectedSlug === 'thuan-tra'" src="assets/images/tra-dai-loan.png" />
-      <img *ngIf="selectedSlug === 'tra-latte'" src="assets/images/tra-latte.png" />
-      <img *ngIf="selectedSlug === 'tra-sua'" src="assets/images/tra-sua.png" />
-      <img *ngIf="selectedSlug === 'mon-moi'" src="assets/images/thuc-uong-moi.png" />
-      <img *ngIf="selectedSlug === 'mon-hot'" src="assets/images/cac-mon-hot.png" />
-      <img *ngIf="selectedSlug === 'tra-trai-cay'" src="assets/images/tra-yakult.png" />
-    </div>
+    <a routerLink="/menu" [queryParams]="{ category: getSelectedCategoryName() }" class="drinks-left" [attr.aria-label]="'Xem ' + getSelectedCategoryName() + ' tại menu'">
+      <img *ngIf="selectedSlug === 'thuan-tra'" src="assets/images/tra-dai-loan.png" alt="Thuần Trà" />
+      <img *ngIf="selectedSlug === 'tra-latte'" src="assets/images/tra-latte.png" alt="Trà Latte" />
+      <img *ngIf="selectedSlug === 'tra-sua'" src="assets/images/tra-sua.png" alt="Trà Sữa" />
+      <img *ngIf="selectedSlug === 'mon-moi'" src="assets/images/thuc-uong-moi.png" alt="Thức Uống Mới" />
+      <img *ngIf="selectedSlug === 'mon-hot'" src="assets/images/cac-mon-hot.png" alt="Thức Uống Hot" />
+      <img *ngIf="selectedSlug === 'tra-trai-cay'" src="assets/images/tra-yakult.png" alt="Trà Trái Cây" />
+    </a>
 
     <div class="drinks-right">
       <div class="swiper-button-prev drinks-nav"></div>

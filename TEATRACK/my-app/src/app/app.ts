@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostBinding, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
@@ -15,15 +15,23 @@ export class App implements OnInit, OnDestroy {
   private sub?: Subscription;
 
   showLayout = true;
+
+  /** Màu nền dải phía trên footer: khớp với aboutus/menu để không bị tách màu */
+  @HostBinding('style.--footer-overlap-bg') get footerOverlapBg(): string {
+    const path = this.router.url.split('?')[0];
+    if (path === '/aboutus') return '#f6f9ff';
+    if (path === '/menu' || path.startsWith('/menu?')) return '#f3f9fe';
+    return '#ffffff';
+  }
+
   constructor(
     private router: Router,
     private titleService: Title,
   ) {
     this.router.events.subscribe(event => {
     if (event instanceof NavigationEnd) {
-      // Ẩn header/footer ở trang login
-      const hideRoutes = ['/login', '/login-admin', '/register'];
-      this.showLayout = !hideRoutes.includes(event.urlAfterRedirects);
+      const path = event.urlAfterRedirects?.split('?')[0] || '';
+      this.showLayout = !this.hideLayoutPaths.includes(path);
     }
   });
   }
@@ -36,8 +44,12 @@ export class App implements OnInit, OnDestroy {
     this.titleService.setTitle(full);
   }
 
+  private readonly hideLayoutPaths = ['/login', '/login-admin', '/register', '/404'];
+
   ngOnInit(): void {
-    this.updateTitle((this.router.url || '/').split('?')[0]);
+    const path = (this.router.url || '').split('?')[0];
+    this.showLayout = !this.hideLayoutPaths.includes(path);
+    this.updateTitle(path || '/');
     this.sub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => this.updateTitle((e.urlAfterRedirects || '/').split('?')[0]));

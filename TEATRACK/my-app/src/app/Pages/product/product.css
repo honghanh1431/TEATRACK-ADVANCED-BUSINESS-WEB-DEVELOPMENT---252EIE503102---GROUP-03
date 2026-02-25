@@ -762,7 +762,12 @@ body {
 .review .name {
   font-weight: 700;
 }
-.review .name .stars { display: block; font-size: 16px; line-height: 1; margin-top: 4px; margin-left: 0 !important; }
+.review .name .stars { 
+  display: block; 
+  font-size: 16px; 
+  line-height: 1; 
+  margin-top: 4px; 
+  margin-left: 0 !important; }
 .review .time {
   color: var(--muted);
   text-align: right;
