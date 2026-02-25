@@ -3,8 +3,11 @@ export const ROUTE_TITLES: Record<string, string> = {
   '/blog': 'Diễn đàn',
   '/blog/:id': 'Chi tiết bài viết', 
   '/menu': 'Menu thức uống',
+  '/menu/product/:id/:name': 'Chi tiết sản phẩm',
+  '/product': 'Chi tiết sản phẩm',
   '/contact': 'Liên hệ',
   '/aboutus': 'Về chúng tôi',
+  '/cart': 'Giỏ hàng',
   '/agency': 'Chi nhánh',
 };
 

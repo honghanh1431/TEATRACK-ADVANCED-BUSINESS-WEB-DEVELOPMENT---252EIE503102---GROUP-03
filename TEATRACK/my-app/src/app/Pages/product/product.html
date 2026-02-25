@@ -1,0 +1,590 @@
+<main>
+  <div class="container">
+    <p *ngIf="loadError" class="load-error">Không tải được thông tin sản phẩm. Vui lòng thử lại sau.</p>
+    <div *ngIf="!product && !loadError" class="product-loading" aria-live="polite">
+      <p>Đang tải thông tin sản phẩm...</p>
+    </div>
+    <div class="page-head" *ngIf="product">
+      <section class="breadcrumb-banner">
+        <h1 class="breadcrumb-title">{{ product.name }}</h1>
+        <p class="breadcrumb-path">
+          <a routerLink="/" (click)="scrollToTop()"> Trang chủ </a>
+          / <a routerLink="/menu" (click)="scrollToTop()"> Menu thức uống </a> /
+          <a [routerLink]="['/menu']" [queryParams]="{ category: product.category }" (click)="scrollToTop()">{{ product.category }}</a>
+        </p>
+      </section>
+    </div>
+
+    <section class="product-detail" id="product-detail" aria-live="polite" *ngIf="product">
+      <div class="detail-card">
+        <div>
+          <div class="media-frame">
+            <button class="nav-arrow nav-prev" aria-label="Ảnh trước">‹</button>
+            <img class="main-img" [src]="productImage" [alt]="product.name || 'Ảnh sản phẩm'" />
+            <button class="nav-arrow nav-next" aria-label="Ảnh kế">›</button>
+          </div>
+          <div class="thumbs">
+            <img class="thumb" [class.active]="mainImageIndex === 0" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(0)" role="button" tabindex="0" />
+            <img class="thumb" [class.active]="mainImageIndex === 1" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(1)" role="button" tabindex="0" />
+            <img class="thumb" [class.active]="mainImageIndex === 2" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(2)" role="button" tabindex="0" />
+            <img class="thumb" [class.active]="mainImageIndex === 3" [src]="productImage" [alt]="product.name || 'thumb'" (click)="setMainImage(3)" role="button" tabindex="0" />
+          </div>
+        </div>
+        <div class="info">
+          <div class="cat" id="prod-cat">{{ product.category }}</div>
+          <h2 class="name" id="prod-name">{{ product.name }}</h2>
+          <div class="stars"><span class="fill" [style.width.%]="ratingPct"></span></div>
+          <span class="rating-text" id="prod-rating-text">{{ (product.rating ?? 5) | number:'1.1-1' }} ({{ product.reviews ?? 0 }} lượt đánh giá)</span>
+
+          <div class="promo">
+            <div class="title">Ưu đãi đặc biệt</div>
+            <ul>
+              <li>Mua 5 tặng 1</li>
+              <li>
+                Mua 1 ly size L hoặc 2 ly size M được 1 dấu tích điểm, 8 dấu = 1 ly nước trị giá
+                16.000đ
+              </li>
+            </ul>
+          </div>
+
+          <div class="price-table">
+            <div class="price-row">
+              <span class="size-badge">M</span>
+              <span class="price-value" id="price-m">{{ formatVND(getPriceM(product)) }}₫</span>
+              <span class="size-badge">L</span>
+              <span class="price-value" id="price-l">{{ formatVND(getPriceL(product)) }}₫</span>
+            </div>
+            <div class="vip-row">
+              <span class="size-badge vip">VIP</span>
+              <span class="price-value" id="price-vip-m">{{ formatVND(getVipPriceM(product)) }}₫</span>
+              <span class="size-badge vip">VIP</span>
+              <span class="price-value" id="price-vip-l">{{ formatVND(getVipPriceL(product)) }}₫</span>
+            </div>
+          </div>
+
+          <p class="desc" id="prod-desc">
+            {{ product.description || product.detail || 'Sự kết hợp giữa trà ủ đậm và trái cây tạo nên hương vị hài hòa, phù hợp với nhiều sở thích.' }}
+          </p>
+
+          <div class="product-note" [class.open]="noteOpen">
+            <button
+              class="note-toggle"
+              type="button"
+              [attr.aria-expanded]="noteOpen"
+              aria-controls="product-note"
+              (click)="toggleNote()"
+            >
+              <span>Chú thích sản phẩm tại đây</span>
+              <span class="note-icon" aria-hidden="true"></span>
+            </button>
+            <div class="note-content" id="product-note" [class.active]="noteOpen">
+              <p id="note-text">{{ getNote() }}</p>
+              <section class="custom-options" aria-label="Tùy chọn đồ uống">
+                <div class="option-group">
+                  <div class="group-title">Chọn kích cỡ</div>
+                  <div class="pill-group" role="group" aria-label="Chọn kích cỡ">
+                    <button class="pill" [class.active]="selectedSize === 'M'" type="button" data-size="M" (click)="selectSize('M')">
+                      <span class="pill-label">M</span>
+                      <span class="pill-sub" id="size-pill-m">{{ formatVND(getPriceM(product)) }}đ</span>
+                    </button>
+                    <button class="pill" [class.active]="selectedSize === 'L'" type="button" data-size="L" (click)="selectSize('L')">
+                      <span class="pill-label">L</span>
+                      <span class="pill-sub" id="size-pill-l">{{ formatVND(getPriceL(product)) }}đ</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="option-group">
+                  <div class="group-title">Độ ngọt</div>
+                  <div class="pill-group" role="group" aria-label="Chọn độ ngọt" data-field="Ngọt">
+                    <button class="pill" [class.active]="selectedSweetness === 'it'" type="button" (click)="selectSweetness('it')">Ít</button>
+                    <button class="pill" [class.active]="selectedSweetness === 'vua'" type="button" (click)="selectSweetness('vua')">Vừa</button>
+                    <button class="pill" [class.active]="selectedSweetness === 'nhieu'" type="button" (click)="selectSweetness('nhieu')">Nhiều</button>
+                  </div>
+                </div>
+
+                <div class="option-group">
+                  <div class="group-title">Đá</div>
+                  <div class="pill-group" role="group" aria-label="Chọn lượng đá" data-field="Đá">
+                    <button class="pill" [class.active]="selectedIce === 'it'" type="button" (click)="selectIce('it')">Ít</button>
+                    <button class="pill" [class.active]="selectedIce === 'vua'" type="button" (click)="selectIce('vua')">Vừa</button>
+                    <button class="pill" [class.active]="selectedIce === 'nhieu'" type="button" (click)="selectIce('nhieu')">Nhiều</button>
+                  </div>
+                </div>
+
+                <div class="option-group topping-group">
+                  <div class="group-title">Chọn topping</div>
+                  <ul class="topping-list">
+                    <li class="topping-row" data-price="3000">
+                      <div class="topping-info">
+                        <span class="topping-name">Sương sáo</span>
+                        <span class="topping-price">3.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="suong-sao">
+                        <button type="button" class="qty-minus" aria-label="Bớt Sương sáo" (click)="changeToppingQty('suong-sao', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('suong-sao') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Sương sáo" (click)="changeToppingQty('suong-sao', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="3000">
+                      <div class="topping-info">
+                        <span class="topping-name">Thạch dừa nguyên vị</span>
+                        <span class="topping-price">3.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="thach-dua">
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch dừa nguyên vị" (click)="changeToppingQty('thach-dua', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-dua') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch dừa nguyên vị" (click)="changeToppingQty('thach-dua', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="3000">
+                      <div class="topping-info">
+                        <span class="topping-name">Hạt é</span>
+                        <span class="topping-price">3.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="hat-e">
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt é" (click)="changeToppingQty('hat-e', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-e') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt é" (click)="changeToppingQty('hat-e', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Thạch dứa hương đào</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="thach-dua-dao">
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch dứa hương đào" (click)="changeToppingQty('thach-dua-dao', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-dua-dao') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch dứa hương đào" (click)="changeToppingQty('thach-dua-dao', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Thạch aiyu</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="thach-aiyu">
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch aiyu" (click)="changeToppingQty('thach-aiyu', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-aiyu') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch aiyu" (click)="changeToppingQty('thach-aiyu', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Thạch sợi lá dứa</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="thach-soi-la-dua">
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sợi lá dứa" (click)="changeToppingQty('thach-soi-la-dua', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-soi-la-dua') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sợi lá dứa" (click)="changeToppingQty('thach-soi-la-dua', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Thạch sương sáo viên (8)</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="thach-suong-sao-vien">
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sương sáo viên" (click)="changeToppingQty('thach-suong-sao-vien', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-suong-sao-vien') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sương sáo viên" (click)="changeToppingQty('thach-suong-sao-vien', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Trân châu hoàng kim</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="tran-chau-hoang-kim">
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu hoàng kim" (click)="changeToppingQty('tran-chau-hoang-kim', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-hoang-kim') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu hoàng kim" (click)="changeToppingQty('tran-chau-hoang-kim', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Trân châu đường đen</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="tran-chau-duong-den">
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu đường đen" (click)="changeToppingQty('tran-chau-duong-den', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-duong-den') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu đường đen" (click)="changeToppingQty('tran-chau-duong-den', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Trân châu 3Q trắng/đen</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="tran-chau-3q">
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu 3Q" (click)="changeToppingQty('tran-chau-3q', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-3q') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu 3Q" (click)="changeToppingQty('tran-chau-3q', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Trân châu khoai môn</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="tran-chau-khoai-mon">
+                        <button type="button" class="qty-minus" aria-label="Bớt Trân châu khoai môn" (click)="changeToppingQty('tran-chau-khoai-mon', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('tran-chau-khoai-mon') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Trân châu khoai môn" (click)="changeToppingQty('tran-chau-khoai-mon', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Hạt thủy tinh củ năng</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="hat-thuy-tinh-cu-nang">
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt thủy tinh củ năng" (click)="changeToppingQty('hat-thuy-tinh-cu-nang', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-thuy-tinh-cu-nang') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt thủy tinh củ năng" (click)="changeToppingQty('hat-thuy-tinh-cu-nang', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Hạt thủy tinh lúa mạch</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="hat-thuy-tinh-lua-mach">
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt thủy tinh lúa mạch" (click)="changeToppingQty('hat-thuy-tinh-lua-mach', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-thuy-tinh-lua-mach') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt thủy tinh lúa mạch" (click)="changeToppingQty('hat-thuy-tinh-lua-mach', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Đào miếng</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="dao-mieng">
+                        <button type="button" class="qty-minus" aria-label="Bớt Đào miếng" (click)="changeToppingQty('dao-mieng', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('dao-mieng') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Đào miếng" (click)="changeToppingQty('dao-mieng', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="5000">
+                      <div class="topping-info">
+                        <span class="topping-name">Khoai môn nghiền</span>
+                        <span class="topping-price">5.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="khoai-mon-nghien">
+                        <button type="button" class="qty-minus" aria-label="Bớt Khoai môn nghiền" (click)="changeToppingQty('khoai-mon-nghien', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('khoai-mon-nghien') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Khoai môn nghiền" (click)="changeToppingQty('khoai-mon-nghien', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="7000">
+                      <div class="topping-info">
+                        <span class="topping-name">Hạt sen</span>
+                        <span class="topping-price">7.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="hat-sen">
+                        <button type="button" class="qty-minus" aria-label="Bớt Hạt sen" (click)="changeToppingQty('hat-sen', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('hat-sen') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Hạt sen" (click)="changeToppingQty('hat-sen', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="7000">
+                      <div class="topping-info">
+                        <span class="topping-name">Kem tươi vani</span>
+                        <span class="topping-price">7.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="kem-tuoi-vani">
+                        <button type="button" class="qty-minus" aria-label="Bớt Kem tươi vani" (click)="changeToppingQty('kem-tuoi-vani', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('kem-tuoi-vani') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Kem tươi vani" (click)="changeToppingQty('kem-tuoi-vani', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="7000">
+                      <div class="topping-info">
+                        <span class="topping-name">Kem cheese</span>
+                        <span class="topping-price">7.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="kem-cheese">
+                        <button type="button" class="qty-minus" aria-label="Bớt Kem cheese" (click)="changeToppingQty('kem-cheese', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('kem-cheese') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Kem cheese" (click)="changeToppingQty('kem-cheese', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="7000">
+                      <div class="topping-info">
+                        <span class="topping-name">Pudding trứng</span>
+                        <span class="topping-price">7.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="pudding-trung">
+                        <button type="button" class="qty-minus" aria-label="Bớt Pudding trứng" (click)="changeToppingQty('pudding-trung', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('pudding-trung') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Pudding trứng" (click)="changeToppingQty('pudding-trung', 1)">+</button>
+                      </div>
+                    </li>
+                    <li class="topping-row" data-price="7000">
+                      <div class="topping-info">
+                        <span class="topping-name">Thạch sữa viên (8)</span>
+                        <span class="topping-price">7.000đ</span>
+                      </div>
+                      <div class="topping-qty" data-topping="thach-sua-vien">
+                        <button type="button" class="qty-minus" aria-label="Bớt Thạch sữa viên" (click)="changeToppingQty('thach-sua-vien', -1)">-</button>
+                        <span class="qty-value" aria-live="polite">{{ getToppingQty('thach-sua-vien') }}</span>
+                        <button type="button" class="qty-plus" aria-label="Thêm Thạch sữa viên" (click)="changeToppingQty('thach-sua-vien', 1)">+</button>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="actions">
+            <div class="actions">
+              <div class="qty" aria-label="Số lượng">
+                <button type="button" id="qty-minus" (click)="changeQty(-1)">-</button>
+                <input
+                  id="qty-input"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  [value]="qty"
+                  aria-label="Số lượng"
+                  readonly
+                />
+                <button type="button" id="qty-plus" (click)="changeQty(1)">+</button>
+              </div>
+              <button class="btn btn-outline" id="btn-add-cart" type="button" (click)="addToCart()">
+                <img src="assets/icons/cart_product_detail.png" alt="" class="btn-cart-icon" aria-hidden="true" />
+                Thêm vào giỏ
+              </button>
+              <button class="btn btn-primary" id="btn-buy-now" type="button" (click)="buyNow()">Mua ngay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button type="button" class="tab" [class.active]="activeTab === 'desc'" data-target="desc" (click)="setTab('desc')">Mô tả sản phẩm</button>
+        <button type="button" class="tab" [class.active]="activeTab === 'review'" data-target="review" (click)="setTab('review')">Đánh giá</button>
+        <button type="button" class="tab" [class.active]="activeTab === 'commit'" data-target="commit" (click)="setTab('commit')">Cam kết</button>
+      </div>
+
+      <section class="product-info-card tab-pane" [class.active]="activeTab === 'desc'" id="desc">
+        <div class="info-header">
+          <span class="info-icon">i</span>
+          <span class="info-title">Thông tin chi tiết</span>
+        </div>
+        <div class="info-grid">
+          <div class="info-row">
+            <span class="label">Tên sản phẩm:</span> <span id="info-name">{{ product.name }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Bảo quản:</span>
+            <span id="info-storage">{{ getStorage() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Trọng lượng:</span>
+            <span id="info-weight">{{ getWeight() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Xuất xứ:</span> <span id="info-origin">{{ getOrigin() }}</span>
+          </div>
+          <div class="info-row full">
+            <span class="label">Topping nên dùng kèm:</span>
+            <span id="info-topping">{{ getTopping() }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="review-block tab-pane" [class.active]="activeTab === 'review'" id="review">
+        <div class="grid-2">
+          <div class="col-left">
+            <div class="score" id="score-value">{{ (product.rating ?? 5) | number:'1.1-1' }} <span class="unit">out of 5</span></div>
+            <div class="stars" aria-label="Đánh giá" style="margin-top: 6px">
+              <span class="fill" id="score-stars" [style.width.%]="ratingPct"></span>
+            </div>
+            <div class="count" id="score-count">({{ product.reviews ?? 0 }} lượt đánh giá)</div>
+          </div>
+          <div class="col-right">
+            <div class="bar-row">
+              <span>5 sao</span>
+              <div class="bar"><span style="--val: 80%"></span></div>
+            </div>
+            <div class="bar-row">
+              <span>4 sao</span>
+              <div class="bar"><span style="--val: 70%"></span></div>
+            </div>
+            <div class="bar-row">
+              <span>3 sao</span>
+              <div class="bar"><span style="--val: 35%"></span></div>
+            </div>
+            <div class="bar-row">
+              <span>2 sao</span>
+              <div class="bar"><span style="--val: 15%"></span></div>
+            </div>
+            <div class="bar-row">
+              <span>1 sao</span>
+              <div class="bar"><span style="--val: 5%"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <section class="review-section" aria-labelledby="reviews-title">
+          <div class="review-header">
+            <h3 class="reviews-title" id="reviews-title">Đánh giá sản phẩm</h3>
+          </div>
+          <div *ngFor="let r of displayedReviews" class="review">
+            <img class="avatar" src="/assets/icons/user.png" alt="avatar" />
+            <div>
+              <div class="name">
+                {{ r.name }} <span class="stars"><span class="fill" [style.width.%]="(r.rating / 5) * 100"></span></span>
+              </div>
+              <div class="title">{{ r.title }}</div>
+              <div class="content">{{ r.content }}</div>
+              <div class="review-actions">
+                <button
+                  type="button"
+                  class="review-like"
+                  [attr.aria-label]="'Thích đánh giá của ' + r.name"
+                >
+                  <span class="icon" aria-hidden="true">♡</span>
+                  Thích
+                </button>
+                <div class="review-stars-inline" [attr.aria-label]="'Đánh giá ' + r.rating + ' trên 5'">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                </div>
+              </div>
+            </div>
+            <div class="time">{{ r.time }}</div>
+          </div>
+          <nav class="pagination-wrap" *ngIf="totalPages > 1">
+            <button
+              type="button"
+              class="pagination-btn"
+              (click)="prevPage()"
+              [disabled]="currentPage <= 1"
+              [attr.aria-disabled]="currentPage <= 1"
+              aria-label="Trang trước"
+            >
+              ‹
+            </button>
+            <button
+              *ngFor="let p of pageNumbers"
+              type="button"
+              class="pagination-num"
+              [class.active]="p === currentPage"
+              (click)="goToPage(p)"
+            >
+              {{ p }}
+            </button>
+            <span class="pagination-ellipsis" *ngIf="totalPages > 5">...</span>
+            <button
+              type="button"
+              class="pagination-btn"
+              (click)="nextPage()"
+              [disabled]="currentPage >= totalPages"
+              [attr.aria-disabled]="currentPage >= totalPages"
+              aria-label="Trang sau"
+            >
+              ›
+            </button>
+          </nav>
+          <form class="review-form" action="#" method="post" aria-label="Gửi đánh giá sản phẩm">
+            <div class="rating-field">
+              <span class="label">Chất lượng sản phẩm:</span>
+            </div>
+            <textarea
+              name="note"
+              rows="3"
+              placeholder="Hãy để lại nhận xét cho sản phẩm này bạn nhé! Ngô Gia xin chân thành cảm ơn."
+            ></textarea>
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary submit-review">Đánh giá</button>
+            </div>
+          </form>
+        </section>
+      </section>
+
+      <section class="commitment tab-pane" [class.active]="activeTab === 'commit'" id="commit" aria-label="Cam kết">
+        <h3>Cam kết chất lượng</h3>
+        <ul class="commit-list">
+          <li>
+            <span class="commit-icon" aria-hidden="true"></span>
+            Lá trà được chọn lọc kỹ lưỡng từ vùng núi cao,<strong
+              >không phẩm màu – không hương liệu tổng hợp</strong
+            >, giữ trọn vị trà nguyên bản.
+          </li>
+          <li>
+            <span class="commit-icon" aria-hidden="true"></span>
+            Mỗi mẻ trà đều được sao, ủ và lên hương theo<strong>bí quyết gia truyền</strong>, đảm
+            bảo hương thơm đậm đà, vị hậu ngọt tinh tế.
+          </li>
+          <li>
+            <span class="commit-icon" aria-hidden="true"></span>
+            Mọi sản phẩm được<strong>đóng gói kín, bảo quản đúng chuẩn</strong>, đảm bảo hương vị
+            luôn tươi mới khi đến tay khách hàng.
+          </li>
+          <li>
+            <span class="commit-icon" aria-hidden="true"></span>
+            Hồng Trà Ngô Gia luôn lắng nghe phản hồi và<strong
+              >đổi trả nếu sản phẩm không đạt chất lượng cam kết</strong
+            >, mang đến trải nghiệm đáng tin cậy.
+          </li>
+        </ul>
+      </section>
+
+      <section class="related-section" id="related">
+        <h2 class="related-title">Có thể bạn sẽ thích</h2>
+        <div class="menu-grid" id="related-list">
+          <article *ngFor="let p of relatedProducts" class="menu-card"
+                   tabindex="0" role="link"
+                   [attr.aria-label]="'Xem chi tiết ' + p.name"
+                   (click)="goToProduct(p)"
+                   (keydown.enter)="goToProduct(p)"
+                   (keydown.space)="$event.preventDefault(); goToProduct(p)">
+            <figure>
+              <img [src]="getProductImg(p)" [alt]="p.name" />
+            </figure>
+            <div class="card-body">
+              <div class="card-meta">
+                <span class="star">★</span>
+                <span>{{ (p.rating ?? 5) | number:'1.1-1' }}</span>
+                <span>•</span>
+                <span>{{ p.reviews ?? 0 }} lượt đánh giá</span>
+              </div>
+              <h3>{{ p.name }}</h3>
+              <div class="price-row">
+                <div class="price-col">
+                  <div class="line size-line">
+                    <span class="label">M</span>
+                    <span class="value">{{ formatVND(getPriceM(p)) }}đ</span>
+                  </div>
+                  <div class="line vip-line">
+                    <span class="label vip">VIP</span>
+                    <span class="value">{{ formatVND(getVipPriceM(p)) }}đ</span>
+                  </div>
+                </div>
+                <div class="price-col">
+                  <div class="line size-line">
+                    <span class="label">L</span>
+                    <span class="value">{{ formatVND(getPriceL(p)) }}đ</span>
+                  </div>
+                  <div class="line vip-line">
+                    <span class="label vip">VIP</span>
+                    <span class="value">{{ formatVND(getVipPriceL(p)) }}đ</span>
+                  </div>
+                </div>
+                <button class="price-cart" type="button" [attr.aria-label]="'Thêm vào giỏ ' + p.name"
+                        (click)="addRelatedToCart($event, p)">
+                  <img src="assets/icons/Cart2.png" alt="" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </div>
+</main>

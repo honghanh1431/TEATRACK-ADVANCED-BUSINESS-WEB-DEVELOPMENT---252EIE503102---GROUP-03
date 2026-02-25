@@ -103,17 +103,19 @@
   border: 1px solid rgba(29, 78, 216, 0.25);
   background: #fff;
   color: var(--menu-primary);
-  padding: 8px 18px;
+  padding: 6px 18px;
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 13px;
 }
 
 .filter-chip.active {
   background: var(--menu-primary);
   color: #fff;
   box-shadow: 0 8px 22px rgba(29, 78, 216, 0.2);
+  font-size: 13px;
 }
 
 .chip-list {
@@ -223,9 +225,9 @@
 }
 
 .menu-card .card-body {
-  padding: 16px 18px 20px;
+  padding: 12px 14px 14px;
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .menu-card .card-meta {
@@ -251,7 +253,7 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   font-size: 12px;
   color: #1f2937;
   padding-right: 52px;
@@ -261,22 +263,22 @@
 .menu-card .price-col {
   background: #fff;
   border-radius: 14px;
-  padding: 6px 12px 8px;
+  padding: 4px 8px 6px;
   display: grid;
-  gap: 6px;
+  gap: 4px;
   justify-items: center;
 }
 
 .menu-card .price-col .line {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .menu-card .price-col .label {
   background: #eef2ff;
   color: var(--menu-primary);
-  padding: 2px 9px;
+  padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
   font-size: 11px;

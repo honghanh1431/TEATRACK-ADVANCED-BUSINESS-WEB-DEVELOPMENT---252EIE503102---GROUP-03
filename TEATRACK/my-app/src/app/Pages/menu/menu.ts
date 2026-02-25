@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ProductStateService } from '../../product-state.service';
 
 declare const window: Window & {
   NGCart?: {
@@ -40,9 +42,9 @@ interface MenuState {
   standalone: false,
   templateUrl: './menu.html',
   styleUrls: ['./menu.css', '../../../styles.css'],
+  encapsulation: ViewEncapsulation.None, // Để không bị global CSS ảnh hưởng
 })
 export class Menu implements OnInit {
-  // Base URL cho data (public/ được serve từ root)
   private static readonly STATIC_BASE = '/';
 
   // ─── State ────────────────────────────────────────────────────────────────
@@ -63,10 +65,20 @@ export class Menu implements OnInit {
   sectionSubtitle = 'Danh sách đầy đủ các món tại Hồng Trà Ngô Gia.';
   loadError = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private route: ActivatedRoute,
+    private productState: ProductStateService,
+  ) {}
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
+    const categoryFromUrl = this.route.snapshot.queryParamMap.get('category');
+    if (categoryFromUrl != null && categoryFromUrl.trim() !== '') {
+      this.state.category = categoryFromUrl.trim();
+    }
     this.fetchProducts();
   }
 
@@ -84,6 +96,7 @@ export class Menu implements OnInit {
           )
         );
         this.updateProducts();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
@@ -239,8 +252,10 @@ export class Menu implements OnInit {
   }
 
   onCardClick(product: Product): void {
-    const url = this.getProductLink(product);
-    window.location.href = url;
+    const id = product.id != null ? String(product.id) : '';
+    const name = product.name != null ? String(product.name) : '';
+    this.productState.setNextProduct(product as any);
+    this.router.navigate(['/menu/product', id, name]);
   }
 
   onAddToCart(event: Event, product: Product): void {

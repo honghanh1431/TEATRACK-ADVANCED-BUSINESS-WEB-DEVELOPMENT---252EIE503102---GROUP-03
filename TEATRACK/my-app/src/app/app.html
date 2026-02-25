@@ -1,4 +1,3 @@
-<app-page-header></app-page-header>
-
+<app-page-header *ngIf="showLayout"></app-page-header>
 <router-outlet></router-outlet>
-<app-page-footer></app-page-footer>
+<app-page-footer *ngIf="showLayout"></app-page-footer>
