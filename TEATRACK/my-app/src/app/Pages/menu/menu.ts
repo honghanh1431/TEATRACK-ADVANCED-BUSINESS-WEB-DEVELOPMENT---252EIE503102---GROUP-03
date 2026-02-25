@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ViewEncapsulation 
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProductStateService } from '../../product-state.service';
+import { ReviewCountService } from '../../review-count.service';
 
 declare const window: Window & {
   NGCart?: {
@@ -71,6 +72,7 @@ export class Menu implements OnInit, AfterViewInit {
     private router: Router,
     private route: ActivatedRoute,
     private productState: ProductStateService,
+    private reviewCountService: ReviewCountService,
   ) {}
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
@@ -178,7 +180,9 @@ export class Menu implements OnInit, AfterViewInit {
   }
 
   getReviews(product: Product): number {
-    return product.reviews || 500;
+    const fromService = this.reviewCountService.getCount(product?.id);
+    if (fromService !== undefined) return fromService;
+    return product?.reviews ?? 500;
   }
 
   // ─── Filter / Sort ────────────────────────────────────────────────────────

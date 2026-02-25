@@ -1,5 +1,6 @@
 :root {
   --primary: #0088FF;
+  --color-danger: #e11d48;
   --bg: #f2f9fe;
   --text: #1f2a37;
   --muted: #6b7280;
@@ -763,12 +764,27 @@ body {
 .review .name {
   font-weight: 700;
 }
-.review .name .stars { 
-  display: block; 
-  font-size: 16px; 
-  line-height: 1; 
-  margin-top: 4px; 
-  margin-left: 0 !important; }
+.review .name .stars {
+  display: block;
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 4px;
+  margin-left: 0 !important;
+}
+.review .name .stars.stars-inline::before {
+  display: none;
+}
+.review .name .stars-inline {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 6px;
+}
+.review .name .stars-inline .star-dot {
+  color: #d1d5db;
+}
+.review .name .stars-inline .star-dot.filled {
+  color: #f59e0b;
+}
 .review .time {
   color: var(--muted);
   text-align: right;
@@ -797,13 +813,28 @@ body {
 .review-like .icon {
   font-size: 16px;
   line-height: 1;
+  color: var(--color-primary);
+}
+.review-like.liked {
+  color: var(--color-danger);
+}
+.review-like.liked .icon {
+  color: var(--color-danger);
 }
 .review-stars-inline,
 .rating-stars {
-  color: #f59e0b;
   font-size: 16px;
   display: inline-flex;
   gap: 4px;
+}
+.review-stars-inline .star-dot {
+  color: #d1d5db;
+}
+.review-stars-inline .star-dot.filled {
+  color: #f59e0b;
+}
+.rating-stars {
+  color: #f59e0b;
 }
 .review-form {
   background: #f4f8ff;
@@ -842,14 +873,26 @@ body {
   color: #f59e0b;
 }
 .review-form .rating-stars .star:focus {
-  outline: 2px solid #f59e0b;
   outline-offset: 2px;
 }
-.review-form-title {
+.review-form-title,
+.review-form-title-input {
   margin: 0 0 6px 0;
   font-size: 14px;
-  color: #6b7280;
+  color: #1f2937;
   font-weight: 500;
+}
+.review-form-title-input {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+}
+.review-form-title-input::placeholder {
+  color: #94a3b8;
 }
 .review-form textarea {
   width: 100%;
@@ -859,7 +902,7 @@ body {
   padding: 12px 14px;
   font-family: inherit;
   resize: vertical;
-  background: #fff;
+  background: white;
   color: #1f2937;
 }
 .review-form textarea::placeholder {

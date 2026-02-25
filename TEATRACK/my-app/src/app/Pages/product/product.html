@@ -34,7 +34,7 @@
           <div class="cat" id="prod-cat">{{ product.category }}</div>
           <h2 class="name" id="prod-name">{{ product.name }}</h2>
           <div class="stars"><span class="fill" [style.width.%]="ratingPct"></span></div>
-          <span class="rating-text" id="prod-rating-text">{{ (product.rating ?? 5) | number:'1.1-1' }} ({{ product.reviews ?? 0 }} lượt đánh giá)</span>
+          <span class="rating-text" id="prod-rating-text">{{ (product.rating ?? 5) | number:'1.1-1' }} ({{ reviews.length }} lượt đánh giá)</span>
 
           <div class="promo">
             <div class="title">Ưu đãi đặc biệt</div>
@@ -410,23 +410,23 @@
           <div class="col-right">
             <div class="bar-row">
               <span>5 sao</span>
-              <div class="bar"><span style="--val: 80%"></span></div>
+              <div class="bar"><span [style.--val]="barPct(5) + '%'"></span></div>
             </div>
             <div class="bar-row">
               <span>4 sao</span>
-              <div class="bar"><span style="--val: 70%"></span></div>
+              <div class="bar"><span [style.--val]="barPct(4) + '%'"></span></div>
             </div>
             <div class="bar-row">
               <span>3 sao</span>
-              <div class="bar"><span style="--val: 35%"></span></div>
+              <div class="bar"><span [style.--val]="barPct(3) + '%'"></span></div>
             </div>
             <div class="bar-row">
               <span>2 sao</span>
-              <div class="bar"><span style="--val: 15%"></span></div>
+              <div class="bar"><span [style.--val]="barPct(2) + '%'"></span></div>
             </div>
             <div class="bar-row">
               <span>1 sao</span>
-              <div class="bar"><span style="--val: 5%"></span></div>
+              <div class="bar"><span [style.--val]="barPct(1) + '%'"></span></div>
             </div>
           </div>
         </div>
@@ -439,7 +439,9 @@
             <img class="avatar" src="/assets/icons/user.png" alt="avatar" />
             <div>
               <div class="name">
-                {{ r.name }} <span class="stars"><span class="fill" [style.width.%]="(r.rating / 5) * 100"></span></span>
+                {{ r.name }} <span class="stars stars-inline" [attr.aria-label]="'Đánh giá ' + (r.rating ?? 0) + ' trên 5'">
+                <span *ngFor="let star of getFilledStarCount(r.rating)" class="star-dot filled">★</span>
+              </span>
               </div>
               <div class="title">{{ r.title }}</div>
               <div class="content">{{ r.content }}</div>
@@ -447,14 +449,14 @@
                 <button
                   type="button"
                   class="review-like"
+                  [class.liked]="isLiked(r)"
+                  (click)="toggleReviewLike(r)"
                   [attr.aria-label]="'Thích đánh giá của ' + r.name"
+                  [attr.aria-pressed]="isLiked(r)"
                 >
-                  <span class="icon" aria-hidden="true">♡</span>
+                  <span class="icon" aria-hidden="true">{{ isLiked(r) ? '♥' : '♡' }}</span>
                   Thích
                 </button>
-                <div class="review-stars-inline" [attr.aria-label]="'Đánh giá ' + r.rating + ' trên 5'">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
               </div>
             </div>
             <div class="time">{{ r.time }}</div>
@@ -506,7 +508,14 @@
                 >★</button>
               </div>
             </div>
-            <p class="review-form-title">Để lại đánh giá chi tiết tại đây</p>
+            <input
+              type="text"
+              class="review-form-title-input"
+              [(ngModel)]="reviewFormTitle"
+              name="reviewTitle"
+              placeholder="Để lại đánh giá chi tiết tại đây"
+              aria-label="Tiêu đề đánh giá"
+            />
             <textarea
               name="note"
               rows="4"
@@ -565,7 +574,7 @@
                 <span class="star">★</span>
                 <span>{{ (p.rating ?? 5) | number:'1.1-1' }}</span>
                 <span>•</span>
-                <span>{{ p.reviews ?? 0 }} lượt đánh giá</span>
+                <span>{{ getReviewCountForDisplay(p) }} lượt đánh giá</span>
               </div>
               <h3>{{ p.name }}</h3>
               <div class="price-row">

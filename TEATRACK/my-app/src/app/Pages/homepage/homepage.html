@@ -124,7 +124,7 @@
                 <span class="star">★</span>
                 <span>{{ (p.rating ?? 5) | number:'1.1-1' }}</span>
                 <span>•</span>
-                <span>{{ p.reviews ?? 0 }} lượt đánh giá</span>
+                <span>{{ getReviewCount(p) }} lượt đánh giá</span>
               </div>
               <h3 class="product-name">{{ p.name }}</h3>
               <div class="price-row">
