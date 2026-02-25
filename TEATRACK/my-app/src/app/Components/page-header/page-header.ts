@@ -68,86 +68,45 @@ export class PageHeader implements OnInit, AfterViewInit {
       });
     }
 
-    // 🟢 Navigation logic
-    document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
-      const action = item.getAttribute('data-action');
-      const target = item.getAttribute('data-target');
-      const href = item.getAttribute('href');
+    // 🟢 Navigation logic + active state: chỉ chạy trên trang admin (trang chủ dùng routerLink, không gắn listener)
+    if (isAdminPage) {
+      document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
+        const action = item.getAttribute('data-action');
+        const target = item.getAttribute('data-target');
+        const href = item.getAttribute('href');
 
-      this.renderer.listen(item, 'click', (e: Event) => {
-        console.log('Clicked:', (item as HTMLElement).textContent?.trim(), 'Action:', action, 'Target:', target);
-
-        // Case 1: Navigate to another page (Tổng quan, Tài khoản)
-        if (action === 'navigate') {
-          console.log('→ Navigate to:', href);
-          return;
-        }
-
-        // Case 2: Scroll to section (Sản phẩm, Đơn hàng, Báo cáo)
-        if (action === 'scroll') {
-          e.preventDefault();
-
-          // If not on Admin page, navigate to dashboard with hash
-          if (!isAdminPage) {
-            console.log('→ Navigate to admin-dashboard with hash:', target);
-            window.location.href = `/admin-dashboard#${target}`;
-            return;
+        this.renderer.listen(item, 'click', (e: Event) => {
+          if (action === 'navigate') return;
+          if (action === 'scroll') {
+            e.preventDefault();
+            const targetSection = document.getElementById(target || '');
+            if (targetSection) {
+              const headerHeight = 80;
+              window.scrollTo({
+                top: targetSection.offsetTop - headerHeight,
+                behavior: 'smooth'
+              });
+              document.querySelectorAll('.nav-bar .nav-item').forEach((i) => i.classList.remove('active'));
+              item.classList.add('active');
+            } else {
+              window.location.href = `/admin-dashboard#${target}`;
+            }
           }
+        });
+      });
 
-          // If on Admin page, smooth scroll to section
-          const targetSection = document.getElementById(target || '');
-          if (targetSection) {
-            console.log('→ Scroll to section:', target);
-            
-            const headerHeight = 80;
-            const targetPosition = targetSection.offsetTop - headerHeight;
-            
-            window.scrollTo({
-              top: targetPosition,
-              behavior: 'smooth'
-            });
-
-            // Update active state
-            document
-              .querySelectorAll('.nav-bar .nav-item')
-              .forEach((i) => i.classList.remove('active'));
-            item.classList.add('active');
-          } else {
-            console.error('Section not found:', target);
-          }
+      document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
+        const target = item.getAttribute('data-target');
+        const href = item.getAttribute('href');
+        if (isAccountPage && href?.includes('admin-account')) item.classList.add('active');
+        if (isOrderPage && href?.includes('admin-order')) item.classList.add('active');
+        if (isAdminPage) {
+          const hash = window.location.hash.replace('#', '');
+          if (hash && hash === target) item.classList.add('active');
+          else if (!hash && item.querySelector('[data-i18n="header.admin.overview"]')) item.classList.add('active');
         }
       });
-    });
-
-    // 🟢 Set active state on load
-    document.querySelectorAll('.nav-bar .nav-item').forEach((item) => {
-      const target = item.getAttribute('data-target');
-      const href = item.getAttribute('href');
-
-      // Active for account page
-      if (isAccountPage && href?.includes('admin-account')) {
-        item.classList.add('active');
-      }
-      
-      // Active for order page
-      if (isOrderPage && href?.includes('admin-order')) {
-        item.classList.add('active');
-      }
-      
-      // Active for admin page sections based on hash
-      if (isAdminPage) {
-        const hash = window.location.hash.replace('#', '');
-        if (hash && hash === target) {
-          item.classList.add('active');
-        } else if (!hash) {
-          // Set "Tổng quan" active by default on dashboard
-          const overviewSpan = item.querySelector('[data-i18n="header.admin.overview"]');
-          if (overviewSpan) {
-            item.classList.add('active');
-          }
-        }
-      }
-    });
+    }
 
     // 🟢 Handle hash change for scroll sections
     if (isAdminPage) {

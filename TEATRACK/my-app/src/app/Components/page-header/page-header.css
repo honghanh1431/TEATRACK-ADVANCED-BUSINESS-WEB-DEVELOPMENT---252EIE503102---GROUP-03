@@ -6,6 +6,8 @@
 }
 
 .shop-header {
+  position: relative;
+  z-index: 50;
   font-family: "Inter", sans-serif;
   background-color: #f2f9fe;
   border-radius: 12px;

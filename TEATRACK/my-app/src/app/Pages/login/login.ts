@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +31,8 @@ export class Login implements OnInit {
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private title: Title
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +43,12 @@ export class Login implements OnInit {
     // Load ngôn ngữ đã lưu hoặc mặc định vi
     const savedLang = localStorage.getItem('lang') || 'vi';
     this.loadLang(savedLang);
+    this.updatePageTitle();
+  }
+
+  private updatePageTitle(): void {
+    const suffix = 'Hồng trà ngô gia';
+    this.title.setTitle(this.currentLang === 'vi' ? `Login | ${suffix}` : `Đăng nhập | ${suffix}`);
   }
 
   loadLang(lang: string): void {
@@ -50,6 +58,7 @@ export class Login implements OnInit {
       next: (data) => {
         this.t = data;
         this.currentLang = lang;
+        this.updatePageTitle();
         this.cdr.detectChanges();
       },
       error: () => { console.warn('Không load được file ngôn ngữ'); }

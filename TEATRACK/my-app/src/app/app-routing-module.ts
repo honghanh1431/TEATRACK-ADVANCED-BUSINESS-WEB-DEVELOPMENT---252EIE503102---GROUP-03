@@ -12,14 +12,9 @@ import { Cart } from './Pages/cart/cart';
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'blog', pathMatch: 'full' },
-  { path: '', redirectTo: 'homepage', pathMatch: 'full' },
-  { path: "blog", component: BlogList },
-  { path: "blog/:id", component: BlogDetail },
-  { path: "menu", component: Menu },
-  { path: "homepage", component: Homepage},
-  { path: "homepage/:id", component: Product },
-  { path: '', redirectTo: '/', pathMatch: 'full' },
+  { path: '', component: Homepage, pathMatch: 'full' },
+  { path: 'homepage', component: Homepage },
+  { path: 'homepage/:id', component: Product },
   { path: 'blog', component: BlogList },
   { path: 'blog/:id', component: BlogDetail },
   { path: 'menu', component: Menu },
@@ -27,7 +22,7 @@ const routes: Routes = [
   { path: 'aboutus', component: Aboutus },
   { path: 'login', component: Login, data: { isAdmin: false } },
   { path: 'login-admin', component: Login, data: { isAdmin: true } },
-  { path: 'cart',component:Cart},
+  { path: 'cart', component: Cart },
 ];
 
 @NgModule({
