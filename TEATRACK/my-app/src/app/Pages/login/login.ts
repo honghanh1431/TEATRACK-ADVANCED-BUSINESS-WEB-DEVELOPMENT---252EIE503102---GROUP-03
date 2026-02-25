@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -29,7 +29,8 @@ export class Login implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -43,17 +44,17 @@ export class Login implements OnInit {
   }
 
   loadLang(lang: string): void {
-  this.currentLang = lang;
-  localStorage.setItem('lang', lang);
-  this.http.get(`/lang/${lang}.json`).subscribe({
-    next: (data) => { 
-      console.log('Loaded lang:', lang, data); // thêm dòng này
-      this.t = data; 
-      this.currentLang = lang;
-    },
-    error: () => { console.warn('Không load được file ngôn ngữ'); }
-  });
-}
+    this.currentLang = lang;
+    localStorage.setItem('lang', lang);
+    this.http.get(`/lang/${lang}.json`).subscribe({
+      next: (data) => {
+        this.t = data;
+        this.currentLang = lang;
+        this.cdr.detectChanges();
+      },
+      error: () => { console.warn('Không load được file ngôn ngữ'); }
+    });
+  }
 
   setLang(lang: string): void {
     this.loadLang(lang);
@@ -89,6 +90,7 @@ export class Login implements OnInit {
     this.http.get<any>('/data/login.json').subscribe({
       next: (data) => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         const user = data.users.find(
           (x: any) => x.username === u && x.password === p
         );
@@ -97,6 +99,7 @@ export class Login implements OnInit {
           this.showError(this.currentLang === 'vi'
             ? 'Tên đăng nhập hoặc mật khẩu không đúng.'
             : 'Incorrect username or password.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -104,6 +107,7 @@ export class Login implements OnInit {
           this.showError(this.currentLang === 'vi'
             ? 'Tài khoản này không có quyền quản lý.'
             : 'This account does not have admin access.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -111,6 +115,7 @@ export class Login implements OnInit {
           this.showError(this.currentLang === 'vi'
             ? 'Vui lòng đăng nhập tại trang quản lý.'
             : 'Please login at the admin page.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -119,7 +124,7 @@ export class Login implements OnInit {
           localStorage.setItem('authAdmin', '1');
           window.location.href = '/admin-dashboard';
         } else {
-          window.location.href = '/home';
+          this.router.navigate(['/']).then(() => this.cdr.detectChanges());
         }
       },
       error: () => {
@@ -127,6 +132,7 @@ export class Login implements OnInit {
         this.showError(this.currentLang === 'vi'
           ? 'Không thể đọc dữ liệu. Vui lòng thử lại.'
           : 'Cannot load data. Please try again.');
+        this.cdr.detectChanges();
       }
     });
   }
