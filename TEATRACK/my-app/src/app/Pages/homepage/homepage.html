@@ -71,17 +71,36 @@
       <div class="container">
         <h2 class="hot-title">THỬ NGAY MÓN MỚI TẠI CỬA HÀNG</h2>
 
+        <!-- 4 món random từ “Thức Uống Mới” -->
         <div class="product-grid">
-          <a
-            class="product-card"
-            *ngFor="let p of hotMenuItems"
-            [routerLink]="['/product']"
-            [queryParams]="{ pid: p.id ?? '', name: p.name ?? '' }"
-            [attr.aria-label]="p.name"
-          >
-            <figure><img [src]="normSrc(p.image)" [alt]="p.name" /></figure>
-            <h3 class="product-name">{{ p.name }}</h3>
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/hong-tra-trung-khung-long.png" alt="Món 1">
+            </figure>
+            <h3 class="product-name">Hồng Trà Trứng Khủng Long</h3>
           </a>
+
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/o-long-o-mai-chanh-day.png" alt="Món 2">
+            </figure>
+            <h3 class="product-name">Ô Long Ô Mai Chanh Dây</h3>
+          </a>
+
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/tra-xanh-o-mai-chanh-day.png" alt="Món 3">
+            </figure>
+            <h3 class="product-name">Trà Xanh Ô Mai Chanh Dây</h3>
+          </a>
+
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/tra-sua-khoai-mon-nghien.png" alt="Món 4">
+            </figure>
+            <h3 class="product-name">Trà Sữa Khoai Môn Nghiền</h3>
+          </a>
+
         </div>
 
         <div class="promo-banner">
@@ -103,7 +122,9 @@
             [queryParams]="{ pid: p.id ?? '', name: p.name ?? '' }"
             [attr.aria-label]="p.name"
           >
-            <figure><img [src]="normSrc(p.image)" [alt]="p.name" /></figure>
+            <figure>
+              <img [src]="normSrc(p.image)" [alt]="p.name" />
+            </figure>
 
             <div class="card-body">
               <h3 class="product-name">{{ p.name }}</h3>
@@ -136,10 +157,12 @@
                   <span class="vip">VIP</span>
                   {{ priceVN(vipPrice(p.price || 0)) }}₫
                 </span>
+
                 <span>
                   <span class="vip">VIP</span>
                   {{ priceVN(vipPrice((p.price || 0) + 3000)) }}₫
                 </span>
+
                 <span class="vip-spacer"></span>
               </div>
             </div>
@@ -178,12 +201,12 @@
     <button class="drinks-close" (click)="closeDrinksModal()" aria-label="Đóng">×</button>
 
     <div class="drinks-left">
-      <img *ngIf="selectedSlug === 'thuan-tra'" src="TEATRACK/my-app/src/assets/images/tra-dai-loan.png" />
-      <img *ngIf="selectedSlug === 'tra-latte'" src="TEATRACK/my-app/src/assets/images/tra-latte.png" />
-      <img *ngIf="selectedSlug === 'tra-sua'" src="TEATRACK/my-app/src/assets/images/tra-sua.png" />
-      <img *ngIf="selectedSlug === 'mon-moi'" src="TEATRACK/my-app/src/assets/images/thuc-uong-moi.png" />
-      <img *ngIf="selectedSlug === 'mon-hot'" src="TEATRACK/my-app/src/assets/images/cac-mon-hot.png" />
-      <img *ngIf="selectedSlug === 'tra-trai-cay'" src="TEATRACK/my-app/src/assets/images/tra-yakult.png" />
+      <img *ngIf="selectedSlug === 'thuan-tra'" src="assets/images/tra-dai-loan.png" />
+      <img *ngIf="selectedSlug === 'tra-latte'" src="assets/images/tra-latte.png" />
+      <img *ngIf="selectedSlug === 'tra-sua'" src="assets/images/tra-sua.png" />
+      <img *ngIf="selectedSlug === 'mon-moi'" src="assets/images/thuc-uong-moi.png" />
+      <img *ngIf="selectedSlug === 'mon-hot'" src="assets/images/cac-mon-hot.png" />
+      <img *ngIf="selectedSlug === 'tra-trai-cay'" src="assets/images/tra-yakult.png" />
     </div>
 
     <div class="drinks-right">

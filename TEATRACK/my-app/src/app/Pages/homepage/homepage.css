@@ -12,7 +12,30 @@ main { flex: 1; }
   overflow: hidden;
 }
 
-/* Phần trên: Swiper */
+/* Swiper */
+.mySwiper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mySwiper .swiper-wrapper {
+  display: flex !important;     /* quan trọng: nếu thiếu sẽ xếp dọc */
+  flex-direction: row !important;
+}
+
+.mySwiper .swiper-slide {
+  flex: 0 0 100% !important;    /* mỗi slide chiếm 100% ngang */
+  width: 100% !important;
+}
+
+.mySwiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .hero-top {
   flex: 1;
   height: 50vh;

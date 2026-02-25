@@ -1,3 +1,6 @@
+@import "swiper/css";
+@import "swiper/css/pagination";
+@import "swiper/css/navigation";
 
 :root {
   --font-main: 'Inter', 'Helvetica Neue', Arial, sans-serif;
@@ -122,3 +125,4 @@ input:focus, select:focus, textarea:focus {
 .mt-2 { margin-top: 8px; }
 .mt-3 { margin-top: 12px; }
 .mt-4 { margin-top: 20px; }
+

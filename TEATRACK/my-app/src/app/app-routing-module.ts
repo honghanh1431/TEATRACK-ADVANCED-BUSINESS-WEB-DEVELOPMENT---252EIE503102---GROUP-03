@@ -9,6 +9,7 @@ export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 
 const routes: Routes = [
   { path: '', redirectTo: 'blog', pathMatch: 'full' },
+  { path: '', redirectTo: 'homepage', pathMatch: 'full' },
   { path: "blog", component: BlogList },
   { path: "blog/:id", component: BlogDetail },
   { path: "menu", component: Menu },

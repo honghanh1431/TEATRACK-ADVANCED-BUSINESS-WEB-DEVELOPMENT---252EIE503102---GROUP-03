@@ -35,7 +35,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   }
   @ViewChild('drinksSwiperEl') drinksSwiperEl?: ElementRef<HTMLElement>;
 
-  // ====== DATA ======
+  // data
   private ALL_PRODUCTS: Product[] = [];
 
   hotMenuItems: Product[] = [];
@@ -45,11 +45,11 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   selectedSlug = '';
   modalItems: Product[] = [];
 
-  // ====== SWIPERS ======
+  // swipers
   private heroSwiper: Swiper | null = null;
   private drinksSwiper: Swiper | null = null;
 
-  // ====== CATEGORY MAP ======
+  // category map
   private readonly CAT_MAP: Record<string, string> = {
     'thuan-tra': 'Loại Thuần Trà',
     'tra-latte': 'Loại Trà Latte',
@@ -66,7 +66,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly NAME_TO_SLUG: Record<string, string>;
 
-  // ====== BACKEND API BASE ======
+  // backend api base 
   // Bạn có thể tách sang environment.ts nếu muốn
   private readonly API_PRODUCTS = '/api/products/';
 
@@ -87,8 +87,12 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     this.heroSwiper = new Swiper('.mySwiper', {
       loop: true,
       slidesPerView: 1,
-      autoplay: { delay: 3000 },
+      direction: 'horizontal',
+      grabCursor: true,        
+      simulateTouch: true,     
+      allowTouchMove: true,    
       pagination: { el: '.swiper-pagination', clickable: true },
+      autoplay: { delay: 3000, disableOnInteraction: false },
     });
   }
 
@@ -99,9 +103,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     this.drinksSwiper = null;
   }
 
-  // =========================
-  // Backend load products
-  // =========================
+  // backend load products
   private async ensureProducts(): Promise<void> {
     if (this.ALL_PRODUCTS.length) return;
 
@@ -114,9 +116,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // =========================
-  // Utils
-  // =========================
+  // utils
   normalize(str: string = ''): string {
     return String(str || '')
       .normalize('NFD')
