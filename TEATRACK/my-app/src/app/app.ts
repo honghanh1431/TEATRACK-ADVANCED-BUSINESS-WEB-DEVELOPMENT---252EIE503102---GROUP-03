@@ -44,7 +44,8 @@ export class App implements OnInit, OnDestroy {
     this.titleService.setTitle(full);
   }
 
-  private readonly hideLayoutPaths = ['/login', '/login-admin', '/register', '/404'];
+  private readonly hideLayoutPaths = ['/login', '/login-admin', '/register', '/404', '/payment'];
+  
 
   ngOnInit(): void {
     const path = (this.router.url || '').split('?')[0];

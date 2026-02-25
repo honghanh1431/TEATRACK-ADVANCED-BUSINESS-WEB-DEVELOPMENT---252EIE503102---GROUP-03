@@ -1,0 +1,86 @@
+<ng-container [ngSwitch]="method">
+
+  <!-- ================= MOMO ================= -->
+  <ng-container *ngSwitchCase="'momo'">
+    <main class="momo-container">
+      <div class="qr-box-momo">
+        <h2 class="qr-title">Quét mã QR để thanh toán</h2>
+
+        <div class="qr-frame">
+          <img
+            src="/assets/images/qrcode.png"
+            class="qr-image-momo"
+          />
+          <div class="scan-line"></div>
+        </div>
+
+        <p class="qr-desc-momo">
+          Sử dụng App MoMo hoặc ứng dụng camera để thanh toán
+        </p>
+      </div>
+    </main>
+  </ng-container>
+
+
+  <!-- ================= PAYOO ================= -->
+  <ng-container *ngSwitchCase="'payoo'">
+    <main class="payoo-container">
+      <div class="qr-box-payoo">
+        <h2 class="qr-title">Quét mã QR để thanh toán</h2>
+
+        <div class="qr-frame">
+          <img
+            src="/assets/images/qrbanking.png"
+            class="qr-image-payoo"
+          />
+          <div class="scan-line"></div>
+        </div>
+
+        <p class="qr-desc-payoo">
+          Sử dụng App Ngân hàng hoặc camera để thanh toán
+        </p>
+      </div>
+    </main>
+
+    <!-- banks chỉ hiển thị ở Payoo -->
+    <section class="banks-section">
+      <h3 class="banks-title">Ngân hàng hỗ trợ</h3>
+      <div class="banks-grid">
+        <img src="/assets/images/vib.png">
+        <img src="/assets/images/mb.png">
+        <img src="/assets/images/acb.png">
+        <img src="/assets/images/scb.png">
+        <img src="/assets/images/vcb.png">
+        <img src="/assets/images/bidv.png">
+        <img src="/assets/images/agri.png">
+        <img src="/assets/images/tech.png">
+        <img src="/assets/images/tp.png">
+        <img src="/assets/images/cake.png">
+        <img src="/assets/images/lp.png">
+      </div>
+    </section>
+  </ng-container>
+
+
+  <!-- ================= ZALOPAY ================= -->
+  <ng-container *ngSwitchCase="'zalopay'">
+    <main class="zalo-container">
+      <div class="qr-box-zalo">
+        <h2 class="qr-title">Quét mã QR để thanh toán</h2>
+
+        <div class="qr-frame">
+          <img
+            src="/assets/images/qrzalo.png"
+            class="qr-image-zalo"
+          />
+          <div class="scan-line"></div>
+        </div>
+
+        <p class="qr-desc-zalo">
+          Sử dụng App ZaloPay hoặc camera để thanh toán
+        </p>
+      </div>
+    </main>
+  </ng-container>
+
+</ng-container>

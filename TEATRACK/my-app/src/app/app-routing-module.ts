@@ -9,6 +9,7 @@ import { Aboutus } from './Pages/aboutus/aboutus';
 import { Login } from './Pages/login/login';
 import { Cart } from './Pages/cart/cart';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
+import { Payment } from './Pages/payment/payment';
 
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 
@@ -25,6 +26,7 @@ const routes: Routes = [
   { path: 'login-admin', component: Login, data: { isAdmin: true } },
   { path: 'cart', component: Cart },
   { path: '404', component: Pagenotfound },
+  { path: 'payment', component: Payment },
   { path: '**', redirectTo: '404', pathMatch: 'full' },
 ];
 

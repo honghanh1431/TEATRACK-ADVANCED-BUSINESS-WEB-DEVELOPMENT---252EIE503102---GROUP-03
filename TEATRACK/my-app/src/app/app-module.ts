@@ -20,6 +20,7 @@ import { Cart } from './Pages/cart/cart';
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 import { Login } from './Pages/login/login';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
+import { Payment } from './Pages/payment/payment';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
     RouterModule,
     Homepage,
     Login,
-    Cart
+    Cart,
+    Payment
   ],
 
   providers: [
