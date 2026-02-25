@@ -18,6 +18,7 @@ const routes: Routes = [
   { path: "blog/:id", component: BlogDetail },
   { path: "menu", component: Menu },
   { path: "homepage", component: Homepage},
+  { path: "homepage/:id", component: Product },
   { path: '', redirectTo: '/', pathMatch: 'full' },
   { path: 'blog', component: BlogList },
   { path: 'blog/:id', component: BlogDetail },

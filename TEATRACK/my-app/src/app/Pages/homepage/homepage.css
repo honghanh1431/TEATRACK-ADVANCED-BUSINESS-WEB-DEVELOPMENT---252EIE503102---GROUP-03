@@ -20,12 +20,12 @@ main { flex: 1; }
 }
 
 .mySwiper .swiper-wrapper {
-  display: flex !important;     /* quan trọng: nếu thiếu sẽ xếp dọc */
+  display: flex !important;     
   flex-direction: row !important;
 }
 
 .mySwiper .swiper-slide {
-  flex: 0 0 100% !important;    /* mỗi slide chiếm 100% ngang */
+  flex: 0 0 100% !important;   
   width: 100% !important;
 }
 

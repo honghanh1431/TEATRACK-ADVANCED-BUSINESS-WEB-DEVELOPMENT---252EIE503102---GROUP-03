@@ -1,7 +1,6 @@
 @import "swiper/css";
 @import "swiper/css/pagination";
 @import "swiper/css/navigation";
-
 :root {
   --font-main: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   --color-text: #0b1320;

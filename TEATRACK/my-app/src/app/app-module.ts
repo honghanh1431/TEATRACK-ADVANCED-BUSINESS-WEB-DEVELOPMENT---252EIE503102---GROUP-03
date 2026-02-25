@@ -28,6 +28,7 @@ import { Login } from './Pages/login/login';
     Product,
     Aboutus,
   ],
+  
   imports: [
     BrowserModule,
     PageFooter,
@@ -44,6 +45,7 @@ import { Login } from './Pages/login/login';
     Login,
     Cart
   ],
+
   providers: [
     provideBrowserGlobalErrorListeners()
   ],

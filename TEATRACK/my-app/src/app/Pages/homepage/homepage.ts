@@ -67,7 +67,6 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   private readonly NAME_TO_SLUG: Record<string, string>;
 
   // backend api base 
-  // Bạn có thể tách sang environment.ts nếu muốn
   private readonly API_PRODUCTS = '/api/products/';
 
   constructor(private http: HttpClient, private router: Router) {
@@ -153,23 +152,13 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   normSrc(path?: string): string {
     if (!path) return '';
     const s = String(path);
-
-    // nếu backend trả về url tuyệt đối
     if (s.startsWith('http')) return s;
-
-    // nếu backend trả về "assets/..."
     if (s.startsWith('assets/')) return s;
-
-    // nếu backend trả về "/assets/..."
     if (s.startsWith('/assets/')) return s.slice(1);
-
-    // default: coi như nằm trong assets/
     return 'assets/' + s.replace(/^\/+/, '').replace(/^assets\/+/, '');
   }
 
-  // =========================
   // Pick products by category
-  // =========================
   private pickProductsBySlug(slugOrName: string) {
     const normalizedSlug = this.toSlug(slugOrName);
     const categoryName = this.CAT_MAP[normalizedSlug] || slugOrName;
@@ -187,16 +176,12 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     if (!items.length && normalizedSlug) {
       items = this.ALL_PRODUCTS.filter(p => this.normalize(p.category || '').includes(normalizedSlug));
     }
-
-    // fallback bất đắc dĩ
     if (!items.length) items = this.ALL_PRODUCTS.slice(0, 12);
 
     return { slug: normalizedSlug, items: items.slice(0, 12) };
   }
 
-  // =========================
   // Render sections
-  // =========================
   private renderTopHot(): void {
     this.topHotItems = [...this.ALL_PRODUCTS]
       .sort((a, b) => (Number(b.rating || 0) - Number(a.rating || 0)) || (Number(a.id || 0) - Number(b.id || 0)))
@@ -208,9 +193,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     this.hotMenuItems = [...items].sort(() => Math.random() - 0.5).slice(0, 4);
   }
 
-  // =========================
   // Modal
-  // =========================
   async openDrinksModal(slugOrName: string): Promise<void> {
     await this.ensureProducts();
 
@@ -255,9 +238,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // =========================
   // Actions
-  // =========================
   goCart(e: MouseEvent): void {
     e.preventDefault();
     e.stopPropagation();
