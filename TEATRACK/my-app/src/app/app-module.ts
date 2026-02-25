@@ -13,6 +13,7 @@ import { Blog } from './Pages/blog/blog';
 import { BlogList } from './Pages/blog/blog-list/blog-list';
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
 import { Menu } from './Pages/menu/menu';
+import { Homepage } from './Pages/homepage/homepage'
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
 import { Cart } from './Pages/cart/cart';
@@ -26,8 +27,8 @@ import { Login } from './Pages/login/login';
     Menu,
     Product,
     Aboutus,
-  
   ],
+  
   imports: [
     BrowserModule,
     PageFooter,
@@ -40,9 +41,11 @@ import { Login } from './Pages/login/login';
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule,
+    Homepage,
     Login,
     Cart
   ],
+
   providers: [
     provideBrowserGlobalErrorListeners()
   ],

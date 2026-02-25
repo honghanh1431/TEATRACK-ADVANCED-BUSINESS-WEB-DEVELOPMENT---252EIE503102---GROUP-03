@@ -1,0 +1,237 @@
+<main>
+  <div class="container">
+
+    <section class="hero">
+      <!-- HERO TOP -->
+      <div class="hero-top">
+        <div class="swiper mySwiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <img src="assets/images/banner1.png" alt="Banner 1" />
+            </div>
+            <div class="swiper-slide">
+              <img src="assets/images/banner2.jpeg" alt="Banner 2" />
+            </div>
+            <div class="swiper-slide">
+              <img src="assets/images/banner3.jpeg" alt="Banner 3" />
+            </div>
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+
+      <!-- HERO BOTTOM -->
+      <div class="hero-bottom">
+        <section class="drink-section">
+          <h2 class="drink-title">CÁC LOẠI THỨC UỐNG CỦA CHÚNG TÔI</h2>
+          <div class="underline"></div>
+
+          <div class="drink-list">
+            <div class="drink-item" (click)="openDrinksModal('Loại Thuần Trà')">
+              <img src="assets/images/tra-dai-loan.png" alt="Thuần Trà" />
+              <p>Loại Thuần Trà</p>
+            </div>
+
+            <div class="drink-item" (click)="openDrinksModal('Loại Trà Sữa')">
+              <img src="assets/images/tra-sua.png" alt="Trà Sữa" />
+              <p>Loại Trà Sữa</p>
+            </div>
+
+            <div class="drink-item" (click)="openDrinksModal('Loại Trà Latte')">
+              <img src="assets/images/tra-latte.png" alt="Trà Latte" />
+              <p>Loại Trà Latte</p>
+            </div>
+
+            <div class="drink-item" (click)="openDrinksModal('Thức UỐng Hot')">
+              <img src="assets/images/cac-mon-hot.png" alt="Thức uống hot" />
+              <p>Thức UỐng Hot</p>
+            </div>
+
+            <div class="drink-item" (click)="openDrinksModal('Thức Uống Mới')">
+              <img src="assets/images/thuc-uong-moi.png" alt="Thức uống mới" />
+              <p>Thức Uống Mới</p>
+            </div>
+
+            <div class="drink-item" (click)="openDrinksModal('Loại Trà Trái Cây')">
+              <img src="assets/images/tra-yakult.png" alt="Trà trái cây" />
+              <p>Loại Trà Trái Cây</p>
+            </div>
+
+            <p class="drink-desc">
+              Các dòng thức uống được kết hợp giữa trà nguyên chất với sữa béo cùng nguyên liệu tươi,
+              mang đến trải nghiệm tươi mới cho bạn.
+            </p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- HOT MENU -->
+    <section class="hot-menu" id="hot-menu">
+      <div class="container">
+        <h2 class="hot-title">THỬ NGAY MÓN MỚI TẠI CỬA HÀNG</h2>
+
+        <!-- 4 món random từ “Thức Uống Mới” -->
+        <div class="product-grid">
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/hong-tra-trung-khung-long.png" alt="Món 1">
+            </figure>
+            <h3 class="product-name">Hồng trà trứng khủng long</h3>
+          </a>
+
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/o-long-o-mai-chanh-day.png" alt="Món 2">
+            </figure>
+            <h3 class="product-name">Ô long ô mai chanh dây</h3>
+          </a>
+
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/tra-xanh-o-mai-chanh-day.png" alt="Món 3">
+            </figure>
+            <h3 class="product-name">Trà xanh ô mai chanh dây</h3>
+          </a>
+
+          <a class="product-card" routerLink="/product">
+            <figure>
+              <img src="assets/images/products/tra-sua-khoai-mon-nghien.png" alt="Món 4">
+            </figure>
+            <h3 class="product-name">Trà sữa khoai môn nghiền</h3>
+          </a>
+
+        </div>
+
+        <div class="promo-banner">
+          <img src="assets/images/banner_monmoi.png" alt="Khuyến mãi Ngô Gia" />
+        </div>
+      </div>
+    </section>
+
+    <!-- TOP HOT -->
+    <section class="top-hot" id="top-hot">
+      <div class="container">
+        <h2 class="top-hot-title">TOP 9 BÁN CHẠY NHẤT</h2>
+
+        <div class="product-grid" id="top-hot-grid">
+          <a
+            class="product-card"
+            *ngFor="let p of topHotItems"
+            [routerLink]="['/product']"
+            [queryParams]="{ pid: p.id ?? '', name: p.name ?? '' }"
+            [attr.aria-label]="p.name"
+          >
+            <figure>
+              <img [src]="normSrc(p.image)" [alt]="p.name" />
+            </figure>
+
+            <div class="card-body">
+              <h3 class="product-name">{{ p.name }}</h3>
+
+              <div class="meta">
+                <span class="star">★</span>
+                {{ (p.rating ?? 4.8) | number:'1.1-1' }}
+                <span class="sep">•</span>
+                {{ p.reviews ?? 500 }} đánh giá
+              </div>
+
+              <div class="price-row">
+                <span>
+                  <span class="lbl">M</span>
+                  <span class="val">{{ priceVN(p.price || 0) }}₫</span>
+                </span>
+
+                <span>
+                  <span class="lbl">L</span>
+                  <span class="val">{{ priceVN((p.price || 0) + 3000) }}₫</span>
+                </span>
+
+                <button type="button" class="cart2-btn" (click)="goCart($event)">
+                  <img src="assets/icons/Cart2.png" alt="Giỏ hàng" />
+                </button>
+              </div>
+
+              <div class="vip-row">
+                <span>
+                  <span class="vip">VIP</span>
+                  {{ priceVN(vipPrice(p.price || 0)) }}₫
+                </span>
+
+                <span>
+                  <span class="vip">VIP</span>
+                  {{ priceVN(vipPrice((p.price || 0) + 3000)) }}₫
+                </span>
+
+                <span class="vip-spacer"></span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZALO -->
+    <section class="zalo-section">
+      <div class="zalo-content">
+        <div class="zalo-text">
+          <h2>
+            Liên kết <span class="highlight-blue">Zalo</span> để nhận<br />
+            <span class="highlight-yellow">ưu đãi khách hàng VIP</span>
+          </h2>
+          <p>
+            Chỉ cần nhập thông tin, bạn sẽ trở thành khách hàng VIP<br />
+            với ưu đãi giảm <strong>3.000₫</strong> cho mỗi ly tại Ngô Gia.
+          </p>
+        </div>
+        <div class="zalo-qr">
+          <img src="assets/icons/zalo.png" alt="QR Zalo Ngô Gia" />
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="drinks-modal" [class.show]="showDrinksModal" aria-hidden="true">
+  <div class="drinks-backdrop" (click)="closeDrinksModal()"></div>
+
+  <div class="drinks-card" role="dialog" aria-modal="true">
+    <button class="drinks-close" (click)="closeDrinksModal()" aria-label="Đóng">×</button>
+
+    <div class="drinks-left">
+      <img *ngIf="selectedSlug === 'thuan-tra'" src="assets/images/tra-dai-loan.png" />
+      <img *ngIf="selectedSlug === 'tra-latte'" src="assets/images/tra-latte.png" />
+      <img *ngIf="selectedSlug === 'tra-sua'" src="assets/images/tra-sua.png" />
+      <img *ngIf="selectedSlug === 'mon-moi'" src="assets/images/thuc-uong-moi.png" />
+      <img *ngIf="selectedSlug === 'mon-hot'" src="assets/images/cac-mon-hot.png" />
+      <img *ngIf="selectedSlug === 'tra-trai-cay'" src="assets/images/tra-yakult.png" />
+    </div>
+
+    <div class="drinks-right">
+      <div class="swiper-button-prev drinks-nav"></div>
+
+      <div class="swiper drinks-swiper" #drinksSwiperEl>
+        <div class="swiper-wrapper">
+          <div class="swiper-slide" *ngFor="let p of modalItems">
+            <a
+              class="drink-card"
+              [routerLink]="['/product']"
+              [queryParams]="{ pid: p.id ?? '', name: p.name ?? '' }"
+              [attr.aria-label]="p.name"
+              [attr.title]="p.name"
+            >
+              <div class="drink-thumb">
+                <img [src]="normSrc(p.image)" [alt]="p.name" loading="lazy" />
+              </div>
+              <p>{{ p.name }}</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="swiper-button-next drinks-nav"></div>
+    </div>
+  </div>
+</div>
