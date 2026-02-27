@@ -1,0 +1,190 @@
+<section class="auth">
+  <!-- BÊN TRÁI -->
+  <aside class="side-left">
+    <div class="inner">
+      <div class="brand">
+        <a routerLink="/" aria-label="Về trang chủ">
+          <img src="/assets/images/logo ngo gia.png" alt="Ngô Gia Logo" />
+        </a>
+      </div>
+      <p class="desc">
+        Đăng nhập để đặt món nhanh hơn, lưu địa chỉ giao hàng và theo dõi đơn
+        của bạn.
+      </p>
+    </div>
+  </aside>
+
+  <!-- BÊN PHẢI -->
+  <main class="side-right">
+    <div class="form-wrap">
+      <div class="welcome-header">
+        <h2>Ngô Gia xin chào</h2>
+        <p>Tạo tài khoản ngay nào!</p>
+      </div>
+
+      <h3 class="form-title">Đăng ký tại đây</h3>
+
+      <!-- TÊN ĐĂNG NHẬP -->
+      <div class="form-group">
+        <label class="label" [class.error-label]="errors.username">
+          Tên đăng nhập <span class="req">*</span>
+        </label>
+        <div class="control">
+          <input
+            #usernameInput
+            type="text"
+            class="input"
+            [ngClass]="{ 'input-error': errors.username }"
+            placeholder="Nhập tên đăng nhập của bạn"
+            autocomplete="username"
+            [(ngModel)]="username"
+            (keydown.enter)="onSubmit()"
+          />
+        </div>
+        <div class="error-text" *ngIf="errors.username">
+          {{ errors.username }}
+        </div>
+      </div>
+
+      <!-- MẬT KHẨU -->
+      <div class="form-group">
+        <label class="label" [class.error-label]="errors.password">
+          Mật khẩu <span class="req">*</span>
+        </label>
+        <div class="control">
+          <input
+            #passwordInput
+            [type]="showPassword ? 'text' : 'password'"
+            class="input"
+            [ngClass]="{ 'input-error': errors.password }"
+            placeholder="Nhập mật khẩu của bạn"
+            autocomplete="new-password"
+            [(ngModel)]="password"
+            (keydown.enter)="onSubmit()"
+          />
+          <button
+            class="toggle-eye"
+            type="button"
+            (click)="togglePasswordVisibility()"
+            aria-label="Hiện/ẩn mật khẩu"
+          >
+            <!-- Eye Off -->
+            <svg
+              *ngIf="!showPassword"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
+              />
+              <path d="M1 1l22 22" />
+              <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
+              <path
+                d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
+              />
+            </svg>
+            <!-- Eye On -->
+            <svg
+              *ngIf="showPassword"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"
+              />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+        <div class="error-text" *ngIf="errors.password">
+          {{ errors.password }}
+        </div>
+      </div>
+
+      <!-- XÁC NHẬN MẬT KHẨU -->
+      <div class="form-group">
+        <label class="label" [class.error-label]="errors.confirmPassword">
+          Xác nhận mật khẩu <span class="req">*</span>
+        </label>
+        <div class="control">
+          <input
+            #confirmPasswordInput
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            class="input"
+            [ngClass]="{ 'input-error': errors.confirmPassword }"
+            placeholder="Xác nhận lại mật khẩu"
+            autocomplete="new-password"
+            [(ngModel)]="confirmPassword"
+            (keydown.enter)="onSubmit()"
+          />
+          <button
+            class="toggle-eye"
+            type="button"
+            (click)="toggleConfirmPasswordVisibility()"
+            aria-label="Hiện/ẩn xác nhận mật khẩu"
+          >
+            <!-- Eye Off -->
+            <svg
+              *ngIf="!showConfirmPassword"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
+              />
+              <path d="M1 1l22 22" />
+              <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
+              <path
+                d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
+              />
+            </svg>
+            <!-- Eye On -->
+            <svg
+              *ngIf="showConfirmPassword"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"
+              />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+        <div class="error-text" *ngIf="errors.confirmPassword">
+          {{ errors.confirmPassword }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" type="button" (click)="onSubmit()">
+          Đăng ký
+        </button>
+      </div>
+    </div>
+  </main>
+</section>
