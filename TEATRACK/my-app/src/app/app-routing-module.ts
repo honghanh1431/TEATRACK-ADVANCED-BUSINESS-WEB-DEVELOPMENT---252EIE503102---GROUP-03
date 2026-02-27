@@ -6,6 +6,8 @@ import { Menu } from './Pages/menu/menu';
 import { Homepage } from './Pages/homepage/homepage';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
+import { Agency } from './Pages/agency/agency';
+import { Admin } from './Pages/admin/admin';
 import { Login } from './Pages/login/login';
 import { Registion } from './Pages/registion/registion';
 import { Cart } from './Pages/cart/cart';
@@ -22,6 +24,8 @@ const routes: Routes = [
   { path: 'product', component: Product },
   { path: 'menu/product/:id/:name', component: Product },
   { path: 'aboutus', component: Aboutus },
+  { path: 'agency', component: Agency },
+  { path: 'admin-dashboard', component: Admin },
   { path: 'login', component: Login, data: { isAdmin: false } },
   { path: 'login-admin', component: Login, data: { isAdmin: true } },
   { path: 'register', component: Registion },
