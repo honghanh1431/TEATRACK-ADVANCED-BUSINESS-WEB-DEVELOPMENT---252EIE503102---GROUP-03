@@ -7,6 +7,7 @@ import { Homepage } from './Pages/homepage/homepage';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
 import { Login } from './Pages/login/login';
+import { Registion } from './Pages/registion/registion';
 import { Cart } from './Pages/cart/cart';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 
@@ -23,6 +24,7 @@ const routes: Routes = [
   { path: 'aboutus', component: Aboutus },
   { path: 'login', component: Login, data: { isAdmin: false } },
   { path: 'login-admin', component: Login, data: { isAdmin: true } },
+  { path: 'register', component: Registion },
   { path: 'cart', component: Cart },
   { path: '404', component: Pagenotfound },
   { path: '**', redirectTo: '404', pathMatch: 'full' },
