@@ -23,7 +23,7 @@ import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
 import { Registion } from './Pages/registion/registion';
 import { Agency } from './Pages/agency/agency';
-import { Admin } from './Pages/admin/admin';
+import { Admin } from './Pages/Admin/admin';
 
 @NgModule({
   declarations: [
@@ -52,8 +52,8 @@ import { Admin } from './Pages/admin/admin';
     RouterModule,
     Homepage,
     Login,
-    Cart,
     AdminBlog,
+    Cart,
   ],
 
   providers: [

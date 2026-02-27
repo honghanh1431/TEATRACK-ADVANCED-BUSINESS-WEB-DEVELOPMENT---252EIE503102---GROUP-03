@@ -7,7 +7,7 @@ import { Homepage } from './Pages/homepage/homepage';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
 import { Agency } from './Pages/agency/agency';
-import { Admin } from './Pages/admin/admin';
+import { Admin } from './Pages/Admin/admin';
 import { Login } from './Pages/login/login';
 import { Registion } from './Pages/registion/registion';
 import { Cart } from './Pages/cart/cart';

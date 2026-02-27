@@ -331,7 +331,7 @@ export class AdminBlog implements OnInit {
     const base: BlogRow[] = [
       {
         id: 'blog_1',
-        code: 'NG00119',
+        code: 'NG00120',
         title: 'CHÚC MỪNG NGÀY PHỤ NỮ VIỆT NAM 20/10/2025',
         excerpt: 'Chúc mừng 20/10...',
         content: 'Nội dung demo...',
