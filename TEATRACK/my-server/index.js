@@ -19,33 +19,6 @@ app.get("/", (req, res) => {
   res.send("Xin chào quý khách!");
 });
 
-// --- BookInfo (giữ tương thích cũ) ---
-app.get("/bookinfo", (req, res) => {
-  res.send(BookInfo);
-});
-app.get("/bookinfo/:id", (req, res) => {
-  const id = req.params.id;
-  const p = BookInfo.find((x) => x.BookId === id);
-  res.send(p || {});
-});
-app.post("/bookinfo", (req, res) => {
-  const body = req.body;
-  if (!body.BookId) body.BookId = "info" + (BookInfo.length + 1);
-  BookInfo.push(body);
-  res.send(BookInfo);
-});
-app.put("/bookinfo", (req, res) => {
-  const book = BookInfo.find((x) => x.BookId === req.body.BookId);
-  if (book) Object.assign(book, req.body);
-  res.send(BookInfo);
-});
-app.delete("/bookinfo/:id", (req, res) => {
-  const id = req.params.id;
-  const idx = BookInfo.findIndex((x) => x.BookId === id);
-  if (idx >= 0) BookInfo.splice(idx, 1);
-  res.send(BookInfo);
-});
-
 // --- Products (sản phẩm, dành cho admin) ---
 app.get("/products", (req, res) => {
   res.send(Products);

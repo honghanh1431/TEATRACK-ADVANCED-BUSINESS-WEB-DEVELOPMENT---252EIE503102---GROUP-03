@@ -6,6 +6,7 @@ import { combineLatest } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { ROUTE_TITLES } from '../../route-titles';
 import { ProductStateService } from '../../product-state.service';
+import { ReviewCountService } from '../../review-count.service';
 
 declare const window: Window & {
   NGCart?: {
@@ -46,6 +47,8 @@ export interface ProductItem {
 const REVIEW_PAGE_SIZE = 4;
 /** Base URL API đánh giá (my-server port 3100); bỏ trống nếu chỉ dùng local */
 const REVIEWS_API_BASE = 'http://localhost:3100';
+/** localStorage key lưu danh sách review đã thích (mảng key) */
+const REVIEW_LIKED_STORAGE_KEY = 'teatrack_review_liked';
 
 /** Tên hiển thị topping trong giỏ (key data-topping -> "Tên x1") */
 const TOPPING_LABELS: Record<string, string> = {
@@ -116,15 +119,19 @@ export class Product implements OnInit, OnDestroy {
   currentPage = 1;
   /** Số sao đang chọn trong form (0 = chưa chọn, 1–5) */
   reviewFormRating = 0;
+  /** Tiêu đề / dòng tóm tắt đánh giá (để lại đánh giá chi tiết tại đây) */
+  reviewFormTitle = '';
   /** Nội dung đánh giá trong form */
   reviewFormContent = '';
+  /** Set key cho review đã được bấm Thích (trái tim đỏ tô full) */
+  likedReviewKeys = new Set<string>();
   reviews: ReviewItem[] = [
     { name: 'Hồng Hạnh', title: 'Tôi yêu HTVT!!!!!!!', content: 'HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!', time: '2 ngày trước', rating: 5, createdAt: 0 },
     { name: 'Bảo Vy', title: 'So good, so yummy', content: 'HTVT rất ngon, tuyệt vời!', time: '3 ngày trước', rating: 5, createdAt: 0 },
     { name: 'Trung Nhân', title: 'Đáng thử', content: 'Lần đầu uống thấy ổn, sẽ quay lại.', time: '5 ngày trước', rating: 4, createdAt: 0 },
     { name: 'Hoàng Đức', title: 'Ngon đúng vị', content: 'Vị trà và vải hài hòa, không quá ngọt.', time: '1 tuần trước', rating: 5, createdAt: 0 },
-    { name: 'Thanh Thanh', title: 'Recommend', content: 'Bạn bè giới thiệu, uống xong ghiền.', time: '1 tuần trước', rating: 5, createdAt: 0 },
-    { name: 'Thế Hưng', title: 'Tạm được', content: 'Giá hơi cao nhưng chất lượng ổn.', time: '2 tuần trước', rating: 4, createdAt: 0 },
+    { name: 'Thanh Thanh', title: 'Recommend', content: 'Bạn bè giới thiệu, uống xong ghiền.', time: '1 tuần trước', rating: 4, createdAt: 0 },
+    { name: 'Thế Hưng', title: 'Tạm được', content: 'Giá hơi cao nhưng chất lượng ổn.', time: '2 tuần trước', rating: 3, createdAt: 0 },
   ];
   private subs: any[] = [];
 
@@ -135,6 +142,7 @@ export class Product implements OnInit, OnDestroy {
     private titleService: Title,
     private cdr: ChangeDetectorRef,
     private productState: ProductStateService,
+    private reviewCountService: ReviewCountService,
   ) {}
 
   ngOnInit(): void {
@@ -146,6 +154,7 @@ export class Product implements OnInit, OnDestroy {
         r.createdAt = Date.now() - (i + 2) * day * 2;
       }
     });
+    this.loadLikedFromStorage();
     const snapshot = this.route.snapshot;
     const sub = combineLatest([
       this.route.paramMap.pipe(startWith(snapshot.paramMap)),
@@ -195,7 +204,10 @@ export class Product implements OnInit, OnDestroy {
           this.titleService.setTitle(`${found.name || 'Sản phẩm'} | ${ROUTE_TITLES['/product']}`);
         }
         this.pickRelated();
-        if (found) this.loadReviewsForProduct(String(found.id));
+        if (found) {
+          this.reviewCountService.setCount(String(found.id), this.reviews.length);
+          this.loadReviewsForProduct(String(found.id));
+        }
         this.cdr.detectChanges();
         setTimeout(() => this.logRatingStyles(), 150);
       },
@@ -407,6 +419,62 @@ export class Product implements OnInit, OnDestroy {
     return sorted.slice(start, start + REVIEW_PAGE_SIZE);
   }
 
+  /** Phần trăm số lượng theo từng mức sao (5→1) để vẽ bar; total=0 thì trả 0 */
+  barPct(star: number): number {
+    const total = this.reviews.length;
+    if (total === 0) return 0;
+    const n = this.reviews.filter((r) => (r.rating ?? 0) === star).length;
+    return Math.round((n / total) * 100);
+  }
+
+  /** Số sao vàng cần hiển thị (1..rating), không vẽ sao xám */
+  getFilledStarCount(rating: number | undefined): number[] {
+    const n = Math.min(5, Math.max(0, Math.round(Number(rating) || 0)));
+    return Array.from({ length: n }, (_, i) => i + 1);
+  }
+
+  /** Key ổn định để đánh dấu review đã thích */
+  reviewLikeKey(r: ReviewItem): string {
+    return `${r.name ?? ''}_${r.createdAt ?? 0}_${(r.title ?? '').slice(0, 20)}`;
+  }
+
+  isLiked(r: ReviewItem): boolean {
+    return this.likedReviewKeys.has(this.reviewLikeKey(r));
+  }
+
+  toggleReviewLike(r: ReviewItem): void {
+    const key = this.reviewLikeKey(r);
+    if (this.likedReviewKeys.has(key)) this.likedReviewKeys.delete(key);
+    else this.likedReviewKeys.add(key);
+    this.saveLikedToStorage();
+    this.cdr.detectChanges();
+  }
+
+  private loadLikedFromStorage(): void {
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(REVIEW_LIKED_STORAGE_KEY) : null;
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) this.likedReviewKeys = new Set(arr);
+      }
+    } catch (_) {}
+  }
+
+  private saveLikedToStorage(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(REVIEW_LIKED_STORAGE_KEY, JSON.stringify(Array.from(this.likedReviewKeys)));
+      }
+    } catch (_) {}
+  }
+
+  /** Số lượt đánh giá hiển thị: ưu tiên từ ReviewCountService (đã cập nhật), fallback p.reviews */
+  getReviewCountForDisplay(p: ProductItem): number {
+    const fromService = this.reviewCountService.getCount(p?.id);
+    if (fromService !== undefined) return fromService;
+    return p?.reviews ?? 0;
+  }
+
   get pageNumbers(): number[] {
     if (this.totalPages <= 5) {
       return Array.from({ length: this.totalPages }, (_, i) => i + 1);
@@ -439,6 +507,8 @@ export class Product implements OnInit, OnDestroy {
         if (Array.isArray(list)) {
           list.forEach((r) => { if (r.createdAt == null) r.createdAt = 0; });
           this.reviews = list;
+          this.loadLikedFromStorage();
+          if (this.product?.id) this.reviewCountService.setCount(String(this.product.id), this.reviews.length);
           this.cdr.detectChanges();
         }
       },
@@ -453,7 +523,7 @@ export class Product implements OnInit, OnDestroy {
     const content = (this.reviewFormContent || '').trim();
     const user = Product.getCurrentUser();
     const name = user?.username || 'Khách';
-    const title = content ? content.split('\n')[0].slice(0, 80) || 'Đánh giá' : 'Đánh giá';
+    const title = (this.reviewFormTitle || '').trim() || (content ? content.split('\n')[0].slice(0, 80) : '') || 'Đánh giá';
     const createdAt = Date.now();
     const newReview: ReviewItem = {
       name,
@@ -465,8 +535,10 @@ export class Product implements OnInit, OnDestroy {
     };
     this.reviews.unshift(newReview);
     this.reviewFormRating = 0;
+    this.reviewFormTitle = '';
     this.reviewFormContent = '';
     this.currentPage = 1;
+    if (this.product?.id) this.reviewCountService.setCount(String(this.product.id), this.reviews.length);
     this.cdr.detectChanges();
     if (REVIEWS_API_BASE && this.product?.id) {
       const body = { productId: String(this.product.id), name, title, content: newReview.content, time: newReview.time, rating, createdAt };

@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ReviewCountService } from '../../review-count.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -38,6 +39,12 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   ratingPct(p: Product): number {
     const r = typeof p.rating === 'number' && !Number.isNaN(p.rating) ? p.rating : 5;
     return Math.min(100, Math.max(0, (r / 5) * 100));
+  }
+  /** Số lượt đánh giá: ưu tiên từ ReviewCountService (đã xem trang product), fallback p.reviews */
+  getReviewCount(p: Product): number {
+    const fromService = this.reviewCountService.getCount(p?.id);
+    if (fromService !== undefined) return fromService;
+    return p?.reviews ?? 0;
   }
   @ViewChild('heroSwiper') heroSwiperEl?: ElementRef<HTMLElement>;
   @ViewChild('drinksSwiperEl') drinksSwiperEl?: ElementRef<HTMLElement>;
@@ -83,7 +90,8 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private reviewCountService: ReviewCountService
   ) {
     this.NAME_TO_SLUG = Object.fromEntries(
       Object.entries(this.CAT_MAP).map(([slug, name]) => [this.normalize(name), slug])

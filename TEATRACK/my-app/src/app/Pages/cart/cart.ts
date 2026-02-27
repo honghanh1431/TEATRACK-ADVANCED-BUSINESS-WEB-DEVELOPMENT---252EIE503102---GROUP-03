@@ -277,6 +277,9 @@ export class Cart implements OnInit, OnDestroy {
   private saveItems(): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.cartItems));
     this.updateShippingFields();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
+    }
   }
 
   private loadShippingInfo(): void {
