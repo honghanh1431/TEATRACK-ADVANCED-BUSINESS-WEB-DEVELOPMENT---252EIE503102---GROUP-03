@@ -17,11 +17,40 @@ export class App implements OnInit, OnDestroy {
   private toastSub?: Subscription;
 
   showLayout = true;
+  /** 'guest' = page-header, 'customer' = page-header-2, 'admin' = page-header-admin */
+  headerMode: 'guest' | 'customer' | 'admin' = 'guest';
   /** Toast: pre + name (in đậm) + post */
   toastPre = '';
   toastName = '';
   toastPost = '';
   toastVisible = false;
+
+  private updateHeaderMode(): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const userRaw = localStorage.getItem('ngogia_user');
+      if (userRaw) {
+        const user = JSON.parse(userRaw) as { role?: string };
+        // Ưu tiên role trong ngogia_user: customer → header-2, admin → header-admin
+        if (user?.role === 'customer') {
+          this.headerMode = 'customer';
+          return;
+        }
+        if (user?.role === 'admin' && localStorage.getItem('authAdmin')) {
+          this.headerMode = 'admin';
+          return;
+        }
+        // Có user nhưng không rõ role (cũ) → coi là customer
+        this.headerMode = 'customer';
+        return;
+      }
+      if (localStorage.getItem('authAdmin')) {
+        this.headerMode = 'admin';
+        return;
+      }
+    } catch (_) {}
+    this.headerMode = 'guest';
+  }
 
   /** Màu nền dải phía trên footer: khớp với aboutus/menu để không bị tách màu */
   @HostBinding('style.--footer-overlap-bg') get footerOverlapBg(): string {
@@ -40,6 +69,7 @@ export class App implements OnInit, OnDestroy {
     if (event instanceof NavigationEnd) {
       const path = event.urlAfterRedirects?.split('?')[0] || '';
       this.showLayout = !this.hideLayoutPaths.includes(path);
+      this.updateHeaderMode();
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('routeChange', { detail: { path: path } }));
       }
@@ -60,6 +90,7 @@ export class App implements OnInit, OnDestroy {
   ngOnInit(): void {
     const path = (this.router.url || '').split('?')[0];
     this.showLayout = !this.hideLayoutPaths.includes(path);
+    this.updateHeaderMode();
     this.updateTitle(path || '/');
     this.sub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))

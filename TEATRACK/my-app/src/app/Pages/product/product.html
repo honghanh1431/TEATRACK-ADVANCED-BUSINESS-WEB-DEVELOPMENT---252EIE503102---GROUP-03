@@ -439,7 +439,7 @@
             <img class="avatar" src="/assets/icons/user.png" alt="avatar" />
             <div>
               <div class="name">
-                {{ r.name }} <span class="stars stars-inline" [attr.aria-label]="'Đánh giá ' + (r.rating ?? 0) + ' trên 5'">
+                {{ r.name }} <span class="stars stars-inline" [attr.aria-label]="'Đánh giá ' + r.rating + ' trên 5'">
                 <span *ngFor="let star of getFilledStarCount(r.rating)" class="star-dot filled">★</span>
               </span>
               </div>

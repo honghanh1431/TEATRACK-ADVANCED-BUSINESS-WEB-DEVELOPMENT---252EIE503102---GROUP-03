@@ -17,17 +17,18 @@
         </div>
       </a>
 
-      <div class="user" id="user-box">
+      <div class="user" id="user-box" #userBox [class.open]="userMenuOpen">
         <button class="user-btn" id="user-btn" type="button"
-                aria-haspopup="menu" aria-expanded="false" aria-controls="user-menu">
+                aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" aria-controls="user-menu"
+                (click)="toggleUserMenu($event)">
           <img class="avatar" id="user-avatar" src="assets/icons/user.png" alt="User">
-          <span class="name" id="user-name" data-user-chip>Tài khoản</span>
+          <span class="name" id="user-name" data-user-chip>{{ userName }}</span>
           <span class="caret" aria-hidden="true">▾</span>
         </button>
-        <div class="menu" id="user-menu" role="menu" hidden>
-          <a role="menuitem" routerLink="/profile">Hồ sơ</a>
-          <a role="menuitem" routerLink="/order-tracking">Đơn hàng</a>
-          <button role="menuitem" id="btn-logout" type="button">Đăng xuất</button>
+        <div class="menu" id="user-menu" role="menu">
+          <a role="menuitem" routerLink="/profile" (click)="closeUserMenu()">Hồ sơ</a>
+          <a role="menuitem" routerLink="/order-tracking" (click)="closeUserMenu()">Đơn hàng</a>
+          <button role="menuitem" id="btn-logout" type="button" (click)="onLogout($event)">Đăng xuất</button>
         </div>
       </div>
     </div>

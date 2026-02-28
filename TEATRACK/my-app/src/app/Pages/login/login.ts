@@ -137,6 +137,8 @@ export class Login implements OnInit {
           }));
           window.location.href = '/admin-dashboard';
         } else {
+          // Đăng nhập customer: xóa authAdmin để header hiển thị page-header-2, không bị nhầm admin
+          localStorage.removeItem('authAdmin');
           this.router.navigate(['/']).then(() => this.cdr.detectChanges());
         }
       },

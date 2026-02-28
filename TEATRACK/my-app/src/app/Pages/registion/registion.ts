@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registion',
@@ -7,6 +8,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
   styleUrls: ['./registion.css'],
 })
 export class Registion {
+  constructor(private router: Router) {}
   username = '';
   password = '';
   confirmPassword = '';
@@ -104,11 +106,14 @@ export class Registion {
       return;
     }
 
-    // TODO: Gọi API đăng ký thực tế tại đây.
-    // Tạm thời chỉ log ra console.
-    console.log('Đăng ký thành công với:', {
-      username: this.username.trim(),
-      password: this.password.trim(),
-    });
+    const u = this.username.trim();
+    // Lưu user vào localStorage (cùng key với login) để header-2 hiển thị đúng username
+    localStorage.setItem(
+      'ngogia_user',
+      JSON.stringify({ username: u, role: 'customer' })
+    );
+    localStorage.removeItem('authAdmin');
+    // Chuyển về trang chủ → hiện page-header-2 với tên đăng nhập vừa đăng ký
+    this.router.navigate(['/']);
   }
 }
