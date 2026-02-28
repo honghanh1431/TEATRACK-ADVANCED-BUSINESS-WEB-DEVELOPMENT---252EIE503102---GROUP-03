@@ -289,19 +289,28 @@ export class Cart implements OnInit, OnDestroy {
         const parsed = JSON.parse(raw);
         this.shippingInfo = this.normalizeShipping(parsed);
       } else {
-        this.shippingInfo = { ...this.defaultShipping };
-        this.shippingInfo.time = this.buildTimeText(
-          this.shippingInfo.deliveryDate,
-          this.shippingInfo.deliveryTime,
-        );
+        // Không có dữ liệu (vd: sau logout) → form địa chỉ trống
+        this.shippingInfo = {
+          address: '',
+          receiver: '',
+          phone: '',
+          deliveryDate: '',
+          deliveryTime: '',
+          time: '',
+          note: '',
+        };
       }
     } catch (err) {
       console.warn('Cannot parse shipping info', err);
-      this.shippingInfo = { ...this.defaultShipping };
-      this.shippingInfo.time = this.buildTimeText(
-        this.shippingInfo.deliveryDate,
-        this.shippingInfo.deliveryTime,
-      );
+      this.shippingInfo = {
+        address: '',
+        receiver: '',
+        phone: '',
+        deliveryDate: '',
+        deliveryTime: '',
+        time: '',
+        note: '',
+      };
     }
   }
 

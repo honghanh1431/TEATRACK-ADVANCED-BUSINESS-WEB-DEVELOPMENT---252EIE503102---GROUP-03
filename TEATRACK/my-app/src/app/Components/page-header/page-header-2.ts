@@ -70,6 +70,12 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
     if (confirm('Bạn có chắc muốn đăng xuất?')) {
       localStorage.removeItem('authAdmin');
       localStorage.removeItem('ngogia_user');
+      localStorage.removeItem('cart_items');
+      localStorage.removeItem('ngogia_shipping');
+      localStorage.removeItem('ngogia_coupon');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cart:updated'));
+      }
       window.location.href = '/';
     }
   }

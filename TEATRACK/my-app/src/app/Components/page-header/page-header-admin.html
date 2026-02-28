@@ -12,7 +12,7 @@
                 aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" aria-controls="user-menu"
                 (click)="toggleUserMenu($event)">
           <img class="avatar" id="user-avatar" src="/assets/icons/user.png" alt="User">
-          <span class="name" id="user-name" data-user-chip data-i18n="header.admin.account">Tài khoản</span>
+          <span class="name" id="user-name" data-user-chip>{{ userName }}</span>
           <span class="caret">▾</span>
         </button>
         <div class="menu" id="user-menu" role="menu">
