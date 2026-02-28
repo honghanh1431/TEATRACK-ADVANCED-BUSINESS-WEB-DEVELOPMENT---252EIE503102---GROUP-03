@@ -27,6 +27,7 @@ import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
 import { Registion } from './Pages/registion/registion';
 import { Agency } from './Pages/agency/agency';
 import { Admin } from './Pages/Admin/admin';
+import { OrderTracking } from './Pages/order-tracking/order-tracking';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { Admin } from './Pages/Admin/admin';
     Login,
     AdminBlog,
     Cart,
+    OrderTracking,
   ],
 
   providers: [

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 
 interface CartItem {
   id: string;
@@ -58,6 +59,7 @@ interface Totals {
   styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit, OnDestroy {
+  constructor(private router: Router) {}
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
   private readonly COUPON_KEY = 'ngogia_coupon';
@@ -735,7 +737,7 @@ export class Cart implements OnInit, OnDestroy {
         console.error('Error saving order:', err);
       }
 
-      window.location.href = '/order-tracking/?orderId=' + orderId;
+      this.router.navigate(['/order-tracking'], { queryParams: { orderId } });
       return;
     }
 
