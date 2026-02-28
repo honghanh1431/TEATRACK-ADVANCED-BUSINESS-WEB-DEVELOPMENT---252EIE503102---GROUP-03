@@ -1,7 +1,8 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { HttpClientModule} from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -9,6 +10,8 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { PageFooter } from './Components/page-footer/page-footer';
 import { PageHeader } from './Components/page-header/page-header';
+import { PageHeader2 } from './Components/page-header/page-header-2';
+import { PageHeaderAdmin } from './Components/page-header/page-header-admin';
 import { Blog } from './Pages/blog/blog';
 import { BlogList } from './Pages/blog/blog-list/blog-list';
 import { BlogDetail } from './Pages/blog/blog-detail/blog-detail';
@@ -38,13 +41,18 @@ import { Admin } from './Pages/Admin/admin';
     Admin,
   ],
   
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+
   imports: [
     BrowserModule,
     PageFooter,
     PageHeader,
+    PageHeader2,
+    PageHeaderAdmin,
     BlogList,
     BlogDetail,
     CommonModule,
+    DecimalPipe,
     FormsModule,
     AppRoutingModule,
     HttpClientModule,

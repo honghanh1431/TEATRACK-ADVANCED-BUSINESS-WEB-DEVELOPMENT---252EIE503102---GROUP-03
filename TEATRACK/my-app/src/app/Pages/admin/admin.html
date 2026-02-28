@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title data-i18n="admin.dashboard.title">Admin Dashboard • Hồng Trà Ngô Gia</title>
-  <link rel="icon" type="image/png" href="{% static 'assets/images/logo-divider.png' %}">
-  <link rel="stylesheet" href="{% static 'Pages/Admin/admin.css' %}">
+  <link rel="icon" type="image/png" href="assets/images/logo-divider.png">
 </head>
 <body>
   <div id="app-header"></div>
@@ -30,7 +28,7 @@
         <section class="cards" id="overview">
           <div class="card stat revenue">
             <div class="stat-title">
-              <img src="{% static 'assets/icons/doanhthu.png' %}" alt="Revenue icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
+              <img src="assets/icons/doanhthu.png" alt="Revenue icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
               <span data-i18n="admin.dashboard.revenue">DOANH THU</span>
             </div>
             <div class="stat-value" id="sRevenue">679.000đ</div>
@@ -42,7 +40,7 @@
           
           <div class="card stat orders">
             <div class="stat-title">
-              <img src="{% static 'assets/icons/order.png' %}" alt="Order icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
+              <img src="assets/icons/order.png" alt="Order icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
               <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG TUẦN NÀY</span>
             </div>
             <div class="stat-value" id="sOrders">0</div>
@@ -54,7 +52,7 @@
           
           <div class="card stat bestseller">
             <div class="stat-title">
-              <img src="{% static 'assets/icons/bestseller.png' %}" alt="Best seller icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
+              <img src="assets/icons/bestseller.png" alt="Best seller icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
               <span data-i18n="admin.dashboard.productsSold">SẢN PHẨM ĐÃ BÁN</span>
             </div>
             <div class="stat-value" id="sCustomers">327 SẢN PHẨM</div>
@@ -66,7 +64,7 @@
           
           <div class="card stat products">
             <div class="stat-title">
-              <img src="{% static 'assets/icons/product.png' %}" alt="Product icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
+              <img src="assets/icons/product.png" alt="Product icon" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
               <span data-i18n="admin.dashboard.products">SẢN PHẨM</span>
             </div>
             <div class="stat-value" id="sProducts">0</div>
@@ -120,7 +118,7 @@
               <div class="search-box">
                 <input type="search" id="product-search" data-i18n-placeholder="admin.dashboard.searchProduct" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm sản phẩm">
                 <button type="button" class="search-btn" aria-label="Tìm kiếm">
-                  <img src="{% static 'assets/icons/search.png' %}" alt="Search">
+                  <img src="assets/icons/search.png" alt="Search">
                 </button>
               </div>
               
@@ -289,11 +287,11 @@
 
     <div class="modal-footer">
       <button type="button" class="btn-danger" id="btn-delete-product">
-        <span class="btn-icon"><img src="{% static 'assets/icons/delete3.png' %}" alt="" style="width:18px;height:18px;"></span>
+        <span class="btn-icon"><img src="assets/icons/delete3.png" alt="" style="width:18px;height:18px;"></span>
         <span>Xóa</span>
       </button>
       <button type="submit" form="form-edit-product" class="btn-primary">
-        <span class="btn-icon"><img src="{% static 'assets/icons/tick2.png' %}" alt="" style="width:18px;height:18px;"></span>
+        <span class="btn-icon"><img src="assets/icons/tick2.png" alt="" style="width:18px;height:18px;"></span>
         <span>Lưu</span>
       </button>
     </div>
@@ -319,11 +317,11 @@
       
       <div class="confirm-actions">
         <button type="button" class="btn btn-cancel" data-close-delete>
-          <img src="{% static 'assets/icons/delete3.png' %}" alt="" style="width:18px;height:18px;margin-right:6px;">
+          <img src="assets/icons/delete3.png" alt="" style="width:18px;height:18px;margin-right:6px;">
           Hủy bỏ
         </button>
         <button type="button" class="btn btn-confirm" id="btn-confirm-delete">
-          <img src="{% static 'assets/icons/tick2.png' %}" alt="" style="width:18px;height:18px;margin-right:6px;">
+          <img src="assets/icons/tick2.png" alt="" style="width:18px;height:18px;margin-right:6px;">
           Tiếp tục
         </button>
       </div>
@@ -346,7 +344,7 @@
       <!-- Thông tin đơn hàng - Bao gồm cả địa chỉ -->
       <div class="order-info-section">
         <div class="order-info-header">
-          <img src="{% static 'assets/icons/Cart.png' %}" alt="Cart" class="section-icon">
+          <img src="assets/icons/Cart.png" alt="Cart" class="section-icon">
           <h3 class="section-title">Thông tin đơn hàng</h3>
         </div>
         <div class="order-info-grid">
@@ -402,13 +400,13 @@
       <!-- Danh sách đơn hàng -->
       <div class="order-items-section">
         <div class="order-info-header">
-          <img src="{% static 'assets/icons/cart3.png' %}" alt="List" class="section-icon">
+          <img src="assets/icons/cart3.png" alt="List" class="section-icon">
           <h3 class="section-title">Danh sách đơn hàng</h3>
         </div>
         <div class="order-items-list" id="order-items">
           <!-- Item 1 -->
           <div class="order-item">
-            <img src="{% static 'assets/images/products/hong-tra-dai-loan.jpg' %}" alt="Product" class="item-image">
+            <img src="assets/images/products/hong-tra-dai-loan.jpg" alt="Product" class="item-image">
             <div class="item-details">
               <h4 class="item-name">Hồng trà đài loan</h4>
               <p class="item-specs">Kích cỡ: L, Độ ngọt: Vừa, 2x Thạch dừa nguyên vị</p>
@@ -418,7 +416,7 @@
           
           <!-- Item 2 -->
           <div class="order-item">
-            <img src="{% static 'assets/images/products/tra-sua-dai-loan.jpg' %}" alt="Product" class="item-image">
+            <img src="assets/images/products/tra-sua-dai-loan.jpg" alt="Product" class="item-image">
             <div class="item-details">
               <h4 class="item-name">Trà sữa Đài Loan</h4>
               <p class="item-specs">Kích cỡ: M, Độ ngọt: Ít, Trân châu hoàng kim, 2x pudding Trung</p>
@@ -453,7 +451,7 @@
     <!-- Nút Lưu -->
     <div class="modal-footer">
       <button type="button" class="btn-primary" id="btn-save-order">
-        <span class="btn-icon"><img src="{% static 'assets/icons/tick2.png' %}" alt="" style="width:18px;height:18px;"></span>
+        <span class="btn-icon"><img src="assets/icons/tick2.png" alt="" style="width:18px;height:18px;"></span>
         <span>Lưu</span>
       </button>
     </div>
@@ -595,7 +593,7 @@
 
     <div class="modal-footer">
       <button type="button" class="btn-danger" data-close-add-modal>
-        <span class="btn-icon"><img src="{% static 'assets/icons/delete3.png' %}" alt="" style="width:18px;height:18px;"></span>
+        <span class="btn-icon"><img src="assets/icons/delete3.png" alt="" style="width:18px;height:18px;"></span>
         <span>Hủy bỏ</span>
       </button>
       <button type="submit" form="form-add-product" class="btn-primary">
@@ -612,7 +610,7 @@
   <div class="modal-container modal-success-container">
     <div class="modal-success-content">
       <div class="success-icon">
-        <img src="{% static 'assets/icons/tick2.png' %}" alt="Success" style="width:48px;height:48px;">
+        <img src="assets/icons/tick2.png" alt="Success" style="width:48px;height:48px;">
       </div>
       <h2 class="success-title" id="success-message">CHỈNH SỬA THÀNH CÔNG</h2>
       <button type="button" class="btn-close-success" id="btn-close-success">
@@ -624,7 +622,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   
-  <script>
+  <script ngNonBindable>
     window.reloadAdminTranslations = async function(lang) {
       try {
         const response = await fetch(`/public/lang/${lang}.json`);
@@ -676,7 +674,7 @@
     });
   </script>
   
-  <script>
+  <script ngNonBindable>
     (function(){
       async function loadHeaderAdmin(){
         try{
@@ -781,9 +779,9 @@
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
     })();
   </script>
-  <script src="{% static 'Pages/Admin/admin.js' %}" defer></script>
+  <script src="assets/Pages/Admin/admin.js" defer></script>
   
-  <script>
+  <script ngNonBindable>
     (function(){
       function setup(btnId, menuId){
         const btn=document.getElementById(btnId); const menu=document.getElementById(menuId); const box=btn?.closest(".dropdown");
@@ -799,7 +797,7 @@
     })();
   </script>
   
-  <script>
+  <script ngNonBindable>
     (function(){
       function toCSVRow(arr){ return arr.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','); }
       function exportCSV(){
@@ -832,7 +830,7 @@
   </script>
 
   <!-- GIỮ: Wait for header -->
-  <script>
+  <script ngNonBindable>
     document.addEventListener('DOMContentLoaded', async function() {
       const savedLang = localStorage.getItem('app.lang') || 'vi';
       
