@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<div class="order-tracking-container">
+    <!-- Breadcrumb -->
+  <section class="breadcrumb-banner">
+    <h1 class="breadcrumb-title">Đơn hàng</h1>
+    <p class="breadcrumb-path">
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/order-tracking" (click)="scrollToTop()">Đơn hàng</a>
+    </p>
+  </section>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="success-icon-large">
+        <img src="/assets/icons/tick.png" alt="Success" />
+      </div>
+      <h1 class="hero-title">Đặt Hàng Thành Công!</h1>
+      <p class="hero-subtitle">Cảm ơn bạn đã tin tưởng Hồng Trà Ngô Gia</p>
+    </div>
+  </section>
+
+  <!-- Order Info Card -->
+  <section class="order-info-section" *ngIf="order; else errorTemplate">
+    <div class="container">
+      <div class="order-info-card">
+        <div class="order-header">
+          <div class="order-id-box">
+            <span class="label">Mã đơn hàng</span>
+            <span class="order-id">{{ order.id || order.orderId }}</span>
+          </div>
+          <div class="order-date-box">
+            <span class="label">Ngày đặt</span>
+            <span class="order-date">{{ formatDate(order.date || order.createdAt) }}</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="order-details">
+          <div class="detail-row">
+            <span class="detail-label">Người nhận:</span>
+            <span class="detail-value">{{ order.customerName || 'N/A' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Thời gian nhận hàng:</span>
+            <span class="detail-value">
+              {{ order.deliveryTime }}, {{ order.deliveryDate || 'Chưa xác định' }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Địa chỉ nhận hàng:</span>
+            <span class="detail-value">{{ order.customerAddress || 'N/A' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Ghi chú:</span>
+            <span class="detail-value">{{ order.note || 'Không có ghi chú' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phương thức thanh toán:</span>
+            <span class="detail-value">{{ order.paymentMethod || 'Tiền mặt' }}</span>
+          </div>
+          <div class="detail-row total">
+            <span class="detail-label">Tổng tiền:</span>
+            <span class="detail-value">{{ formatMoney(order.total || 0) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #errorTemplate>
+    <!-- Không hiển thị gì thêm, lỗi đã được show ở hero -->
+  </ng-template>
+
+  <!-- Order Status Timeline -->
+  <section class="timeline-section" *ngIf="order">
+    <div class="container">
+      <h2 class="section-title">Trạng Thái Đơn Hàng</h2>
+
+      <div class="timeline-horizontal">
+        <!-- Pending -->
+        <div class="timeline-item" id="timeline-pending"
+             [ngClass]="getStatusClass('pending')">
+          <img src="/assets/icons/1.png" alt="1" class="timeline-number" />
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Confirmed" />
+            </div>
+          </div>
+          <div class="timeline-content">
+            <h3 class="timeline-title">Xác nhận đơn hàng</h3>
+            <span class="timeline-time" id="time-pending">
+              {{ order.status === 'pending' ? formatDate(order.date) : (order.statusProgress?.pending || 'Đang xử lý...') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Processing -->
+        <div class="timeline-item" id="timeline-processing"
+             [ngClass]="getStatusClass('processing')">
+          <img src="/assets/icons/2.png" alt="2" class="timeline-number" />
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Processing" />
+            </div>
+          </div>
+          <div class="timeline-content">
+            <h3 class="timeline-title">Chuẩn bị đơn hàng</h3>
+            <span class="timeline-time" id="time-processing">
+              {{ order.status === 'processing' ? formatDate(order.date) : (order.statusProgress?.processing || 'Đang xử lý...') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Ready -->
+        <div class="timeline-item" id="timeline-ready"
+             [ngClass]="getStatusClass('ready')">
+          <img src="/assets/icons/3.png" alt="3" class="timeline-number" />
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Ready" />
+            </div>
+          </div>
+          <div class="timeline-content">
+            <h3 class="timeline-title">Chờ lấy hàng</h3>
+            <span class="timeline-time" id="time-ready">
+              {{ order.status === 'ready' ? formatDate(order.date) : (order.statusProgress?.ready || 'Chờ xử lý') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Shipping -->
+        <div class="timeline-item" id="timeline-shipping"
+             [ngClass]="getStatusClass('shipping')">
+          <img src="/assets/icons/4.png" alt="4" class="timeline-number" />
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Shipping" />
+            </div>
+          </div>
+          <div class="timeline-content">
+            <h3 class="timeline-title">Đang giao hàng</h3>
+            <span class="timeline-time" id="time-shipping">
+              {{ order.status === 'shipping' ? formatDate(order.date) : (order.statusProgress?.shipping || 'Chờ xử lý') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="timeline-item" id="timeline-completed"
+             [ngClass]="getStatusClass('completed')">
+          <img src="/assets/icons/5.png" alt="5" class="timeline-number" />
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Delivered" />
+            </div>
+          </div>
+          <div class="timeline-content">
+            <h3 class="timeline-title">Giao thành công</h3>
+            <span class="timeline-time" id="time-completed">
+              {{ order.status === 'completed' ? formatDate(order.date) : (order.statusProgress?.completed || 'Chờ xử lý') }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Items -->
+  <section class="order-items-section" *ngIf="order">
+    <div class="container">
+      <h2 class="section-title">Sản Phẩm Đã Đặt</h2>
+      <div class="items-list">
+        <div class="order-item" *ngFor="let item of order.items">
+          <img [src]="item.image || '/assets/images/products/default.jpg'"
+               [alt]="item.name"
+               class="item-image" />
+          <div class="item-info">
+            <div class="item-name">{{ item.name }}</div>
+            <div class="item-details">
+              Size: {{ item.size || 'M' }} | Số lượng: {{ item.qty || item.quantity || 1 }}
+            </div>
+          </div>
+          <div class="item-price">
+            {{ formatMoney((item.price || 0) * (item.qty || item.quantity || 1)) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Action Buttons -->
+  <section class="action-section" *ngIf="order">
+    <div class="container">
+      <div class="action-buttons">
+        <a href="#" class="btn btn-primary" (click)="openReviewModal(); $event.preventDefault()">
+          <img src="/assets/icons/tick2.png" alt="Review" />
+          Viết Đánh Giá
+        </a>
+        <a routerLink="/menu/" class="btn btn-secondary">
+          <img src="/assets/icons/Cart.png" alt="Shop" />
+          Tiếp Tục Mua Sắm
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notification -->
+  <div class="notification-box" *ngIf="order">
+    <div class="notification-icon">
+      <img src="/assets/icons/tick.png" alt="Info" />
+    </div>
+    <div class="notification-content">
+      <h4>Thông báo quan trọng</h4>
+      <p>Đơn hàng sẽ được giao trong vòng 15-30 phút. Vui lòng để ý điện thoại!</p>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div class="modal" [class.show]="showReviewModal" (click)="closeReviewModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Viết Đánh Giá</h2>
+        <button class="modal-close" (click)="closeReviewModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitReview()" #reviewForm="ngForm">
+          <!-- Rating Stars -->
+          <div class="form-group">
+            <label>Đánh giá của bạn:</label>
+            <div class="star-rating">
+              <ng-container *ngFor="let star of [5,4,3,2,1]">
+                <input type="radio" name="rating" [id]="'star'+star"
+                       [value]="star" (change)="onRatingChange(star)" required />
+                <label [for]="'star'+star" title="{{star}} sao">★</label>
+              </ng-container>
+            </div>
+            <span class="rating-text" [style.color]="review.rating ? '#0088ff' : '#6b7280'">
+              {{ ratingText }}
+            </span>
+          </div>
+
+          <!-- Review Text -->
+          <div class="form-group">
+            <label for="reviewText">Nhận xét của bạn:</label>
+            <textarea id="reviewText" name="reviewText" rows="5"
+                      placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm và dịch vụ..."
+                      [(ngModel)]="review.comment" required></textarea>
+          </div>
+
+          <!-- Customer Name -->
+          <div class="form-group">
+            <label for="reviewerName">Tên của bạn (tùy chọn):</label>
+            <input type="text" id="reviewerName" name="reviewerName"
+                   placeholder="Nhập tên của bạn" [(ngModel)]="review.reviewerName" />
+          </div>
+
+          <!-- Footer Buttons -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeReviewModal()">Hủy</button>
+            <button type="submit" class="btn btn-primary" [disabled]="reviewForm.invalid">
+              Gửi Đánh Giá
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Button (Floating) -->
+  <button *ngIf="demoMode" id="btnNextStatus" class="btn-demo-float"
+          [disabled]="btnNextDisabled" [title]="btnNextTitle"
+          (click)="nextStatus()">
+    ⏭️
+  </button>
+</div>

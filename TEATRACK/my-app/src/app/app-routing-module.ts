@@ -13,6 +13,7 @@ import { Registion } from './Pages/registion/registion';
 import { Cart } from './Pages/cart/cart';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
+import { OrderTracking } from './Pages/order-tracking/order-tracking';
 
 
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
@@ -32,6 +33,7 @@ const routes: Routes = [
   { path: 'login-admin', component: Login, data: { isAdmin: true } },
   { path: 'register', component: Registion },
   { path: 'cart', component: Cart },
+  { path: 'order-tracking', component: OrderTracking},
   { path: '404', component: Pagenotfound },
   { path: 'admin/blog', component: AdminBlog },
   { path: 'admin/blog', loadComponent: () => import('./Pages/Admin/admin-blog/admin-blog').then(m => m.AdminBlog) },
