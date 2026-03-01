@@ -21,6 +21,8 @@ export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
 import { Login } from './Pages/login/login';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { Payment } from './Pages/payment/payment';
+import { Contact } from './Pages/contact/contact';
+import { Profile } from './Pages/profile/profile';
 
 @NgModule({
   declarations: [
@@ -30,6 +32,8 @@ import { Payment } from './Pages/payment/payment';
     Product,
     Aboutus,
     Pagenotfound,
+    Contact,
+    Profile,
   ],
   
   imports: [

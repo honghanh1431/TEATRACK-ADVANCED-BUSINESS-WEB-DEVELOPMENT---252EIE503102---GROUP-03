@@ -1,0 +1,82 @@
+<!-- contact.component.html -->
+<div class="account-breadcrumb">
+  <div class="account-breadcrumb-container">
+    <h2>Liên Hệ</h2>
+    <p>Liên Hệ</p>
+  </div>
+</div>
+
+<div class="contact-container">
+  <!-- LEFT CARD -->
+  <aside class="contact-card">
+    <div class="contact-card__body">
+      <h3 class="contact-card__title">Thông tin liên hệ:</h3>
+      <p class="contact-card__desc">
+        Hồng Trà Ngô Gia luôn mong muốn nhận được những phản hồi quý giá...
+      </p>
+      <div class="contact-card__line">
+        <img src="assets/icons/Phone2.png" alt="sđt" class="icons">
+        <span>0999.888.777</span>
+      </div>
+      <div class="contact-card__line">
+        <img src="assets/icons/Mail2.png" alt="email" class="icons">
+        <a><u>ngogiahotro&#64;gmail.com</u></a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT FORM -->
+  <div class="contact-form">
+    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Họ và tên<span class="req">*</span></label>
+          <input class="input" type="text" formControlName="fullname" placeholder="Nguyễn Ba Dù">
+          <small *ngIf="f['fullname'].invalid && f['fullname'].touched">Vui lòng nhập họ tên</small>
+        </div>
+
+        <div class="form-group">
+          <label>Email<span class="req">*</span></label>
+          <input class="input" type="email" formControlName="email" placeholder="badudepttrai@gmail.com">
+          <small *ngIf="f['email'].invalid && f['email'].touched">Email không hợp lệ</small>
+        </div>
+
+        <div class="form-group">
+          <label>Số điện thoại<span class="req">*</span></label>
+          <input class="input" type="tel" formControlName="phone" placeholder="0123456789">
+        </div>
+
+        <div class="form-group">
+          <label>Chi nhánh phản hồi<span class="req">*</span></label>
+          <select class="input select" formControlName="branch">
+            <option value="">— Chọn chi nhánh —</option>
+            <option *ngFor="let b of branches" [value]="b">{{ b }}</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Vấn đề phản hồi<span class="req">*</span></label>
+          <div class="radio-row">
+            <label class="radio" *ngFor="let t of topics">
+              <input type="radio" formControlName="topic" [value]="t.value">
+              {{ t.label }}
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label>Nội dung phản hồi<span class="req">*</span></label>
+          <textarea class="textarea" formControlName="content" rows="7"
+            placeholder="Mô tả chi tiết nội dung bạn muốn phản hồi..."></textarea>
+        </div>
+
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" [disabled]="contactForm.invalid">
+          GỬI
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
