@@ -35,7 +35,7 @@
             type="text"
             class="input"
             [ngClass]="{ 'input-error': errors.username }"
-            placeholder="Nhập tên đăng nhập của bạn"
+            placeholder="Nhập tên đăng nhập"
             autocomplete="username"
             [(ngModel)]="username"
             (keydown.enter)="onSubmit()"
@@ -43,6 +43,50 @@
         </div>
         <div class="error-text" *ngIf="errors.username">
           {{ errors.username }}
+        </div>
+      </div>
+
+      <!-- HỌ TÊN -->
+      <div class="form-group">
+        <label class="label" [class.error-label]="errors.name">
+          Họ tên <span class="req">*</span>
+        </label>
+        <div class="control">
+          <input
+            #nameInput
+            type="text"
+            class="input"
+            [ngClass]="{ 'input-error': errors.name }"
+            placeholder="Nhập họ tên của bạn"
+            autocomplete="name"
+            [(ngModel)]="name"
+            (keydown.enter)="onSubmit()"
+          />
+        </div>
+        <div class="error-text" *ngIf="errors.name">
+          {{ errors.name }}
+        </div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="form-group">
+        <label class="label" [class.error-label]="errors.email">
+          Email <span class="req">*</span>
+        </label>
+        <div class="control">
+          <input
+            #emailInput
+            type="email"
+            class="input"
+            [ngClass]="{ 'input-error': errors.email }"
+            placeholder="Nhập email của bạn"
+            autocomplete="email"
+            [(ngModel)]="email"
+            (keydown.enter)="onSubmit()"
+          />
+        </div>
+        <div class="error-text" *ngIf="errors.email">
+          {{ errors.email }}
         </div>
       </div>
 
@@ -68,42 +112,14 @@
             (click)="togglePasswordVisibility()"
             aria-label="Hiện/ẩn mật khẩu"
           >
-            <!-- Eye Off -->
-            <svg
-              *ngIf="!showPassword"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
-              />
+            <svg *ngIf="!showPassword" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23" />
               <path d="M1 1l22 22" />
               <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
-              <path
-                d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
-              />
+              <path d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17" />
             </svg>
-            <!-- Eye On -->
-            <svg
-              *ngIf="showPassword"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"
-              />
+            <svg *ngIf="showPassword" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
           </button>
@@ -135,42 +151,14 @@
             (click)="toggleConfirmPasswordVisibility()"
             aria-label="Hiện/ẩn xác nhận mật khẩu"
           >
-            <!-- Eye Off -->
-            <svg
-              *ngIf="!showConfirmPassword"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
-              />
+            <svg *ngIf="!showConfirmPassword" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23" />
               <path d="M1 1l22 22" />
               <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
-              <path
-                d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
-              />
+              <path d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17" />
             </svg>
-            <!-- Eye On -->
-            <svg
-              *ngIf="showConfirmPassword"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"
-              />
+            <svg *ngIf="showConfirmPassword" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
           </button>
@@ -180,9 +168,38 @@
         </div>
       </div>
 
+      <!-- SỐ ĐIỆN THOẠI (Không bắt buộc) -->
       <div class="form-group">
-        <button class="btn btn-primary" type="button" (click)="onSubmit()">
-          Đăng ký
+        <label class="label">Số điện thoại</label>
+        <div class="control">
+          <input
+            type="tel"
+            class="input"
+            placeholder="Nhập số điện thoại (không bắt buộc)"
+            [(ngModel)]="phone"
+            (keydown.enter)="onSubmit()"
+          />
+        </div>
+      </div>
+
+      <!-- ĐỊA CHỈ (Không bắt buộc) -->
+      <div class="form-group">
+        <label class="label">Địa chỉ</label>
+        <div class="control">
+          <input
+            type="text"
+            class="input"
+            placeholder="Nhập địa chỉ (không bắt buộc)"
+            [(ngModel)]="address"
+            (keydown.enter)="onSubmit()"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" type="button" (click)="onSubmit()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Đăng ký</span>
+          <span *ngIf="isLoading">Đang xử lý...</span>
         </button>
       </div>
     </div>

@@ -84,73 +84,65 @@ export class Login implements OnInit {
   }
 
   onLogin(): void {
-    const u = this.username.trim();
-    const p = this.password.trim();
+  const u = this.username.trim();
+  const p = this.password.trim();
 
-    if (!u || !p) {
-      this.showError(this.currentLang === 'vi'
-        ? 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.'
-        : 'Please enter your username and password.');
-      return;
-    }
-
-    this.isLoading = true;
-
-    this.http.get<any>('/data/login.json').subscribe({
-      next: (data) => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-        const user = data.users.find(
-          (x: any) => x.username === u && x.password === p
-        );
-
-        if (!user) {
-          this.showError(this.currentLang === 'vi'
-            ? 'Tên đăng nhập hoặc mật khẩu không đúng.'
-            : 'Incorrect username or password.');
-          this.cdr.detectChanges();
-          return;
-        }
-
-        if (this.isAdmin && user.role !== 'admin') {
-          this.showError(this.currentLang === 'vi'
-            ? 'Tài khoản này không có quyền quản lý.'
-            : 'This account does not have admin access.');
-          this.cdr.detectChanges();
-          return;
-        }
-
-        if (!this.isAdmin && user.role !== 'customer') {
-          this.showError(this.currentLang === 'vi'
-            ? 'Vui lòng đăng nhập tại trang quản lý.'
-            : 'Please login at the admin page.');
-          this.cdr.detectChanges();
-          return;
-        }
-
-        localStorage.setItem('ngogia_user', JSON.stringify(user));
-        if (this.isAdmin) {
-          // lưu thông tin admin để dashboard kiểm tra và hiển thị tên
-          localStorage.setItem('authAdmin', JSON.stringify({
-            name: user.username || u,
-            role: 'admin'
-          }));
-          window.location.href = '/admin-dashboard';
-        } else {
-          // Đăng nhập customer: xóa authAdmin để header hiển thị page-header-2, không bị nhầm admin
-          localStorage.removeItem('authAdmin');
-          this.router.navigate(['/']).then(() => this.cdr.detectChanges());
-        }
-      },
-      error: () => {
-        this.isLoading = false;
-        this.showError(this.currentLang === 'vi'
-          ? 'Không thể đọc dữ liệu. Vui lòng thử lại.'
-          : 'Cannot load data. Please try again.');
-        this.cdr.detectChanges();
-      }
-    });
+  if (!u || !p) {
+    this.showError(this.currentLang === 'vi'
+      ? 'Vui lòng nhập email và mật khẩu.'
+      : 'Please enter email and password.');
+    return;
   }
+
+  this.isLoading = true;
+
+  this.http.post<{ token: string; user: any }>('http://localhost:3002/api/auth/login', {
+  identifier: u,
+  password: p
+  }).subscribe({
+    next: (res) => {
+      this.isLoading = false;
+
+      // Kiểm tra quyền dựa trên route hiện tại (isAdmin từ route data)
+      if (this.isAdmin && res.user.role !== 'admin') {
+        this.showError(this.currentLang === 'vi'
+          ? 'Tài khoản này không có quyền quản lý.'
+          : 'This account does not have admin access.');
+        this.cdr.detectChanges();
+        return;
+      }
+      if (!this.isAdmin && res.user.role !== 'customer') {
+        this.showError(this.currentLang === 'vi'
+          ? 'Vui lòng đăng nhập tại trang quản lý.'
+          : 'Please login at the admin page.');
+        this.cdr.detectChanges();
+        return;
+      }
+
+      // Lưu token và thông tin user
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('ngogia_user', JSON.stringify(res.user));
+
+      if (res.user.role === 'admin') {
+        localStorage.setItem('authAdmin', JSON.stringify({
+          name: res.user.username,
+          role: 'admin'
+        }));
+        window.location.href = '/admin-dashboard';
+      } else {
+        localStorage.removeItem('authAdmin');
+        this.router.navigate(['/']).then(() => this.cdr.detectChanges());
+      }
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      this.isLoading = false;
+      const msg = err.error?.message || (this.currentLang === 'vi' ? 'Đăng nhập thất bại' : 'Login failed');
+      this.showError(msg);
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') this.onLogin();
