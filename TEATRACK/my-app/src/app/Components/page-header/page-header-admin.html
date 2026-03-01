@@ -7,15 +7,17 @@
     </div>
 
     <div class="actions">
-      <div class="user" id="user-box">
-        <button class="user-btn" id="user-btn" type="button">
+      <div class="user" id="user-box" #userBox [class.open]="userMenuOpen">
+        <button class="user-btn" id="user-btn" type="button"
+                aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" aria-controls="user-menu"
+                (click)="toggleUserMenu($event)">
           <img class="avatar" id="user-avatar" src="/assets/icons/user.png" alt="User">
-          <span class="name" id="user-name" data-user-chip data-i18n="header.admin.account">Tài khoản</span>
+          <span class="name" id="user-name" data-user-chip>{{ userName }}</span>
           <span class="caret">▾</span>
         </button>
-        <div class="menu" id="user-menu" role="menu" hidden>
-          <a role="menuitem" href="/admin-account" data-i18n="header.admin.profile">Hồ sơ</a>
-          <button role="menuitem" id="btn-logout" type="button" data-i18n="header.admin.logout">Đăng xuất</button>
+        <div class="menu" id="user-menu" role="menu">
+          <a role="menuitem" routerLink="/admin-account" (click)="closeUserMenu()" data-i18n="header.admin.profile">Hồ sơ</a>
+          <button role="menuitem" id="btn-logout" type="button" (click)="onLogout($event)" data-i18n="header.admin.logout">Đăng xuất</button>
         </div>
       </div>
     </div>

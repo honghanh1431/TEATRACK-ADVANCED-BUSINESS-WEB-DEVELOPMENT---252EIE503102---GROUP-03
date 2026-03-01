@@ -1,0 +1,235 @@
+<div class="admin-page">
+  <!-- Content -->
+  <div class="admin-content">
+    <div class="content-card">
+      <h1 class="page-title">DIỄN ĐÀN</h1>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <img src="/assets/icons/tongbaiviet.png" alt="" />
+          </div>
+          <div>
+            <div class="stat-label">Tổng bài viết</div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-note">↗ Tháng này</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <img src="/assets/icons/luotxem.png" alt="" />
+          </div>
+          <div>
+            <div class="stat-label">Lượt xem</div>
+            <div class="stat-value">{{ stats.views }}</div>
+            <div class="stat-note">↗ Tuần này</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <img src="/assets/icons/daxuatban.png" alt="" />
+          </div>
+          <div>
+            <div class="stat-label">Đã xuất bản</div>
+            <div class="stat-value">{{ stats.published }}</div>
+            <div class="stat-note">Đang hoạt động</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <img src="/assets/icons/bannhap.png" alt="" />
+          </div>
+          <div>
+            <div class="stat-label">Bản nháp</div>
+            <div class="stat-value">{{ stats.draft }}</div>
+            <div class="stat-note">Chờ xuất bản</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table card -->
+      <div class="table-card">
+        <div class="table-head">
+          <button class="btn-primary" type="button" (click)="openAdd()">
+            <span class="btn-plus">+</span>
+            Thêm bài viết
+          </button>
+
+          <div class="table-actions">
+            <div class="search">
+              <input
+                type="search"
+                placeholder="Tìm kiếm..."
+                [value]="q"
+                (input)="onSearch($any($event.target).value)"
+              />
+              <img class="search-ico" src="/assets/icons/search.png" alt="" />
+            </div>
+
+            <select class="status-filter" [value]="status" (change)="onStatus($any($event.target).value)">
+              <option value="">Tất cả trạng thái</option>
+              <option value="published">Đã xuất bản</option>
+              <option value="draft">Bản nháp</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="posts">
+            <thead>
+              <tr>
+                <th class="col-id">ID</th>
+                <th class="col-date">Ngày đăng</th>
+                <th class="col-img">Hình ảnh</th>
+                <th class="col-title">Tiêu đề</th>
+                <th class="col-show">Hiển thị</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let p of pagedPosts; let i = index" [class.alt]="i % 2 === 0">
+                <td class="col-id">{{ p.code }}</td>
+                <td class="col-date">{{ p.date | date : 'dd/MM/yyyy' }}</td>
+
+                <td class="col-img">
+                  <div class="thumb">
+                    <img [src]="p.image" [alt]="p.title" (error)="imgFallback($event)" />
+                  </div>
+                </td>
+
+                <td class="col-title">
+                  <div class="title-strong">{{ p.title }}</div>
+                </td>
+
+                <td class="col-show">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="p.visible" (change)="toggleVisible(p)" />
+                    <span class="slider"></span>
+                  </label>
+                </td>
+
+                <td class="col-actions">
+                  <button class="icon-btn" type="button" (click)="openEdit(p)" title="Sửa">
+                    <img src="/assets/icons/edit2.png" alt="edit" />
+                  </button>
+                  <button class="icon-btn" type="button" (click)="openDelete(p)" title="Xóa">
+                    <img src="/assets/icons/delete2.png" alt="delete" />
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngIf="pagedPosts.length === 0">
+                <td colspan="6" class="empty">Không có bài viết</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pager" *ngIf="totalPages > 1">
+          <button class="page-btn" (click)="goPage(page - 1)" [disabled]="page === 1">‹</button>
+
+          <button
+            class="page-btn"
+            *ngFor="let n of pages"
+            (click)="goPage(n)"
+            [class.active]="n === page"
+          >
+            {{ n }}
+          </button>
+
+          <button class="page-btn" (click)="goPage(page + 1)" [disabled]="page === totalPages">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal: Add/Edit ===== -->
+  <div class="modal" [class.show]="modalOpen" (click)="backdropClose($event)">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-title">{{ editing ? 'CHỈNH SỬA BÀI VIẾT' : 'THÊM BÀI VIẾT' }}</div>
+        <button class="modal-x" type="button" (click)="closeModal()">×</button>
+      </div>
+
+      <form class="modal-body" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-row">
+          <label>Tiêu đề trang</label>
+          <input formControlName="title" type="text" placeholder="Nhập tiêu đề" />
+        </div>
+
+        <div class="form-row">
+          <label>Tiêu đề nội dung</label>
+          <input formControlName="excerpt" type="text" placeholder="Nhập tiêu đề nội dung" />
+        </div>
+
+        <div class="form-row">
+          <label>Nội dung bài viết</label>
+          <textarea formControlName="content" rows="8" placeholder="Nhập nội dung bài viết"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label>Hình ảnh bài viết</label>
+
+          <input #fileInput type="file" accept="image/*" multiple hidden (change)="onFiles($event)" />
+
+          <div class="gallery">
+            <div class="img-item" *ngFor="let img of formImages; let i = index">
+              <img [src]="img" alt="poster" (error)="imgFallback($event)" />
+              <button type="button" class="img-remove" (click)="removeImg(i)">×</button>
+              <div class="img-cap">Poster {{ i + 1 }}</div>
+            </div>
+
+            <button type="button" class="upload-box" (click)="fileInput.click()">
+              <div class="upload-circle">
+                <img src="/assets/icons/upload.png" alt="upload" />
+              </div>
+              <div class="upload-text">Tải ảnh lên</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-danger" type="button" (click)="closeModal()">Hủy bỏ</button>
+          <button class="btn-save" type="submit" [disabled]="form.invalid">
+            {{ editing ? 'Lưu' : 'Thêm' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Delete confirm ===== -->
+  <div class="modal" [class.show]="deleteOpen" (click)="backdropCloseDelete($event)">
+    <div class="confirm-card" role="dialog" aria-modal="true">
+      <button class="modal-x" type="button" (click)="closeDelete()">×</button>
+      <div class="confirm-title">XÁC NHẬN XÓA BÀI VIẾT</div>
+      <div class="confirm-desc">Sau khi xóa, bạn sẽ không thể khôi phục bài viết.</div>
+
+      <div class="confirm-actions">
+        <button class="btn-danger" type="button" (click)="closeDelete()">Hủy bỏ</button>
+        <button class="btn-save" type="button" (click)="confirmDelete()">Tiếp tục</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toasts ===== -->
+  <div class="toast-wrap">
+    <div class="toast" *ngFor="let t of toasts" [class.ok]="t.type==='ok'" [class.err]="t.type==='err'">
+      <div class="toast-ico">
+        <span *ngIf="t.type==='ok'">✓</span>
+        <span *ngIf="t.type==='err'">✕</span>
+      </div>
+      <div class="toast-text">
+        <div class="toast-title">{{ t.title }}</div>
+        <div class="toast-sub" *ngIf="t.sub">{{ t.sub }}</div>
+      </div>
+      <button class="toast-x" type="button" (click)="removeToast(t.id)">×</button>
+    </div>
+  </div>
+</div>

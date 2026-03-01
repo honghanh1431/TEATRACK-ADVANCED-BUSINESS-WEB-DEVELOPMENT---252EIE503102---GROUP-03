@@ -606,22 +606,32 @@ function initializeWeatherPopup() {
     // Thêm popup vào body
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-    // Ẩn popup trên login, signup, pagenotfound; hiện trên tất cả trang còn lại
+    // Ẩn popup trên login, signup, pagenotfound, và khi đang dùng giao diện admin (guest + customer mới hiện)
     var container = document.getElementById('weatherPopupContainer');
     function updateWeatherVisibility() {
         if (!container) return;
         var path = (window.location.pathname || '').split('?')[0];
-        var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/404';
+        var isAdminPath = path.indexOf('admin') !== -1;
+        var isAdminUser = typeof localStorage !== 'undefined' && !!localStorage.getItem('authAdmin');
+        var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/404' || isAdminPath || isAdminUser;
         container.style.display = hide ? 'none' : '';
     }
     updateWeatherVisibility();
     window.addEventListener('routeChange', function(e) {
+        if (!container) return;
         if (e.detail && e.detail.path !== undefined) {
-            var hide = e.detail.path === '/login' || e.detail.path === '/login-admin' || e.detail.path === '/register' || e.detail.path === '/404';
+            var path = e.detail.path;
+            var isAdminPath = path.indexOf('admin') !== -1;
+            var isAdminUser = typeof localStorage !== 'undefined' && !!localStorage.getItem('authAdmin');
+            var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/404' || isAdminPath || isAdminUser;
             container.style.display = hide ? 'none' : '';
         }
     });
     window.addEventListener('popstate', updateWeatherVisibility);
+    // Cập nhật khi đăng nhập/đăng xuất (storage thay đổi)
+    if (typeof window !== 'undefined') {
+        window.addEventListener('storage', updateWeatherVisibility);
+    }
 
     // Xử lý sự kiện
     const toggleBtn = document.getElementById('weatherToggleBtn');

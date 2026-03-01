@@ -130,9 +130,15 @@ export class Login implements OnInit {
 
         localStorage.setItem('ngogia_user', JSON.stringify(user));
         if (this.isAdmin) {
-          localStorage.setItem('authAdmin', '1');
+          // lưu thông tin admin để dashboard kiểm tra và hiển thị tên
+          localStorage.setItem('authAdmin', JSON.stringify({
+            name: user.username || u,
+            role: 'admin'
+          }));
           window.location.href = '/admin-dashboard';
         } else {
+          // Đăng nhập customer: xóa authAdmin để header hiển thị page-header-2, không bị nhầm admin
+          localStorage.removeItem('authAdmin');
           this.router.navigate(['/']).then(() => this.cdr.detectChanges());
         }
       },

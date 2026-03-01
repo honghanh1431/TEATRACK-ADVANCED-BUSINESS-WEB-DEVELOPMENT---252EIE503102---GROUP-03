@@ -1,4 +1,6 @@
-<app-page-header *ngIf="showLayout"></app-page-header>
+<app-page-header *ngIf="showLayout && headerMode === 'guest'"></app-page-header>
+<app-page-header-2 *ngIf="showLayout && headerMode === 'customer'"></app-page-header-2>
+<app-page-header-admin *ngIf="showLayout && headerMode === 'admin'"></app-page-header-admin>
 <router-outlet></router-outlet>
 <app-page-footer *ngIf="showLayout"></app-page-footer>
 

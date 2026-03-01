@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 
 interface CartItem {
   id: string;
@@ -58,6 +59,7 @@ interface Totals {
   styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit, OnDestroy {
+  constructor(private router: Router) {}
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
   private readonly COUPON_KEY = 'ngogia_coupon';
@@ -289,19 +291,28 @@ export class Cart implements OnInit, OnDestroy {
         const parsed = JSON.parse(raw);
         this.shippingInfo = this.normalizeShipping(parsed);
       } else {
-        this.shippingInfo = { ...this.defaultShipping };
-        this.shippingInfo.time = this.buildTimeText(
-          this.shippingInfo.deliveryDate,
-          this.shippingInfo.deliveryTime,
-        );
+        // Không có dữ liệu (vd: sau logout) → form địa chỉ trống
+        this.shippingInfo = {
+          address: '',
+          receiver: '',
+          phone: '',
+          deliveryDate: '',
+          deliveryTime: '',
+          time: '',
+          note: '',
+        };
       }
     } catch (err) {
       console.warn('Cannot parse shipping info', err);
-      this.shippingInfo = { ...this.defaultShipping };
-      this.shippingInfo.time = this.buildTimeText(
-        this.shippingInfo.deliveryDate,
-        this.shippingInfo.deliveryTime,
-      );
+      this.shippingInfo = {
+        address: '',
+        receiver: '',
+        phone: '',
+        deliveryDate: '',
+        deliveryTime: '',
+        time: '',
+        note: '',
+      };
     }
   }
 
@@ -726,7 +737,7 @@ export class Cart implements OnInit, OnDestroy {
         console.error('Error saving order:', err);
       }
 
-      window.location.href = '/order-tracking/?orderId=' + orderId;
+      this.router.navigate(['/order-tracking'], { queryParams: { orderId } });
       return;
     }
 
