@@ -20,7 +20,7 @@ const createUser = async (userData) => {
   }
   
   const newUser = {
-    username: userData.username,   // thêm username
+    username: userData.username,   
     name: userData.name,
     email: userData.email,
     password: userData.password,
@@ -58,5 +58,9 @@ const findUserById = async (id) => {
   const users = collection();
   return await users.findOne({ _id: new ObjectId(id) });
 };
+const updatePassword = async (email, hashedPassword) => {
+  const users = collection();
+  return await users.updateOne({ email }, { $set: { password: hashedPassword } });
+};
 
-module.exports = { init, createUser, findUserByIdentifier, findUserByEmail, findUserByUsername, findUserById };
+module.exports = { init, createUser, findUserByIdentifier, findUserByEmail, findUserByUsername, findUserById, collection, updatePassword };
