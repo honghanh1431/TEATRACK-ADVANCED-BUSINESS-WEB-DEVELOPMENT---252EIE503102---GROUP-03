@@ -8,7 +8,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrl: './contact.css',
 })
 export class Contact {
-contactForm: FormGroup;
+  contactForm: FormGroup;
+
+  scrollToTop(): void {
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   branches = [
     'Đường số 8, Linh Xuân, Thủ Đức',
@@ -17,10 +21,10 @@ contactForm: FormGroup;
   ];
 
   topics = [
-    { value: 'complain', label: '😞 Than phiền' },
-    { value: 'praise',   label: '😊 Khen ngợi'  },
-    { value: 'issued',   label: '📦 Đề xuất'    },
-    { value: 'other',    label: '... Vấn đề khác'}
+    { value: 'complain', label: 'Than phiền' },
+    { value: 'praise',   label: 'Khen ngợi'  },
+    { value: 'issued',   label: 'Đề xuất'    },
+    { value: 'other',    label: 'Vấn đề khác'}
   ];
 
   constructor(private fb: FormBuilder) {

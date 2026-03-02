@@ -19,8 +19,12 @@ interface UserProfile {
   styleUrl: './profile.css',
 })
 export class Profile implements OnInit {
-// ── Tab ───────────────────────────────────
+  // ── Tab ───────────────────────────────────
   activeTab: 'profile' | 'security' | 'policy' | 'support' = 'profile';
+
+  scrollToTop(): void {
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   // ── Dữ liệu user ─────────────────────────
   user: UserProfile = {

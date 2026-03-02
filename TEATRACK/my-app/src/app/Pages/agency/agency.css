@@ -5,25 +5,34 @@
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.account-breadcrumb {
-  background: #e8f2ff;
-  border-bottom: 1px solid #dbe8ff;
-  margin-bottom: 6px;
+/* Breadcrumb (giống blog-list) */
+.breadcrumb-banner {
+  background: #D4EDFC;
+  padding: 20px 20px;
   text-align: center;
-  padding-top:20px
+  position: relative;
+  z-index: 1;
 }
-.account-breadcrumb-container {             
-  margin-top: 16px;
-  margin-bottom: 26px;
-}
-.account-breadcrumb h2 {
-  margin: 0;
+
+.breadcrumb-title {
+  font-size: 28px;
   font-weight: 700;
+  margin: 0 0 10px 0;
 }
-.account-breadcrumb p {
-  margin: 4px 0 0;
-  color: #6b7280;
-  font-size: 14px;
+
+.breadcrumb-path {
+  font-size: 15px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.breadcrumb-path a {
+  text-decoration: none;
+  color: #808080 !important;
+}
+
+.breadcrumb-path a:hover {
+  text-decoration: underline;
 }
 /* ========== RESET / BASE ========== */
 *{box-sizing:border-box}
@@ -82,7 +91,7 @@ html,body{
 }
 
 .branch-card.is-active {
-  border-color: #2b6fe6;
+  border: 2px solid #0088ff;
   box-shadow: 0 12px 28px rgba(19, 94, 230, .16);
 }
 

@@ -9,13 +9,13 @@
 <body>
   <div id="app-header"></div>
   <main class="account-page">
-    <!-- breadcrumb light bar -->
-    <div class="account-breadcrumb">
-      <div class="account-breadcrumb-container">
-        <h2>Các chi nhánh hoạt động</h2>
-        <p>Chi nhánh</p>
-      </div>
-    </div>
+    <!-- Breadcrumb (giống blog-list) -->
+    <section class="breadcrumb-banner">
+      <h1 class="breadcrumb-title">Các chi nhánh hoạt động</h1>
+      <p class="breadcrumb-path">
+        <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/agency" (click)="scrollToTop()">Chi nhánh</a>
+      </p>
+    </section>
     <section class="agency-layout">
       <!-- COLUMN LEFT: BRANCH LIST -->
       <div class="agency-left">
