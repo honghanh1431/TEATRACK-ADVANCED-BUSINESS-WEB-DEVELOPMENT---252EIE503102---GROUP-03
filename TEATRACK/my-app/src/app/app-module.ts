@@ -31,6 +31,7 @@ import { Registion } from './Pages/registion/registion';
 import { Agency } from './Pages/agency/agency';
 import { Admin } from './Pages/Admin/admin';
 import { OrderTracking } from './Pages/order-tracking/order-tracking';
+import { ForgotPassword } from './Pages/forgot-password/forgot-password';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { OrderTracking } from './Pages/order-tracking/order-tracking';
     Registion,
     Agency,
     Admin,
+    ForgotPassword,
   ],
   
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

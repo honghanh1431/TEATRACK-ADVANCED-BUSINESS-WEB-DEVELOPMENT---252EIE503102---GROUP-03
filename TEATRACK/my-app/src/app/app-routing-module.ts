@@ -17,6 +17,8 @@ import { Contact } from './Pages/contact/contact';
 import { Profile } from './Pages/profile/profile';
 import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
 import { OrderTracking } from './Pages/order-tracking/order-tracking';
+import { ForgotPassword } from './Pages/forgot-password/forgot-password';
+
 
 
 export { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
@@ -34,6 +36,7 @@ const routes: Routes = [
   { path: 'admin-dashboard', component: Admin },
   { path: 'login', component: Login, data: { isAdmin: false } },
   { path: 'login-admin', component: Login, data: { isAdmin: true } },
+  { path: 'forgot-password', component: ForgotPassword},
   { path: 'register', component: Registion },
   { path: 'cart', component: Cart },
   { path: 'order-tracking', component: OrderTracking},
