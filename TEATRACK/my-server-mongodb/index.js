@@ -24,7 +24,9 @@ const UserCollection = database.collection("users");
 
 // Pass database to models
 const User = require('./models/User');
-User.init(database);   // <-- initialize model with database instance
+User.init(database);
+const Otp = require('./models/Otp');
+Otp.init(database);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -43,7 +45,7 @@ app.use((req, res, next) => {
   }
 })();
 
-// Use auth routes
+// Sử dụng auth routes (bao gồm cả forgot-password, verify-otp, reset-password)
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 

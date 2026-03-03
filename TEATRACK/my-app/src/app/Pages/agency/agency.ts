@@ -7,6 +7,10 @@ import { AfterViewInit, Component } from '@angular/core';
   styleUrls: ['./agency.css'],
 })
 export class Agency implements AfterViewInit {
+  scrollToTop(): void {
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   ngAfterViewInit(): void {
     // Khi click vào card → đổi src của iframe sang URL embed tương ứng
     const cards = document.querySelectorAll<HTMLElement>('.branch-card');

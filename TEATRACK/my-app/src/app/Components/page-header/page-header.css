@@ -166,6 +166,10 @@
   color: #fff;
   border-color: transparent;
 }
+.signup-btn:hover {
+  background-color: #1d4ed8;
+  color: #fff;
+}
 
 /* ========== NAVIGATION BAR ========== */
 .nav-bar {

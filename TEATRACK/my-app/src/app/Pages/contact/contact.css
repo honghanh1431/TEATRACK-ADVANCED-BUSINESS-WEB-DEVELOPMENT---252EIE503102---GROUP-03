@@ -1,34 +1,50 @@
-.account-page{
-  background:#f2f9fe;
-  color:#0b1320;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+.account-page {
+  background: #f2f9fe;
+  color: #0b1320;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   padding-bottom: 250px;
 }
 
-.account-breadcrumb {
-  background: #e8f2ff;
-  border-bottom: 1px solid #dbe8ff;
-  margin-bottom: 6px;
+.breadcrumb-banner {
+  background: #d4edfc;
+  padding: 20px 20px;
   text-align: center;
-  padding-top:20px
+  position: relative;
+  z-index: 1;
 }
-.account-breadcrumb-container {             
-  margin-top: 16px;
-  margin-bottom: 26px;
-}
-.account-breadcrumb h2 {
-  margin: 0;
+
+.breadcrumb-title {
+  font-size: 28px;
   font-weight: 700;
+  margin: 0 0 10px 0;
 }
-.account-breadcrumb p {
-  margin: 4px 0 0;
-  color: #6b7280;
-  font-size: 14px;
+
+.breadcrumb-path {
+  font-size: 15px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.breadcrumb-path a {
+  text-decoration: none;
+  color: #808080 !important;
+}
+
+.breadcrumb-path a:hover {
+  text-decoration: underline;
 }
 
 .contact-container {
   display: flex;
-  flex-direction: row;  
+  flex-direction: row;
   justify-content: space-between;
   align-items: stretch;
   gap: 32px;
@@ -39,7 +55,7 @@
 
 /* BÊN TRÁI */
 .contact-card {
-  flex: 0 0 400px; 
+  flex: 0 0 400px;
   border-radius: 20px;
   background-size: cover;
   background-position: center;
@@ -62,19 +78,21 @@
 
 .contact-card__title {
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .contact-card__desc {
   font-size: 14px;
   line-height: 1.6;
+  color: white;
+  text-align: justify;
 }
 
 .contact-card__line {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
   margin-bottom: 10px;
 }
@@ -113,7 +131,7 @@
 }
 
 label {
-  font-weight: 600;
+  font-weight: 700;
   color: #0088ff;
 }
 
@@ -121,7 +139,7 @@ label {
 .textarea {
   width: 100%;
   border: none;
-  border-bottom:1px solid #d9d9d9;
+  border-bottom: 1px solid #d9d9d9;
   padding: 10px 14px;
   font-size: 14px;
   outline: none;
@@ -129,10 +147,34 @@ label {
   margin-top: 14px;
 }
 
-.textarea{border: 1px solid #d9d9d9 !important;}
+.textarea {
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 10px;
+}
 .input:focus,
 .textarea:focus {
   border-color: #0088ff;
+  box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.1);
+}
+
+/* Select Chi nhánh */
+.contact-form .input.select,
+.contact-form select.input {
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  min-height: 44px;
+}
+
+.contact-form .input.select:focus,
+.contact-form select.input:focus {
+  border: 2px solid #0088ff;
   box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.1);
 }
 
@@ -162,15 +204,34 @@ label {
 .btn-primary:hover {
   background: #1d4ed8;
 }
-.radio{
-  margin-right:30px;
-  color: #000;
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 20px;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
 }
-.radio-row{
+.radio input[type="radio"] {
+  margin: 0;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #0088ff;
+}
+.radio-row {
   margin-top: 14px;
-  font-weight: 500 !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 8px;
 }
-.icons{height: 24px; width: 24px;}
+.icons {
+  height: 24px;
+  width: 24px;
+}
 /* RESPONSIVE */
 @media (max-width: 992px) {
   .contact-container {

@@ -463,7 +463,7 @@ export class Cart implements OnInit, OnDestroy {
     this.shippingFields[0].value = this.shippingInfo.address || '';
     this.shippingFields[1].value = `${this.shippingInfo.receiver || ''}<br>${this.shippingInfo.phone || ''}`;
     this.shippingFields[2].value = this.shippingInfo.time || '';
-    this.shippingFields[3].value = this.shippingInfo.note || 'Không có ghi chú';
+    this.shippingFields[3].value = this.shippingInfo.note || '';
   }
 
   // Cart actions

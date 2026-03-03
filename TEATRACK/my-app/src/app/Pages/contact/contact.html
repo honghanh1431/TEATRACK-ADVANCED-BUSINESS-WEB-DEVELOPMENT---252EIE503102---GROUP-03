@@ -1,10 +1,10 @@
 <!-- contact.component.html -->
-<div class="account-breadcrumb">
-  <div class="account-breadcrumb-container">
-    <h2>Liên Hệ</h2>
-    <p>Liên Hệ</p>
-  </div>
-</div>
+<section class="breadcrumb-banner">
+  <h1 class="breadcrumb-title">Liên hệ</h1>
+  <p class="breadcrumb-path">
+    <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/contact" (click)="scrollToTop()">Liên hệ</a>
+  </p>
+</section>
 
 <div class="contact-container">
   <!-- LEFT CARD -->
@@ -12,8 +12,7 @@
     <div class="contact-card__body">
       <h3 class="contact-card__title">Thông tin liên hệ:</h3>
       <p class="contact-card__desc">
-        Hồng Trà Ngô Gia luôn mong muốn nhận được những phản hồi quý giá...
-      </p>
+        Hồng Trà Ngô Gia luôn mong muốn nhận được những phản hồi quý giá của quý khách hàng để có cơ hội hoàn thiện sản phẩm, dịch vụ hơn nữa. Những đóng góp của quý khách hàng luôn là tài sản vô giá đối với chúng tôi.      </p>
       <div class="contact-card__line">
         <img src="assets/icons/Phone2.png" alt="sđt" class="icons">
         <span>0999.888.777</span>
@@ -32,19 +31,19 @@
 
         <div class="form-group">
           <label>Họ và tên<span class="req">*</span></label>
-          <input class="input" type="text" formControlName="fullname" placeholder="Nguyễn Ba Dù">
+          <input class="input" type="text" formControlName="fullname" placeholder="Hãy nhập họ và tên đầy đủ của bạn">
           <small *ngIf="f['fullname'].invalid && f['fullname'].touched">Vui lòng nhập họ tên</small>
         </div>
 
         <div class="form-group">
           <label>Email<span class="req">*</span></label>
-          <input class="input" type="email" formControlName="email" placeholder="badudepttrai@gmail.com">
+          <input class="input" type="email" formControlName="email" placeholder="Hãy nhập email của bạn">
           <small *ngIf="f['email'].invalid && f['email'].touched">Email không hợp lệ</small>
         </div>
 
         <div class="form-group">
           <label>Số điện thoại<span class="req">*</span></label>
-          <input class="input" type="tel" formControlName="phone" placeholder="0123456789">
+          <input class="input" type="tel" formControlName="phone" placeholder="Hãy nhập số điện thoại của bạn">
         </div>
 
         <div class="form-group">
@@ -74,7 +73,7 @@
       </div>
       <div class="form-actions">
         <button class="btn btn-primary" type="submit" [disabled]="contactForm.invalid">
-          GỬI
+          Gửi
         </button>
       </div>
     </form>
