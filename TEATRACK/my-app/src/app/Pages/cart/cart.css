@@ -111,11 +111,15 @@
   display: block;
   line-height: 1.6;
   box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.08);
+  min-height: 64px;
+  height: 64px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .shipping-row {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
@@ -503,6 +507,13 @@
   width: 16px;
   height: 16px;
   accent-color: #0088FF;
+  margin-top: 2px;
+  cursor: pointer;
+}
+.terms input[type="checkbox"]:hover {
+  width: 16px;
+  height: 16px;
+  accent-color: #1d4ed8;
   margin-top: 2px;
   cursor: pointer;
 }

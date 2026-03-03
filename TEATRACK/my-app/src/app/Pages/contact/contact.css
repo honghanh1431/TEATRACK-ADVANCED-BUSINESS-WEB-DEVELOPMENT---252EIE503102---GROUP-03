@@ -205,12 +205,28 @@ label {
   background: #1d4ed8;
 }
 .radio {
-  margin-right: 30px;
-  color: #000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 20px;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.radio input[type="radio"] {
+  margin: 0;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #0088ff;
 }
 .radio-row {
   margin-top: 14px;
-  font-weight: 500 !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 8px;
 }
 .icons {
   height: 24px;

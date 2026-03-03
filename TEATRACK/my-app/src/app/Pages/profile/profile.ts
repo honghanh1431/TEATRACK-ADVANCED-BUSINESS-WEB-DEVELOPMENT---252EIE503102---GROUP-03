@@ -54,7 +54,7 @@ export class Profile implements OnInit {
     { label: 'TikTok',    icon: 'assets/icons/tiktok.png',   href: 'https://www.tiktok.com/@hongtrangogiavn',        display: 'tiktok.com/@hongtrangogiavn' },
     { label: 'Instagram', icon: 'assets/icons/ig.png',       href: 'https://www.instagram.com/wujiablacktea/',       display: 'instagram.com/wujiablacktea' },
     { label: 'Email',     icon: 'assets/icons/mail.png',     href: 'mailto:marketing@wujiateavn.com',                display: 'marketing@wujiateavn.com' },
-    { label: 'Hotline',   icon: 'assets/icons/phone.png',    href: 'tel:0999888777',                                 display: '0.999.888.777' },
+    { label: 'Hotline',   icon: 'assets/icons/phone.png',    href: 'tel:02723979518',                                 display: '02-723-979-518' },
   ];
 
   constructor(
