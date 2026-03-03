@@ -1,0 +1,57 @@
+<div class="app">
+    <main class="main">
+    <!-- Thống kê đơn hàng -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Tất cả đơn hàng</span>
+        <span class="stat-value">{{ stats.total }}</span>
+      </div>
+      <div class="stat-card pending">
+        <span class="stat-label">Chờ xác nhận</span>
+        <span class="stat-value">{{ stats.pending }}</span>
+      </div>
+      <div class="stat-card shipping">
+        <span class="stat-label">Đang giao hàng</span>
+        <span class="stat-value">{{ stats.shipping }}</span>
+      </div>
+      <div class="stat-card delivered">
+        <span class="stat-label">Đã giao hàng</span>
+        <span class="stat-value">{{ stats.delivered }}</span>
+      </div>
+    </div>
+
+    <!-- Bảng sản phẩm -->
+    <div class="table-container">
+      <h2>Bảng sản phẩm</h2>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Mã đơn hàng</th>
+            <th>Thời gian</th>
+            <th>Tình trạng</th>
+            <th>Thanh toán</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders">
+            <td>{{ order.stt }}</td>
+            <td>{{ order.maDonHang }}</td>
+            <td>{{ order.thoiGian }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(order.tinhTrang)">
+                {{ order.tinhTrang }}
+              </span>
+            </td>
+            <td>{{ order.thanhToan }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 Hồng Trà Ngô Gia. All rights reserved.</p>
+  </footer>
+</div>

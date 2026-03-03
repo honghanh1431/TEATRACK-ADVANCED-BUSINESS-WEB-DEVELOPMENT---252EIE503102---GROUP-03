@@ -1,0 +1,234 @@
+/* Reset & base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+}
+
+/* Header */
+.header {
+    background-color: #8b2c1d;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    background-color: #f0b27a;
+    border-radius: 50%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%238b2c1d"><text x="50" y="68" font-size="50" text-anchor="middle" font-family="Arial" font-weight="bold">T</text></svg>');
+    background-size: cover;
+    background-position: center;
+}
+
+.header-left h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.header-right .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0b27a;
+    color: #8b2c1d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border: 2px solid white;
+}
+
+/* Main */
+.main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Stats cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border-left: 5px solid #8b2c1d;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.stat-card.pending {
+    border-left-color: #f39c12;
+}
+.stat-card.shipping {
+    border-left-color: #3498db;
+}
+.stat-card.delivered {
+    border-left-color: #2ecc71;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Table */
+.table-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.table-container h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.2rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0.5rem;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.order-table th {
+    background-color: #f8f9fa;
+    padding: 1rem 0.8rem;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.order-table td {
+    padding: 1rem 0.8rem;
+    border-bottom: 1px solid #eee;
+}
+
+.order-table tbody tr:hover {
+    background-color: #fcf8f0;
+}
+
+/* Badge trạng thái */
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 110px;
+}
+
+.status-badge.delivered {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-badge.shipping {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+/* Footer */
+.footer {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 1.2rem;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .main {
+        padding: 1rem;
+    }
+
+    .order-table th, .order-table td {
+        padding: 0.8rem 0.4rem;
+        font-size: 0.85rem;
+    }
+
+    .status-badge {
+        min-width: 80px;
+        padding: 0.2rem 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .header-left {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
