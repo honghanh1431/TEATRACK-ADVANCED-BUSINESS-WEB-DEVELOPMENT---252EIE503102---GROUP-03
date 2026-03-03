@@ -72,8 +72,8 @@ import { ForgotPassword } from './Pages/forgot-password/forgot-password';
     Cart,
     Payment,
     AdminBlog,
-    OrderTracking,    
     AdminOrder,
+    OrderTracking,    
   ],
 
   providers: [

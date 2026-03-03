@@ -16,8 +16,8 @@ import { Payment } from './Pages/payment/payment';
 import { Contact } from './Pages/contact/contact';
 import { Profile } from './Pages/profile/profile';
 import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
-import { OrderTracking } from './Pages/order-tracking/order-tracking';
 import { AdminOrder } from './Pages/Admin/admin-order/admin-order';
+import { OrderTracking } from './Pages/order-tracking/order-tracking';
 import { ForgotPassword } from './Pages/forgot-password/forgot-password';
 
 
