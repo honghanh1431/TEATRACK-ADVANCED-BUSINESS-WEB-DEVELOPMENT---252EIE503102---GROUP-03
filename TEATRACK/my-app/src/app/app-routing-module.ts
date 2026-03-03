@@ -16,6 +16,7 @@ import { Payment } from './Pages/payment/payment';
 import { Contact } from './Pages/contact/contact';
 import { Profile } from './Pages/profile/profile';
 import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
+import { AdminOrder } from './Pages/Admin/admin-order/admin-order';
 import { OrderTracking } from './Pages/order-tracking/order-tracking';
 import { ForgotPassword } from './Pages/forgot-password/forgot-password';
 
@@ -46,6 +47,7 @@ const routes: Routes = [
   { path: 'profile', component: Profile },
   { path: 'admin/blog', component: AdminBlog },
   { path: 'admin/blog', loadComponent: () => import('./Pages/Admin/admin-blog/admin-blog').then(m => m.AdminBlog) },
+  { path: 'admin/order', component: AdminOrder },
   { path: '**', redirectTo: '404', pathMatch: 'full' },
 ];
 
