@@ -203,6 +203,7 @@ body {
   background: white;
   border-radius: 16px;
   padding: 32px;
+  align-items: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   animation: fadeInUp 0.6s ease-out 0.4s both;
 }
@@ -280,7 +281,7 @@ body {
 .detail-row .detail-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-weight: 500;
   color: #0088ff;
   flex-shrink: 0;
@@ -349,7 +350,7 @@ body {
 }
 
 .detail-value {
-  font-weight: 600;
+  font-weight: 700;
   color: #1f2937;
   text-align: left;
   font-size: 14px;
@@ -646,6 +647,14 @@ body {
 .item-details {
   font-size: 14px;
   color: #6b7280;
+}
+
+.item-details .item-detail-line {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: #4b5563;
+  line-height: 1.5;
 }
 
 .item-price {

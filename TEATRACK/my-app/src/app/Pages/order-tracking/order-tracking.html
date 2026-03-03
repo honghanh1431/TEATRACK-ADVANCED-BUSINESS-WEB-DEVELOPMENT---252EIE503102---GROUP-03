@@ -68,7 +68,6 @@
   </section>
 
   <ng-template #errorTemplate>
-    <!-- Không hiển thị gì thêm, lỗi đã được show ở hero -->
   </ng-template>
 
   <!-- Order Status Timeline -->
@@ -176,8 +175,8 @@
                class="item-image" />
           <div class="item-info">
             <div class="item-name">{{ item.name }}</div>
-            <div class="item-details">
-              Size: {{ item.size || 'M' }} | Số lượng: {{ item.qty || item.quantity || 1 }}
+            <div class="item-details" *ngIf="getItemDetailLines(item).length">
+              <p *ngFor="let line of getItemDetailLines(item)" class="item-detail-line">{{ line }}</p>
             </div>
           </div>
           <div class="item-price">

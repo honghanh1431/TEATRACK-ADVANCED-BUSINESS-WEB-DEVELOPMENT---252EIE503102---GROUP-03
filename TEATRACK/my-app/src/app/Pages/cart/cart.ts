@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
+import { Payment } from '../payment/payment';
 
 interface CartItem {
   id: string;
@@ -54,7 +55,7 @@ interface Totals {
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, Payment],
   templateUrl: './cart.html',
   styleUrls: ['./cart.css'],
 })
@@ -156,7 +157,22 @@ export class Cart implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   shippingInfo: ShippingInfo = { ...this.defaultShipping };
   selectedPayment = 'cash';
+
+  /** Map selectedPayment sang method cho app-payment (ewallet -> payoo). */
+  get paymentMethodForDisplay(): string {
+    return this.selectedPayment === 'ewallet' ? 'payoo' : this.selectedPayment;
+  }
+  /** True khi đang chọn MoMo / ZaloPay / Ví điện tử (có QR, bật timer giả lập scan). */
+  get isNonCashPayment(): boolean {
+    return ['momo', 'zalopay', 'ewallet'].indexOf(this.selectedPayment) >= 0;
+  }
   termsAgreed = false;
+
+  // Scan success (sau 3s khi xem QR)
+  showScanSuccessModal = false;
+  scanSuccessOrderId = '';
+  private scanSuccessTimer: ReturnType<typeof setTimeout> | null = null;
+  private scanSuccessAutoTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Modal state
   showModal = false;
@@ -177,6 +193,17 @@ export class Cart implements OnInit, OnDestroy {
   // Computed properties
   get cartCount(): number {
     return this.cartItems.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+  }
+
+  /** True khi đã điền đủ: địa chỉ, người nhận, SĐT, thời gian giao hàng (bắt buộc mới được bấm thanh toán) */
+  get isShippingComplete(): boolean {
+    const s = this.shippingInfo;
+    const addr = (s.address || '').trim();
+    const receiver = (s.receiver || '').trim();
+    const phone = (s.phone || '').trim();
+    const date = (s.deliveryDate || '').trim();
+    const time = (s.deliveryTime || '').trim();
+    return addr.length > 0 && receiver.length > 0 && phone.length > 0 && date.length > 0 && time.length > 0;
   }
 
   get coupon(): CouponData {
@@ -251,10 +278,46 @@ export class Cart implements OnInit, OnDestroy {
     this.loadShippingInfo();
     this.updateShippingFields();
     this.setupStorageListener();
+    this.startScanTimerIfNeeded();
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.handleStorageEvent);
+    this.clearScanTimers();
+  }
+
+  /** Gọi khi đổi phương thức thanh toán (từ template (ngModelChange)); selectedPayment đã được cập nhật bởi ngModel. */
+  onPaymentMethodChange(): void {
+    this.clearScanTimers();
+    this.startScanTimerIfNeeded();
+  }
+
+  private clearScanTimers(): void {
+    if (this.scanSuccessTimer != null) {
+      clearTimeout(this.scanSuccessTimer);
+      this.scanSuccessTimer = null;
+    }
+    if (this.scanSuccessAutoTimer != null) {
+      clearTimeout(this.scanSuccessAutoTimer);
+      this.scanSuccessAutoTimer = null;
+    }
+  }
+
+  private startScanTimerIfNeeded(): void {
+    if (!this.isNonCashPayment) return;
+    this.clearScanTimers();
+    this.scanSuccessTimer = setTimeout(() => {
+      this.scanSuccessTimer = null;
+      if (!this.termsAgreed || !this.cartItems.length || !this.isShippingComplete) return;
+      const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
+      this.scanSuccessOrderId = orderId;
+      this.showScanSuccessModal = true;
+      this.scanSuccessAutoTimer = setTimeout(() => {
+        this.scanSuccessAutoTimer = null;
+        this.showScanSuccessModal = false;
+        this.doCheckoutWithOrderId(orderId);
+      }, 1500);
+    }, 3000);
   }
 
   scrollToTop(): void {
@@ -463,7 +526,8 @@ export class Cart implements OnInit, OnDestroy {
     this.shippingFields[0].value = this.shippingInfo.address || '';
     this.shippingFields[1].value = `${this.shippingInfo.receiver || ''}<br>${this.shippingInfo.phone || ''}`;
     this.shippingFields[2].value = this.shippingInfo.time || '';
-    this.shippingFields[3].value = this.shippingInfo.note || '';
+    const noteTrim = (this.shippingInfo.note || '').trim();
+    this.shippingFields[3].value = noteTrim || 'Không có ghi chú';
   }
 
   // Cart actions
@@ -559,10 +623,12 @@ export class Cart implements OnInit, OnDestroy {
           this.saveShippingInfo();
         }
         break;
-      case 'note':
-        this.shippingInfo.note = this.modalData.note || '';
+      case 'note': {
+        const noteTrim = (this.modalData.note || '').trim();
+        this.shippingInfo.note = noteTrim;
         this.saveShippingInfo();
         break;
+      }
       case 'coupon':
         this.applyCoupon(this.modalData.code);
         break;
@@ -696,58 +762,66 @@ export class Cart implements OnInit, OnDestroy {
       return;
     }
 
-    // Cash payment - create order
-    if (this.selectedPayment === 'cash') {
-      const user = this.getCurrentUser();
-      const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
-
-      const order = {
-        id: orderId,
-        orderId: orderId,
-        date: new Date().toISOString(),
-        customerName: this.shippingInfo.receiver || (user ? user.username : 'Khách hàng'),
-        customerPhone: this.shippingInfo.phone || '0123456789',
-        customerAddress: this.shippingInfo.address || '',
-        paymentMethod: 'Tiền mặt',
-        status: 'pending',
-        subtotal: this.totals.subtotal,
-        shipping: this.totals.shipping,
-        discount: this.totals.discount,
-        total: this.totals.grand,
-        items: this.cartItems.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          qty: item.qty,
-          size: item.size || '',
-          image: item.image || '',
-          options: item.options || [],
-        })),
-        deliveryDate: this.shippingInfo.deliveryDate || '',
-        deliveryTime: this.shippingInfo.deliveryTime || '',
-        note: this.shippingInfo.note || '',
-        couponCode: this.coupon.code || '',
-      };
-
-      try {
-        const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-        existingOrders.push(order);
-        localStorage.setItem('orders', JSON.stringify(existingOrders));
-      } catch (err) {
-        console.error('Error saving order:', err);
-      }
-
-      this.router.navigate(['/order-tracking'], { queryParams: { orderId } });
+    if (!this.isShippingComplete) {
+      await this.showAlertModal(
+        'warning',
+        'Thiếu thông tin giao hàng',
+        'Vui lòng điền đủ các mục bắt buộc (địa chỉ, người nhận, Số điện thoại, thời gian giao hàng) trước khi thanh toán.',
+        false,
+      );
       return;
     }
 
-    // Other payment methods
-    const methodMap: Record<string, string> = {
-      momo: 'momo',
-      zalopay: 'zalopay',
-      ewallet: 'payoo',
+    const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
+    this.doCheckoutWithOrderId(orderId);
+  }
+
+  /** Tạo đơn với orderId có sẵn và chuyển sang order-tracking (dùng cho cả checkout thường và sau khi “scan” 3s). */
+  doCheckoutWithOrderId(orderId: string): void {
+    const user = this.getCurrentUser();
+    const pm = this.paymentMethods.find((m) => m.value === this.selectedPayment);
+    const paymentLabel = pm ? pm.label : 'Tiền mặt';
+
+    const order = {
+      id: orderId,
+      orderId: orderId,
+      date: new Date().toISOString(),
+      customerName: this.shippingInfo.receiver || (user ? user.username : 'Khách hàng'),
+      customerPhone: this.shippingInfo.phone || '0123456789',
+      customerAddress: this.shippingInfo.address || '',
+      paymentMethod: paymentLabel,
+      status: 'pending',
+      subtotal: this.totals.subtotal,
+      shipping: this.totals.shipping,
+      discount: this.totals.discount,
+      total: this.totals.grand,
+      items: this.cartItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        qty: item.qty,
+        size: item.size || '',
+        image: item.image || '',
+        options: item.options || [],
+        sweetness: item.sweetness || '',
+        ice: item.ice || '',
+        toppings: item.toppings || [],
+        note: item.note || '',
+      })),
+      deliveryDate: this.shippingInfo.deliveryDate || '',
+      deliveryTime: this.shippingInfo.deliveryTime || '',
+      note: (this.shippingInfo.note || '').trim() || 'Không có ghi chú',
+      couponCode: this.coupon.code || '',
     };
-    const method = methodMap[this.selectedPayment] || 'momo';
-    window.location.href = '/payment/?method=' + method;
+
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      existingOrders.push(order);
+      localStorage.setItem('orders', JSON.stringify(existingOrders));
+    } catch (err) {
+      console.error('Error saving order:', err);
+    }
+
+    this.router.navigate(['/order-tracking'], { queryParams: { orderId } });
   }
 }

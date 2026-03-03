@@ -1,5 +1,12 @@
 <ng-container [ngSwitch]="method">
 
+  <!-- ================= TIỀN MẶT ================= -->
+  <ng-container *ngSwitchCase="'cash'">
+    <div class="payment-cash-note">
+      <p>Thanh toán khi nhận hàng (COD).</p>
+    </div>
+  </ng-container>
+
   <!-- ================= MOMO ================= -->
   <ng-container *ngSwitchCase="'momo'">
     <main class="momo-container">

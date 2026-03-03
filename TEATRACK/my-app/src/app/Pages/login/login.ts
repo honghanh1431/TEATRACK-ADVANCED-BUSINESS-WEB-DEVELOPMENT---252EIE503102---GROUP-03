@@ -137,7 +137,11 @@ export class Login implements OnInit {
     },
     error: (err) => {
       this.isLoading = false;
-      const msg = err.error?.message || (this.currentLang === 'vi' ? 'Đăng nhập thất bại' : 'Login failed');
+      const raw = (err.error?.message || '').trim();
+      const isInvalidCreds = /invalid\s*credentials/i.test(raw);
+      const msg = isInvalidCreds
+        ? (this.t['error.invalidCredentials'] || (this.currentLang === 'vi' ? 'Thông tin đăng nhập không hợp lệ' : 'Invalid credentials'))
+        : (raw || (this.t['error.loginFailed'] || (this.currentLang === 'vi' ? 'Đăng nhập thất bại' : 'Login failed')));
       this.showError(msg);
       this.cdr.detectChanges();
     }

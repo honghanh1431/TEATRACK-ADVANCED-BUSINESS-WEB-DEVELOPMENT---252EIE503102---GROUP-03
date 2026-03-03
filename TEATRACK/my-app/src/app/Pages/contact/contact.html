@@ -79,3 +79,20 @@
     </form>
   </div>
 </div>
+
+<div
+  class="contact-alert-modal"
+  *ngIf="showSuccessModal"
+  (click)="closeSuccessModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="contact-success-modal-title"
+>
+  <div class="contact-alert-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="contact-alert-modal__title" id="contact-success-modal-title">Thông báo</h3>
+    <p class="contact-alert-modal__message">Cảm ơn bạn đã gửi phản hồi!</p>
+    <div class="contact-alert-modal__actions">
+      <button type="button" class="contact-alert-modal__btn contact-alert-modal__btn--primary" (click)="closeSuccessModal()">OK</button>
+    </div>
+  </div>
+</div>

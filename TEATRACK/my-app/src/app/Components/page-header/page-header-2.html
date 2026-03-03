@@ -57,3 +57,22 @@
     </a>
   </nav>
 </header>
+
+<!-- Modal xác nhận đăng xuất (CSS giống mẫu profile/cart) -->
+<div
+  class="header-alert-modal"
+  *ngIf="showLogoutModal"
+  (click)="closeLogoutModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="header-logout-title"
+>
+  <div class="header-alert-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="header-alert-modal__title" id="header-logout-title">Xác nhận đăng xuất</h3>
+    <p class="header-alert-modal__message">Bạn có chắc muốn đăng xuất?</p>
+    <div class="header-alert-modal__actions">
+      <button type="button" class="header-alert-modal__btn header-alert-modal__btn--ghost" (click)="closeLogoutModal()">Đóng</button>
+      <button type="button" class="header-alert-modal__btn header-alert-modal__btn--primary" (click)="confirmLogout()">Xác nhận</button>
+    </div>
+  </div>
+</div>

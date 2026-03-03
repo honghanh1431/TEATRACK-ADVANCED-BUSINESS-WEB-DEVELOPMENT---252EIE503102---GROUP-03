@@ -1,25 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { App } from '../../app';
 
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports:[CommonModule],
+  imports: [CommonModule],
   templateUrl: './payment.html',
   styleUrl: './payment.css',
 })
 export class Payment implements OnInit {
-  method: string = 'momo';
+  /** Khi dùng trong cart: parent truyền method. Khi vào route /payment: lấy từ queryParam. */
+  @Input() method: string = 'momo';
 
-  constructor(
-    private route: ActivatedRoute,
-  ) {}
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
-      this.method = params.get('method') || 'momo';
-    });
+    const fromRoute = this.route.snapshot.queryParamMap.get('method');
+    if (fromRoute) this.method = fromRoute;
   }
 }

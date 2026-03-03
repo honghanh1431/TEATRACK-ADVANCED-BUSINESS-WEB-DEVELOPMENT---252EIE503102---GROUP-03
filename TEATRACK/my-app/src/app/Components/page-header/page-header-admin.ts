@@ -1,15 +1,17 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-page-header-admin',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './page-header-admin.html',
   styleUrl: './page-header.css',
 })
 export class PageHeaderAdmin {
   userMenuOpen = false;
+  showLogoutModal = false;
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
 
@@ -51,16 +53,24 @@ export class PageHeaderAdmin {
 
   onLogout(event: Event): void {
     event.preventDefault();
-    if (confirm('Bạn có chắc muốn đăng xuất?')) {
-      localStorage.removeItem('authAdmin');
-      localStorage.removeItem('ngogia_user');
-      localStorage.removeItem('cart_items');
-      localStorage.removeItem('ngogia_shipping');
-      localStorage.removeItem('ngogia_coupon');
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('cart:updated'));
-      }
-      window.location.href = '/login-admin';
+    this.closeUserMenu();
+    this.showLogoutModal = true;
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout(): void {
+    localStorage.removeItem('authAdmin');
+    localStorage.removeItem('ngogia_user');
+    localStorage.removeItem('cart_items');
+    localStorage.removeItem('ngogia_shipping');
+    localStorage.removeItem('ngogia_coupon');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
     }
+    this.showLogoutModal = false;
+    window.location.href = '/login-admin';
   }
 }

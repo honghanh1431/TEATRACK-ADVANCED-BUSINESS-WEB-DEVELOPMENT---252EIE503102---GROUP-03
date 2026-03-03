@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class Contact {
   contactForm: FormGroup;
+  showSuccessModal = false;
 
   scrollToTop(): void {
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -47,7 +48,11 @@ export class Contact {
       return;
     }
     console.log(this.contactForm.value);
-    alert('Cảm ơn bạn đã gửi phản hồi!');
     this.contactForm.reset();
+    this.showSuccessModal = true;
+  }
+
+  closeSuccessModal(): void {
+    this.showSuccessModal = false;
   }
 }

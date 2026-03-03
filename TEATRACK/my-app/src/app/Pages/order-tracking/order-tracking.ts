@@ -8,7 +8,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './order-tracking.html',
-  styleUrls: ['./order-tracking.css']
+  styleUrls: ['./order-tracking.css'],
 })
 export class OrderTracking implements OnInit, OnDestroy {
   // Dữ liệu đơn hàng
@@ -20,7 +20,7 @@ export class OrderTracking implements OnInit, OnDestroy {
   review = {
     rating: 0,
     comment: '',
-    reviewerName: ''
+    reviewerName: '',
   };
   ratingText = 'Chưa chọn';
 
@@ -31,7 +31,7 @@ export class OrderTracking implements OnInit, OnDestroy {
     processing: 'Chuẩn bị đơn hàng',
     ready: 'Chờ lấy hàng',
     shipping: 'Đang giao hàng',
-    completed: 'Giao thành công'
+    completed: 'Giao thành công',
   };
 
   // Demo control
@@ -134,6 +134,35 @@ export class OrderTracking implements OnInit, OnDestroy {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
+  /** Nhiều dòng mô tả sản phẩm (giống cart: Size, Ngọt, Đá, Topping; Số lượng xuống dòng riêng). */
+  getItemDetailLines(item: any): string[] {
+    const lines: string[] = [];
+    const ngot = item.sweetness || 'Ít';
+    const da = item.ice || 'Ít';
+    const qty = item.qty ?? item.quantity ?? 1;
+    if (item.size) {
+      const first = `Size ${item.size} - Ngọt: ${ngot} - Đá: ${da}`;
+      lines.push(Array.isArray(item.toppings) && item.toppings.length ? first + ',' : first);
+    } else if (item.sweetness || item.ice) {
+      const part = [item.sweetness && `Ngọt: ${item.sweetness}`, item.ice && `Đá: ${item.ice}`]
+        .filter(Boolean)
+        .join(', ');
+      lines.push(part);
+    }
+    lines.push(`Số lượng: ${qty}`);
+    if (Array.isArray(item.toppings) && item.toppings.length) {
+      lines.push('Topping:');
+      item.toppings.forEach((t: string) => lines.push(t));
+    }
+    if (lines.length === 0 && Array.isArray(item.options) && item.options.length) {
+      lines.push(item.options.join(', '));
+    }
+    if (item.note && !lines.some((l: string) => l.includes(item.note))) {
+      lines.push(item.note);
+    }
+    return lines;
+  }
+
   // ==================== TIMELINE ====================
   getStatusClass(step: string): { active: boolean; completed: boolean } {
     if (!this.order) return { active: false, completed: false };
@@ -141,7 +170,7 @@ export class OrderTracking implements OnInit, OnDestroy {
     const stepIndex = this.statusFlow.indexOf(step);
     return {
       active: stepIndex === currentIndex,
-      completed: stepIndex < currentIndex
+      completed: stepIndex < currentIndex,
     };
   }
 
@@ -238,7 +267,7 @@ export class OrderTracking implements OnInit, OnDestroy {
       4: 'Rất tốt! ⭐⭐⭐⭐',
       3: 'Tốt! ⭐⭐⭐',
       2: 'Trung bình ⭐⭐',
-      1: 'Kém ⭐'
+      1: 'Kém ⭐',
     };
     this.ratingText = texts[value] || 'Chưa chọn';
   }
@@ -255,7 +284,7 @@ export class OrderTracking implements OnInit, OnDestroy {
       comment: this.review.comment,
       reviewerName: this.review.reviewerName.trim() || 'Khách hàng',
       date: new Date().toISOString(),
-      productIds: this.order?.items?.map((i: any) => i.id) || []
+      productIds: this.order?.items?.map((i: any) => i.id) || [],
     };
 
     try {

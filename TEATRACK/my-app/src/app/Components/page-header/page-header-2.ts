@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 const CART_KEY = 'cart_items';
 const USER_KEY = 'ngogia_user';
@@ -8,12 +8,13 @@ const USER_KEY = 'ngogia_user';
 @Component({
   selector: 'app-page-header-2',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './page-header-2.html',
   styleUrl: './page-header.css',
 })
 export class PageHeader2 implements AfterViewInit, OnDestroy {
   userMenuOpen = false;
+  showLogoutModal = false;
   private cartUpdatedHandler = () => this.updateCartBadge();
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
@@ -67,17 +68,25 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
 
   onLogout(event: Event): void {
     event.preventDefault();
-    if (confirm('Bạn có chắc muốn đăng xuất?')) {
-      localStorage.removeItem('authAdmin');
-      localStorage.removeItem('ngogia_user');
-      localStorage.removeItem('cart_items');
-      localStorage.removeItem('ngogia_shipping');
-      localStorage.removeItem('ngogia_coupon');
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('cart:updated'));
-      }
-      window.location.href = '/';
+    this.closeUserMenu();
+    this.showLogoutModal = true;
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout(): void {
+    localStorage.removeItem('authAdmin');
+    localStorage.removeItem('ngogia_user');
+    localStorage.removeItem('cart_items');
+    localStorage.removeItem('ngogia_shipping');
+    localStorage.removeItem('ngogia_coupon');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
     }
+    this.showLogoutModal = false;
+    window.location.href = '/login';
   }
 
   private updateCartBadge(): void {

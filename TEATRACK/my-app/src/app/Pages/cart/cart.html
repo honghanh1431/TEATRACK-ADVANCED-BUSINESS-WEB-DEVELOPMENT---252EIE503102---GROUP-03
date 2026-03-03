@@ -16,7 +16,7 @@
           <ng-container *ngFor="let field of shippingFields">
             <div class="shipping-row">
               <div class="row-body">
-                <dt>{{ field.label }}</dt>
+                <dt>{{ field.label }}<span class="req" *ngIf="field.key !== 'note'"> *</span></dt>
                 <dd [innerHTML]="field.value"></dd>
               </div>
               <button
@@ -151,10 +151,15 @@
               name="payment"
               [value]="method.value"
               [(ngModel)]="selectedPayment"
+              (ngModelChange)="onPaymentMethodChange()"
             />
             <span>{{ method.label }}</span>
           </label>
         </section>
+
+        <div class="payment-embed">
+          <app-payment [method]="paymentMethodForDisplay"></app-payment>
+        </div>
 
         <label class="terms">
           <input type="checkbox" [(ngModel)]="termsAgreed" />
@@ -164,8 +169,8 @@
           >
         </label>
 
-        <button class="checkout-btn" (click)="checkout()" type="button">
-          Tiến hành thanh toán
+        <button class="checkout-btn" type="button" (click)="checkout()">
+          Kiểm tra đơn hàng
         </button>
       </article>
     </section>
@@ -399,6 +404,25 @@
             {{ alertConfirm ? 'Xác nhận' : 'OK' }}
           </button>
         </div>
+      </div>
+    </div>
+
+    <div
+      class="alert-overlay scan-success-overlay"
+      [class.show]="showScanSuccessModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="scan-success-title"
+    >
+      <div class="alert-dialog alert-info">
+        <div class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <h3 class="alert-title" id="scan-success-title">Đã nhận chuyển khoản</h3>
+        <p class="alert-message">Mã đơn: <strong>{{ scanSuccessOrderId }}</strong>. Đang chuyển đến trang đơn hàng...</p>
       </div>
     </div>
   </div>
