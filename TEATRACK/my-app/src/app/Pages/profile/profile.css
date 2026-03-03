@@ -748,3 +748,85 @@
 .support-hero .contact-icon {
   filter: brightness(0) invert(1);
 }
+
+.profile-alert-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+  animation: profileAlertModalFadeIn 0.2s ease forwards;
+}
+
+.profile-alert-modal__dialog {
+  width: min(440px, 100%);
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.25);
+  padding: 28px 28px 26px;
+  position: relative;
+  display: grid;
+  gap: 18px;
+}
+
+.profile-alert-modal__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0088FF;
+  text-align: center;
+}
+
+.profile-alert-modal__message {
+  margin: 0;
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.5;
+  text-align: center;
+  font-weight: 700;
+}
+
+.profile-alert-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.profile-alert-modal__btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.profile-alert-modal__btn--ghost {
+  background: rgba(148, 163, 184, 0.16);
+  color: #6b7280;
+}
+
+.profile-alert-modal__btn--ghost:hover {
+  background: rgba(148, 163, 184, 0.24);
+  transform: translateY(-1px);
+}
+
+.profile-alert-modal__btn--primary {
+  background: #0088FF;
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
+  align-items: center;
+}
+
+.profile-alert-modal__btn--primary:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes profileAlertModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

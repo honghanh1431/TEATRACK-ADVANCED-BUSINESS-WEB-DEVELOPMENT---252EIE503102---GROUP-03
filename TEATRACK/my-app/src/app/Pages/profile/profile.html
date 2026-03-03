@@ -1,5 +1,4 @@
 <main class="account-page">
-  <!-- Breadcrumb (đồng nhất agency/contact/blog-list) -->
   <section class="breadcrumb-banner">
     <h1 class="breadcrumb-title">Thông tin tài khoản</h1>
     <p class="breadcrumb-path">
@@ -40,7 +39,7 @@
           (click)="setTab('support')"
           >Trung tâm trợ giúp</a
         >
-        <a class="nav-link danger" (click)="logout()">Đăng xuất</a>
+        <a class="nav-link danger" (click)="logout()" role="button">Đăng xuất</a>
       </nav>
     </aside>
 
@@ -52,7 +51,6 @@
         <h3>Thông tin cá nhân</h3>
       </header>
 
-      <!-- Block: Cơ bản -->
       <div class="account-block">
         <h4 class="block-title">Thông tin cơ bản</h4>
 
@@ -385,5 +383,60 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <div
+    class="profile-alert-modal"
+    *ngIf="showLogoutModal"
+    (click)="closeLogoutModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="logout-modal-title"
+  >
+    <div class="profile-alert-modal__dialog" (click)="$event.stopPropagation()">
+      <h3 class="profile-alert-modal__title" id="logout-modal-title">Xác nhận đăng xuất</h3>
+      <p class="profile-alert-modal__message">Bạn có chắc muốn đăng xuất?</p>
+      <div class="profile-alert-modal__actions">
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--ghost" (click)="closeLogoutModal()">Đóng</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary" (click)="confirmLogout()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal xác nhận gỡ ảnh đại diện -->
+  <div
+    class="profile-alert-modal"
+    *ngIf="showAvatarModal"
+    (click)="closeAvatarModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="avatar-modal-title"
+  >
+    <div class="profile-alert-modal__dialog" (click)="$event.stopPropagation()">
+      <h3 class="profile-alert-modal__title" id="avatar-modal-title">Gỡ ảnh đại diện</h3>
+      <p class="profile-alert-modal__message">Bạn có chắc muốn gỡ ảnh đại diện?</p>
+      <div class="profile-alert-modal__actions">
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--ghost" (click)="closeAvatarModal()">Đóng</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary" (click)="confirmRemoveAvatar()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal thông báo đã lưu hồ sơ -->
+  <div
+    class="profile-alert-modal"
+    *ngIf="showSavedModal"
+    (click)="closeSavedModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="saved-modal-title"
+  >
+    <div class="profile-alert-modal__dialog" (click)="$event.stopPropagation()">
+      <h3 class="profile-alert-modal__title" id="saved-modal-title">Thông báo</h3>
+      <p class="profile-alert-modal__message">Đã lưu hồ sơ (cục bộ).</p>
+      <div class="profile-alert-modal__actions">
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary" (click)="closeSavedModal()">OK</button>
+      </div>
+    </div>
   </div>
 </main>

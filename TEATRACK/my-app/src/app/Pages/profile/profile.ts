@@ -28,12 +28,12 @@ export class Profile implements OnInit {
 
   // ── Dữ liệu user ─────────────────────────
   user: UserProfile = {
-    fullName: 'Nguyễn Thị Hồng Hạnh',
-    dob: '31/07/2005',
-    gender: 'Nữ',
-    email: 'badudeptrai@gmail.com',
-    phone: '0123456789',
-    address: 'HT Pearl, Quốc lộ 1K, Thành phố Thủ Đức, Thành phố Hồ Chí Minh.',
+    fullName: '',
+    dob: '',
+    gender: '',
+    email: '',
+    phone: '',
+    address: '',
   };
 
   username  = 'ngogia_user';
@@ -95,7 +95,7 @@ export class Profile implements OnInit {
   saveProfile(): void {
     this.setUser(this.user);
     this.isEditing = false;
-    alert('Đã lưu hồ sơ (cục bộ).');
+    this.showSavedModal = true;
   }
 
   cancelEdit(): void {
@@ -117,17 +117,50 @@ export class Profile implements OnInit {
   }
 
   removeAvatar(): void {
-    if (confirm('Gỡ ảnh đại diện?')) {
-      this.avatarSrc = 'assets/images/user-default.png';
-    }
+    this.showAvatarModal = true;
+  }
+
+  confirmRemoveAvatar(): void {
+    this.avatarSrc = 'assets/images/user-default.png';
+    this.showAvatarModal = false;
+  }
+
+  closeAvatarModal(): void {
+    this.showAvatarModal = false;
   }
 
   // ── Đăng xuất ────────────────────────────
-  logout(): void {
-    if (confirm('Bạn có chắc muốn đăng xuất?')) {
-      localStorage.removeItem('ngogia_user');
-      this.router.navigate(['/login']);
+  showLogoutModal = false;
+  showAvatarModal = false;
+  showSavedModal = false;
+
+  openLogoutModal(): void {
+    this.showLogoutModal = true;
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout(): void {
+    localStorage.removeItem('authAdmin');
+    localStorage.removeItem('ngogia_user');
+    localStorage.removeItem('cart_items');
+    localStorage.removeItem('ngogia_shipping');
+    localStorage.removeItem('ngogia_coupon');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
     }
+    this.showLogoutModal = false;
+    this.router.navigate(['/login']);
+  }
+
+  logout(): void {
+    this.openLogoutModal();
+  }
+
+  closeSavedModal(): void {
+    this.showSavedModal = false;
   }
 
   // ── Helpers localStorage ──────────────────
