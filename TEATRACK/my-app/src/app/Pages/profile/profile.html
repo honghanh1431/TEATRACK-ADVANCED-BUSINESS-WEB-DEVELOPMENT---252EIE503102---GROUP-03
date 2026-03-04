@@ -66,7 +66,7 @@
               (change)="onAvatarChange($event)"
             />
           </div>
-          <div class="avatar-actions">
+          <div class="avatar-actions" *ngIf="isEditing">
             <button type="button" class="btn btn-text" (click)="uploadAvatar()">
               Tải lên ảnh đại diện mới
             </button>
