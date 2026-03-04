@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, Renderer2 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { isPlatformBrowser } from '@angular/common';
 
 const CART_KEY = 'cart_items';
@@ -7,12 +8,13 @@ const CART_KEY = 'cart_items';
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './page-header.html',
   styleUrl: './page-header.css',
 })
 export class PageHeader implements OnInit, AfterViewInit, OnDestroy {
   private cartUpdatedHandler = () => this.updateCartBadge();
+  showLoginPromptModal = false;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -24,6 +26,17 @@ export class PageHeader implements OnInit, AfterViewInit, OnDestroy {
   get isMenuOrProductActive(): boolean {
     const path = this.router.url.split('?')[0];
     return path.startsWith('/menu') || path.startsWith('/product');
+  }
+
+  /** Guest bấm giỏ hàng: chặn điều hướng, hiện modal mời đăng nhập */
+  onCartClick(e: Event): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.showLoginPromptModal = true;
+  }
+
+  closeLoginPromptModal(): void {
+    this.showLoginPromptModal = false;
   }
 
   ngOnInit() {

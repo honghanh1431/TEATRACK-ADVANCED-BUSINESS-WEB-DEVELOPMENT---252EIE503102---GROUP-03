@@ -7,7 +7,7 @@
     </div>
 
     <div class="actions">
-      <a class="cart-link" routerLink="/cart">
+      <a class="cart-link cart-link--guest-disabled" href="#" (click)="onCartClick($event)" aria-label="Giỏ hàng">
         <span class="icon-wrap">
           <img src="assets/icons/Cart.png" alt="Giỏ hàng">
           <span class="cart-badge" data-cart-count>0</span>
@@ -46,3 +46,22 @@
     </a>
   </nav>
 </header>
+
+<div
+  class="guest-login-prompt-modal"
+  *ngIf="showLoginPromptModal"
+  (click)="closeLoginPromptModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="guest-prompt-title"
+>
+  <div class="guest-login-prompt-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="guest-login-prompt-modal__title" id="guest-prompt-title">Thông báo</h3>
+    <p class="guest-login-prompt-modal__message">
+      Mời bạn đăng nhập hoặc đăng ký để thưởng trọn hương vị dịch vụ và trải nghiệm tinh hoa trà Việt cùng Hồng Trà Ngô Gia.
+    </p>
+    <div class="guest-login-prompt-modal__actions">
+      <button type="button" class="guest-login-prompt-modal__btn--primary" (click)="closeLoginPromptModal()">OK</button>
+    </div>
+  </div>
+</div>

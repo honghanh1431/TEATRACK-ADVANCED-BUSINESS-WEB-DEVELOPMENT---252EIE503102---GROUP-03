@@ -25,7 +25,6 @@
   z-index: 1;
 }
 
-/* Nền trắng leo lên: vẽ strip trắng phía trên .footer-cols, nằm dưới banner xanh (z-index 2) */
 .footer-cols::before {
   content: '';
   position: absolute;

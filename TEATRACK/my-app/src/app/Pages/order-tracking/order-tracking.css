@@ -684,6 +684,23 @@ body {
   transform: translateY(-2px);
 }
 
+.item-image-link {
+  display: block;
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.item-image-link:hover {
+  opacity: 0.9;
+}
+
+.item-image-link .item-image {
+  display: block;
+}
+
 .item-image {
   width: 80px;
   height: 80px;

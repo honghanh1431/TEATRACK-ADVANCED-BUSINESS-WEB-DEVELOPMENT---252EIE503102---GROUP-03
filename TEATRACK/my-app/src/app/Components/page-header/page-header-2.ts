@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 const CART_KEY = 'cart_items';
@@ -19,7 +19,10 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router,
+  ) {}
 
   /** Username từ ngogia_user (đăng nhập/đăng ký), hiển thị thay "Tài khoản" */
   get userName(): string {
@@ -84,9 +87,10 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
     localStorage.removeItem('ngogia_coupon');
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('cart:updated'));
+      window.dispatchEvent(new CustomEvent('user:logout'));
     }
     this.showLogoutModal = false;
-    window.location.href = '/login';
+    this.router.navigate(['/']);
   }
 
   private updateCartBadge(): void {

@@ -166,3 +166,71 @@ textarea:focus {
 .mt-4 {
   margin-top: 20px;
 }
+
+.guest-login-prompt-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+  animation: guestLoginPromptFadeIn 0.2s ease forwards;
+}
+.guest-login-prompt-modal__dialog {
+  width: min(440px, 100%);
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.25);
+  padding: 28px 28px 26px;
+  position: relative;
+  display: grid;
+  gap: 18px;
+}
+.guest-login-prompt-modal__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0088ff;
+  text-align: center;
+}
+.guest-login-prompt-modal__message {
+  margin: 0;
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.5;
+  font-weight: 700;
+  text-align: center;
+}
+.guest-login-prompt-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.guest-login-prompt-modal__btn--primary {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #0088ff;
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.guest-login-prompt-modal__btn--primary:hover {
+  transform: translateY(-1px);
+}
+@keyframes guestLoginPromptFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Nút thêm vào giỏ khi guest: gợi ý disabled, bấm vẫn mở modal mời đăng nhập */
+.price-cart.guest-disabled,
+.btn.guest-disabled {
+  opacity: 0.88;
+  cursor: pointer;
+}

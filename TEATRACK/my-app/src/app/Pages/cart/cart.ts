@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -60,7 +60,11 @@ interface Totals {
   styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit, OnDestroy {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+  ) {}
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
   private readonly COUPON_KEY = 'ngogia_coupon';
@@ -168,11 +172,10 @@ export class Cart implements OnInit, OnDestroy {
   }
   termsAgreed = false;
 
-  // Scan success (sau 3s khi xem QR)
+  // Scan success (sau 3s khi chọn MoMo/Payoo/ZaloPay → alert "Chuyển khoản đã ghi nhận" → user bấm "Kiểm tra đơn hàng")
   showScanSuccessModal = false;
   scanSuccessOrderId = '';
   private scanSuccessTimer: ReturnType<typeof setTimeout> | null = null;
-  private scanSuccessAutoTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Modal state
   showModal = false;
@@ -204,6 +207,16 @@ export class Cart implements OnInit, OnDestroy {
     const date = (s.deliveryDate || '').trim();
     const time = (s.deliveryTime || '').trim();
     return addr.length > 0 && receiver.length > 0 && phone.length > 0 && date.length > 0 && time.length > 0;
+  }
+
+  /** Disable nút "Kiểm tra đơn hàng" khi: giỏ trống, thiếu shipping, chưa tick điều khoản, hoặc chọn MoMo/ZaloPay/Payoo. */
+  get isCheckoutDisabled(): boolean {
+    return (
+      !this.cartItems.length ||
+      !this.isShippingComplete ||
+      !this.termsAgreed ||
+      this.isNonCashPayment
+    );
   }
 
   get coupon(): CouponData {
@@ -286,6 +299,7 @@ export class Cart implements OnInit, OnDestroy {
     this.clearScanTimers();
   }
 
+  /** Khi đổi phương thức thanh toán: clear timer rồi bật lại nếu đang chọn MoMo/ZaloPay/Payoo (nút bị disable nên timer tự chạy 3s). */
   onPaymentMethodChange(): void {
     this.clearScanTimers();
     this.startScanTimerIfNeeded();
@@ -296,27 +310,48 @@ export class Cart implements OnInit, OnDestroy {
       clearTimeout(this.scanSuccessTimer);
       this.scanSuccessTimer = null;
     }
-    if (this.scanSuccessAutoTimer != null) {
-      clearTimeout(this.scanSuccessAutoTimer);
-      this.scanSuccessAutoTimer = null;
-    }
   }
 
+  /** Tạo orderId tránh trùng (6 số cuối timestamp + 2 số random). */
+  private generateOrderId(): string {
+    return 'HTNGTD' + Date.now().toString().slice(-6) + String(Math.floor(Math.random() * 100)).padStart(2, '0');
+  }
+
+  /** Chọn MoMo/ZaloPay/Payoo → sau 3s tự hiện modal "Chuyển khoản đã ghi nhận". Dùng NgZone + detectChanges để UI cập nhật ngay không cần bấm gì. */
   private startScanTimerIfNeeded(): void {
     if (!this.isNonCashPayment) return;
     this.clearScanTimers();
+    const delayMs = 5000;
     this.scanSuccessTimer = setTimeout(() => {
       this.scanSuccessTimer = null;
       if (!this.termsAgreed || !this.cartItems.length || !this.isShippingComplete) return;
-      const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
-      this.scanSuccessOrderId = orderId;
-      this.showScanSuccessModal = true;
-      this.scanSuccessAutoTimer = setTimeout(() => {
-        this.scanSuccessAutoTimer = null;
-        this.showScanSuccessModal = false;
-        this.doCheckoutWithOrderId(orderId);
-      }, 1500);
-    }, 3000);
+      const orderId = this.generateOrderId();
+      this.ngZone.run(() => {
+        this.scanSuccessOrderId = orderId;
+        this.showScanSuccessModal = true;
+        this.cdr.detectChanges();
+      });
+    }, delayMs);
+  }
+
+  private startScanTimerAfterCheckoutClick(orderId: string): void {
+    this.clearScanTimers();
+    this.scanSuccessOrderId = orderId;
+    this.scanSuccessTimer = setTimeout(() => {
+      this.scanSuccessTimer = null;
+      this.ngZone.run(() => {
+        this.showScanSuccessModal = true;
+        this.cdr.detectChanges();
+      });
+    }, 5000);
+  }
+
+  /** Đóng modal "Chuyển khoản đã ghi nhận" và tạo đơn với status 'paid' rồi chuyển order-tracking. */
+  closeScanSuccessAndCheckout(): void {
+    const orderId = this.scanSuccessOrderId;
+    this.showScanSuccessModal = false;
+    this.scanSuccessOrderId = '';
+    if (orderId) this.doCheckoutWithOrderId(orderId, 'paid');
   }
 
   scrollToTop(): void {
@@ -746,15 +781,6 @@ export class Cart implements OnInit, OnDestroy {
 
   // Checkout
   async checkout(): Promise<void> {
-    if (!this.termsAgreed) {
-      await this.showAlertModal(
-        'warning',
-        'Chưa đồng ý điều khoản',
-        'Vui lòng đồng ý với các điều khoản trước khi thanh toán.',
-        false,
-      );
-      return;
-    }
 
     if (!this.cartItems.length) {
       await this.showAlertModal('info', 'Giỏ hàng trống', 'Giỏ hàng hiện đang trống.', false);
@@ -770,13 +796,26 @@ export class Cart implements OnInit, OnDestroy {
       );
       return;
     }
-
-    const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
-    this.doCheckoutWithOrderId(orderId);
+    if (!this.termsAgreed) {
+      await this.showAlertModal(
+        'warning',
+        'Chưa đồng ý điều khoản',
+        'Vui lòng đồng ý với các điều khoản trước khi thanh toán.',
+        false,
+      );
+      return;
+    }
+    if (this.isNonCashPayment) {
+      const orderId = this.generateOrderId();
+      this.startScanTimerAfterCheckoutClick(orderId);
+      return;
+    }
+    const orderId = this.generateOrderId();
+    this.doCheckoutWithOrderId(orderId, 'pending');
   }
 
   /** Tạo đơn với orderId có sẵn và chuyển sang order-tracking (dùng cho cả checkout thường và sau khi “scan” 3s). */
-  doCheckoutWithOrderId(orderId: string): void {
+  doCheckoutWithOrderId(orderId: string, status: 'pending' | 'paid' = 'pending'): void {
     const user = this.getCurrentUser();
     const pm = this.paymentMethods.find((m) => m.value === this.selectedPayment);
     const paymentLabel = pm ? pm.label : 'Tiền mặt';
@@ -789,7 +828,7 @@ export class Cart implements OnInit, OnDestroy {
       customerPhone: this.shippingInfo.phone || '0123456789',
       customerAddress: this.shippingInfo.address || '',
       paymentMethod: paymentLabel,
-      status: 'pending',
+      status,
       subtotal: this.totals.subtotal,
       shipping: this.totals.shipping,
       discount: this.totals.discount,
@@ -819,6 +858,13 @@ export class Cart implements OnInit, OnDestroy {
       localStorage.setItem('orders', JSON.stringify(existingOrders));
     } catch (err) {
       console.error('Error saving order:', err);
+    }
+
+    // Xoá giỏ hàng đã thanh toán và cập nhật badge header
+    this.cartItems = [];
+    localStorage.setItem(this.STORAGE_KEY, '[]');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
     }
 
     this.router.navigate(['/order-tracking'], { queryParams: { orderId } });

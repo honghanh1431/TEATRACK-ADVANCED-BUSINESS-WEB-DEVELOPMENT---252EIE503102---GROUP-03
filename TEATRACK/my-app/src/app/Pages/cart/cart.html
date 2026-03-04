@@ -169,7 +169,12 @@
           >
         </label>
 
-        <button class="checkout-btn" type="button" (click)="checkout()">
+        <button
+          class="checkout-btn"
+          type="button"
+          (click)="checkout()"
+          [disabled]="isCheckoutDisabled"
+        >
           Kiểm tra đơn hàng
         </button>
       </article>
@@ -407,22 +412,27 @@
       </div>
     </div>
 
+    <!-- Alert sau 3s khi chọn MoMo / Payoo / ZaloPay: "Chuyển khoản đã ghi nhận" → bấm OK để tự chuyển trang kiểm tra đơn -->
     <div
       class="alert-overlay scan-success-overlay"
       [class.show]="showScanSuccessModal"
+      (click)="showScanSuccessModal && closeScanSuccessAndCheckout()"
       role="dialog"
       aria-modal="true"
       aria-labelledby="scan-success-title"
     >
-      <div class="alert-dialog alert-info">
+      <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
         <div class="alert-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M9 12l2 2 4-4"></path>
           </svg>
         </div>
-        <h3 class="alert-title" id="scan-success-title">Đã nhận chuyển khoản</h3>
-        <p class="alert-message">Mã đơn: <strong>{{ scanSuccessOrderId }}</strong>. Đang chuyển đến trang đơn hàng...</p>
+        <h3 class="alert-title" id="scan-success-title">Thông báo</h3>
+        <p class="alert-message">Chuyển khoản của bạn đã được ghi nhận thành công.</p>
+        <div class="alert-actions">
+          <button type="button" class="alert-btn alert-btn-primary" (click)="closeScanSuccessAndCheckout()">Kiểm tra đơn hàng</button>
+        </div>
       </div>
     </div>
   </div>

@@ -150,9 +150,10 @@ export class Profile implements OnInit {
     localStorage.removeItem('ngogia_coupon');
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('cart:updated'));
+      window.dispatchEvent(new CustomEvent('user:logout'));
     }
     this.showLogoutModal = false;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   logout(): void {

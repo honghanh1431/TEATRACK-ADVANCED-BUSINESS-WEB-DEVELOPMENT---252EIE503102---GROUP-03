@@ -183,7 +183,16 @@
       <h2 class="section-title">Sản Phẩm Đã Đặt</h2>
       <div class="items-list">
         <div class="order-item" *ngFor="let item of order.items">
-          <img [src]="item.image || '/assets/images/products/default.jpg'"
+          <a *ngIf="item.id"
+             [routerLink]="['/menu/product', item.id, item.name || item.id]"
+             class="item-image-link"
+             [attr.aria-label]="'Xem chi tiết ' + (item.name || 'sản phẩm')">
+            <img [src]="item.image || '/assets/images/products/default.jpg'"
+                 [alt]="item.name"
+                 class="item-image" />
+          </a>
+          <img *ngIf="!item.id"
+               [src]="item.image || '/assets/images/products/default.jpg'"
                [alt]="item.name"
                class="item-image" />
           <div class="item-info">
