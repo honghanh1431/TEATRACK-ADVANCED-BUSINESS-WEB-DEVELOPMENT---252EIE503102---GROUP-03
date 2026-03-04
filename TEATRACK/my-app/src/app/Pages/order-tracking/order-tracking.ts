@@ -51,12 +51,30 @@ export class OrderTracking implements OnInit, OnDestroy {
     if (this.orderId) {
       this.loadOrderData();
       this.startAutoRefresh();
+      this.applyFragmentAndOpenReview();
     } else {
       this.showError('Không tìm thấy thông tin đơn hàng');
     }
 
     // Xoá giỏ hàng sau khi đặt hàng thành công
     localStorage.removeItem('cart_items');
+  }
+
+  /** Cuộn tới fragment (order-status) và/hoặc mở modal đánh giá khi có openReview=1 (từ order-history). */
+  private applyFragmentAndOpenReview(): void {
+    setTimeout(() => {
+      const fragment = this.route.snapshot.fragment;
+      const openReview = this.route.snapshot.queryParamMap.get('openReview');
+      if (fragment === 'order-status') {
+        const el = document.getElementById('order-status');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (openReview === '1') {
+        const reviewEl = document.getElementById('review-section');
+        if (reviewEl) reviewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.openReviewModal();
+      }
+    }, 200);
   }
 
   ngOnDestroy(): void {
@@ -101,6 +119,7 @@ export class OrderTracking implements OnInit, OnDestroy {
         this.order = order;
         this.updateTimeline(order.status || 'pending', false);
         this.updateDemoButtonState();
+        this.applyFragmentAndOpenReview();
       } else {
         this.showError('Không tìm thấy đơn hàng');
       }

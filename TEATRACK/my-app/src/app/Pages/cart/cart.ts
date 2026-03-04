@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { Payment } from '../payment/payment';
+import { CartService } from '../../cart.service';
 
 interface CartItem {
   id: string;
@@ -64,6 +65,7 @@ export class Cart implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private cartService: CartService,
   ) {}
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
@@ -407,7 +409,11 @@ export class Cart implements OnInit, OnDestroy {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          this.cartItems = parsed;
+          // Gộp món trùng đặc điểm (cùng id, size, sweetness, ice, toppings, note) và cộng quantity
+          this.cartItems = this.cartService.mergeDuplicateItems(parsed);
+          if (this.cartItems.length !== parsed.length) {
+            this.saveItems();
+          }
         }
       }
     } catch (err) {

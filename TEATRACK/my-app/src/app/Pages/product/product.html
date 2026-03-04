@@ -935,7 +935,7 @@
               ‹
             </button>
             <button
-              *ngFor="let p of pageNumbers"
+              *ngFor="let p of visiblePageNumbers"
               type="button"
               class="pagination-num"
               [class.active]="p === currentPage"
@@ -943,7 +943,7 @@
             >
               {{ p }}
             </button>
-            <span class="pagination-ellipsis" *ngIf="totalPages > 5">...</span>
+            <span class="pagination-ellipsis" *ngIf="showEllipsisAfter">...</span>
             <button
               type="button"
               class="pagination-btn"

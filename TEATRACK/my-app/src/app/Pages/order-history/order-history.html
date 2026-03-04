@@ -23,7 +23,7 @@
 
   <!-- Orders List -->
   <ng-container *ngIf="filteredOrders.length > 0; else emptyState">
-    <div class="order-card" *ngFor="let order of filteredOrders">
+    <div class="order-card" *ngFor="let order of pagedOrders">
 
       <!-- Card Header -->
       <div class="card-header">
@@ -117,8 +117,7 @@
           </button>
           <button
             *ngIf="order.status !== 'completed'"
-            class="btn-sm"
-            [ngClass]="order.status === 'shipping' ? 'solid' : 'outline'"
+            class="btn-sm outline"
             (click)="viewDetail(order)"
           >
             Xem chi tiết
@@ -151,7 +150,7 @@
       ‹
     </button>
     <button
-      *ngFor="let p of pageNumbers"
+      *ngFor="let p of visiblePageNumbers"
       type="button"
       class="pagination-num"
       [class.active]="p === currentPage"
@@ -159,7 +158,7 @@
     >
       {{ p }}
     </button>
-    <span class="pagination-ellipsis" *ngIf="totalPages > 5">...</span>
+    <span class="pagination-ellipsis" *ngIf="showEllipsisAfter">...</span>
     <button
       type="button"
       class="pagination-btn"
@@ -171,5 +170,30 @@
       ›
     </button>
   </nav>
+
+  <div
+    class="order-history-cancel-modal"
+    *ngIf="showCancelModal"
+    (click)="closeCancelModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cancel-modal-title"
+  >
+    <div class="order-history-cancel-modal__dialog" (click)="$event.stopPropagation()">
+      <h3 class="order-history-cancel-modal__title" id="cancel-modal-title">Xác nhận huỷ đơn</h3>
+      <p class="order-history-cancel-modal__message">
+        Bạn có chắc muốn huỷ đơn hàng <strong>{{ orderToCancel?.id }}</strong> ?
+        <br/> Thao tác này không thể hoàn tác.
+      </p>
+      <div class="order-history-cancel-modal__actions">
+        <button type="button" class="order-history-cancel-modal__btn order-history-cancel-modal__btn--secondary" (click)="closeCancelModal()">
+          Không
+        </button>
+        <button type="button" class="order-history-cancel-modal__btn order-history-cancel-modal__btn--danger" (click)="confirmCancelOrder()">
+          Huỷ đơn
+        </button>
+      </div>
+    </div>
+  </div>
 
 </div>

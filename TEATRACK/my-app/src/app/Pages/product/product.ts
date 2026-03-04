@@ -495,11 +495,25 @@ export class Product implements OnInit, OnDestroy {
     return p?.reviews ?? 0;
   }
 
-  get pageNumbers(): number[] {
-    if (this.totalPages <= 5) {
-      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    }
-    return [1, 2, 3, 4];
+  private static readonly PAGINATION_VISIBLE = 5;
+
+  /** Chỉ hiển thị tối đa 5 số trang, trượt theo currentPage. */
+  get visiblePageNumbers(): number[] {
+    const n = Product.PAGINATION_VISIBLE;
+    const total = this.totalPages;
+    if (total <= n) return Array.from({ length: total }, (_, i) => i + 1);
+    const start = Math.floor((this.currentPage - 1) / n) * n + 1;
+    const end = Math.min(start + n - 1, total);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  /** Hiện "..." chỉ khi còn trang sau cửa sổ 5 số. */
+  get showEllipsisAfter(): boolean {
+    if (this.totalPages <= Product.PAGINATION_VISIBLE) return false;
+    const n = Product.PAGINATION_VISIBLE;
+    const start = Math.floor((this.currentPage - 1) / n) * n + 1;
+    const end = Math.min(start + n - 1, this.totalPages);
+    return end < this.totalPages;
   }
 
   prevPage(): void {
