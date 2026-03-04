@@ -262,7 +262,7 @@
               </p>
             </div>
 
-            <!-- Time Modal -->
+            <!-- Time Modal: 24h + 60 phút, mặc định giờ hiện tại, khóa giờ/phút đã qua -->
             <div *ngSwitchCase="'time'" class="cart-modal__row">
               <label>
                 <span>Ngày nhận hàng</span>
@@ -275,19 +275,42 @@
                   #dateInput="ngModel"
                 />
               </label>
-              <label>
-                <span>Thời gian</span>
-                <select
-                  name="deliveryTime"
-                  required
-                  [(ngModel)]="modalData.deliveryTime"
-                  #timeInput="ngModel"
-                >
-                  <option *ngFor="let opt of timeOptions" [value]="opt">{{ opt }}</option>
-                </select>
-              </label>
+              <div class="cart-modal__time-picker">
+                <label>
+                  <span>Giờ (24h)</span>
+                  <select
+                    name="deliveryHour"
+                    [ngModel]="modalHour"
+                    (ngModelChange)="setModalHour($event)"
+                  >
+                    <option
+                      *ngFor="let h of hourOptions"
+                      [value]="h"
+                      [disabled]="isHourDisabled(h)"
+                    >
+                      {{ padTime(h) }}
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  <span>Phút</span>
+                  <select
+                    name="deliveryMinute"
+                    [ngModel]="modalMinute"
+                    (ngModelChange)="setModalMinute($event)"
+                  >
+                    <option
+                      *ngFor="let m of minuteOptions"
+                      [value]="m"
+                      [disabled]="isMinuteDisabled(m)"
+                    >
+                      {{ padTime(m) }}
+                    </option>
+                  </select>
+                </label>
+              </div>
               <span class="cart-modal__hint"
-                >Cửa hàng sẽ giao trong vòng +/-30 phút quanh thời gian bạn chọn.</span
+                >Cửa hàng sẽ giao trong vòng +/-30 phút quanh thời gian bạn chọn. Mặc định: giờ hiện tại.</span
               >
             </div>
 

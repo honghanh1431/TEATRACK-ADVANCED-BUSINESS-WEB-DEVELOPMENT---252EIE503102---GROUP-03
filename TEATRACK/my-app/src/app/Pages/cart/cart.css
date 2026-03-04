@@ -819,6 +819,20 @@
   margin: 0;
 }
 
+.cart-modal__time-picker {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.cart-modal__time-picker label {
+  flex: 1;
+  min-width: 80px;
+}
+.cart-modal__time-picker select {
+  width: 100%;
+}
+
 body.modal-open {
   overflow: hidden;
 }

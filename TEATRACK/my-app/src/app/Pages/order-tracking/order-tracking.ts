@@ -37,7 +37,7 @@ export class OrderTracking implements OnInit, OnDestroy {
   };
 
   // Demo control
-  demoMode = true; // có thể đặt false ở môi trường production
+  demoMode = true;
   btnNextDisabled = false;
   btnNextTitle = '';
 

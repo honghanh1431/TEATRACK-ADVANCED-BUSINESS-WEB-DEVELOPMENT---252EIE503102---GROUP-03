@@ -33,6 +33,7 @@ import { Admin } from './Pages/Admin/admin';
 import { OrderTracking } from './Pages/order-tracking/order-tracking';
 import { AdminOrder } from './Pages/Admin/admin-order/admin-order';
 import { ForgotPassword } from './Pages/forgot-password/forgot-password';
+import { OrderHistory } from './Pages/order-history/order-history';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { ForgotPassword } from './Pages/forgot-password/forgot-password';
     Payment,
     AdminBlog,
     AdminOrder,
-    OrderTracking,    
+    OrderTracking,
+    OrderHistory,
   ],
 
   providers: [

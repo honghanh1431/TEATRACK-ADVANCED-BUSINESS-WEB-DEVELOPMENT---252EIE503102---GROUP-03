@@ -93,37 +93,79 @@ export class Cart implements OnInit, OnDestroy {
     },
   };
 
-  // Time options
-  readonly timeOptions = [
-    '08:00',
-    '08:30',
-    '09:00',
-    '09:30',
-    '10:00',
-    '10:30',
-    '11:00',
-    '11:30',
-    '12:00',
-    '12:30',
-    '13:00',
-    '13:30',
-    '14:00',
-    '14:30',
-    '15:00',
-    '15:30',
-    '16:00',
-    '16:30',
-    '17:00',
-    '17:30',
-    '18:00',
-    '18:30',
-    '19:00',
-    '19:30',
-    '20:00',
-    '20:30',
-    '21:00',
-    '21:30',
-  ];
+  /** Giờ hiện tại dạng "HH:mm" (24h, 60 phút) */
+  getCurrentTimeString(): string {
+    const d = new Date();
+    const h = d.getHours();
+    const m = d.getMinutes();
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  /** 0–23 cho dropdown giờ */
+  readonly hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  /** 0–59 cho dropdown phút */
+  readonly minuteOptions = Array.from({ length: 60 }, (_, i) => i);
+
+  /** Giờ hiện tại (0–23) */
+  get currentHour(): number {
+    return new Date().getHours();
+  }
+  /** Phút hiện tại (0–59) */
+  get currentMinute(): number {
+    return new Date().getMinutes();
+  }
+
+  /** Ngày hôm nay dạng YYYY-MM-DD */
+  get todayDateString(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  /** Đang chọn đúng ngày hôm nay (để khóa giờ/phút đã qua) */
+  get isTodaySelected(): boolean {
+    const date = (this.modalData?.deliveryDate || '').trim();
+    return date === this.todayDateString;
+  }
+
+  /** Giờ đang chọn trong modal (0–23) */
+  get modalHour(): number {
+    const t = (this.modalData?.deliveryTime || '').trim();
+    const match = t.match(/^(\d{1,2})/);
+    return match ? Math.min(23, Math.max(0, parseInt(match[1], 10))) : this.currentHour;
+  }
+  /** Phút đang chọn trong modal (0–59) */
+  get modalMinute(): number {
+    const t = (this.modalData?.deliveryTime || '').trim();
+    const match = t.match(/:(\d{1,2})/);
+    return match ? Math.min(59, Math.max(0, parseInt(match[1], 10))) : this.currentMinute;
+  }
+
+  setModalHour(h: number): void {
+    const m = this.modalMinute;
+    this.modalData = this.modalData || {};
+    this.modalData.deliveryTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+  setModalMinute(m: number): void {
+    const h = this.modalHour;
+    this.modalData = this.modalData || {};
+    this.modalData.deliveryTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  /** Format số 0–9 thành "00"-"09" cho hiển thị giờ/phút */
+  padTime(n: number): string {
+    return String(n).padStart(2, '0');
+  }
+
+  /** Khóa giờ đã qua khi chọn ngày hôm nay */
+  isHourDisabled(h: number): boolean {
+    return this.isTodaySelected && h < this.currentHour;
+  }
+  /** Khóa phút đã qua khi chọn hôm nay và đúng giờ hiện tại */
+  isMinuteDisabled(m: number): boolean {
+    if (!this.isTodaySelected) return false;
+    if (this.modalHour < this.currentHour) return true;
+    if (this.modalHour === this.currentHour) return m < this.currentMinute;
+    return false;
+  }
 
   readonly minDate = new Date().toISOString().split('T')[0];
 
@@ -600,7 +642,7 @@ export class Cart implements OnInit, OnDestroy {
         this.modalTitle = 'Thời gian nhận hàng';
         this.modalData = {
           deliveryDate: this.shippingInfo.deliveryDate || this.minDate,
-          deliveryTime: this.shippingInfo.deliveryTime || this.timeOptions[0],
+          deliveryTime: this.shippingInfo.deliveryTime || this.getCurrentTimeString(),
         };
         break;
       case 'note':
