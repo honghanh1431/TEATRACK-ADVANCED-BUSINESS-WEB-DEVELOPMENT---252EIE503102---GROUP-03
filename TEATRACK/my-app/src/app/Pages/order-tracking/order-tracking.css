@@ -412,17 +412,17 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0;
+  gap: 24px;
   position: relative;
 }
 
-/* Progress line connecting items */
+/* Progress line connecting items (đi qua tâm các marker) */
 .timeline-horizontal::before {
   content: '';
   position: absolute;
   left: 50px;
   right: 50px;
-  top: 106px;
+  top: 192px;
   height: 4px;
   background: #e5e7eb;
   z-index: 0;
@@ -444,14 +444,19 @@ body {
   opacity: 1;
 }
 
-/* Timeline number icon above marker */
+/* Timeline number icon (kích thước cố định, đồng đều) */
 .timeline-number {
   width: 32px;
   height: 32px;
-  margin-bottom: 8px;
+  min-width: 32px;
+  min-height: 32px;
+  margin-bottom: 16px;
   opacity: 0.6;
   transition: all 0.3s ease;
   animation: bounceIn 0.6s ease-out backwards;
+  object-fit: contain;
+  object-position: center;
+  flex-shrink: 0;
 }
 
 /* Stagger animation for each number */
@@ -497,6 +502,7 @@ body {
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 2;
+  margin-top: 20px;
   margin-bottom: 16px;
   position: relative;
 }
@@ -513,13 +519,13 @@ body {
   animation: none;
 }
 
-/* Progress line for completed items */
+/* Progress line for completed items (ngang tâm marker) */
 .timeline-item.completed::after {
   content: '';
   position: absolute;
   left: 50%;
   right: -50%;
-  top: 68px;
+  top: 192px;
   height: 4px;
   background: #0088ff;
   z-index: 0;
@@ -549,8 +555,8 @@ body {
 }
 
 .marker-inner img {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   opacity: 0.4;
   transition: all 0.3s ease;
 }
@@ -564,34 +570,89 @@ body {
   filter: brightness(0) invert(1);
 }
 
+/* Thẻ nội dung (nền xanh #0088ff, mũi tên xuống; chiều cao cố định để ô đều nhau) */
 .timeline-content {
-  background: white;
-  padding: 16px 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  background: #0088ff;
+  padding: 18px 14px 22px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 136, 255, 0.35);
   transition: all 0.3s ease;
-  min-width: 140px;
-  max-width: 180px;
+  min-width: 150px;
+  max-width: 200px;
+  min-height: 120px;
+  text-align: center;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mũi tên chỉ xuống dưới (về phía timeline marker) */
+.timeline-content::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  transform: translateX(-50%);
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid #0088ff;
 }
 
 .timeline-item.active .timeline-content {
-  box-shadow: 0 4px 12px rgba(0, 136, 255, 0.15);
-  border: 2px solid #0088ff;
+  box-shadow: 0 6px 18px rgba(0, 136, 255, 0.45);
+}
+
+.timeline-item:not(.active):not(.completed) .timeline-content {
+  background: rgba(0, 136, 255, 0.75);
+}
+
+.timeline-item:not(.active):not(.completed) .timeline-content::after {
+  border-top-color: rgba(0, 136, 255, 0.75);
+}
+
+/* Ô icon/check trong thẻ: cùng chiều cao để không kéo dãn thẻ */
+.timeline-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 28px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.timeline-check img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 8px;
+  object-fit: contain;
+  object-position: center;
+  filter: brightness(0) invert(1);
+  flex-shrink: 0;
 }
 
 .timeline-title {
   font-size: 15px;
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 8px;
+  color: #fff;
+  margin: 0 0 6px 0;
   line-height: 1.3;
+  text-align: center;
 }
 
 .timeline-time {
   font-size: 12px;
-  color: #0088ff;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
   display: block;
+  text-align: center;
 }
 
 /* ===== ORDER ITEMS SECTION ===== */
@@ -771,47 +832,46 @@ body {
   line-height: 1.5;
 }
 
-/* ===== REVIEW MODAL ===== */
+/* ===== REVIEW MODAL*/
 .modal {
   display: none;
   position: fixed;
+  inset: 0;
   z-index: 10000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s ease-out;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  animation: orderTrackingModalFadeIn 0.2s ease forwards;
 }
 
 .modal.show {
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 16px;
+  background: #fff;
+  border-radius: 18px;
   width: 90%;
-  max-width: 600px;
+  max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  animation: orderTrackingModalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-@keyframes fadeIn {
+@keyframes orderTrackingModalFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes slideUp {
-  from { 
-    transform: translateY(50px);
+@keyframes orderTrackingModalSlideUp {
+  from {
+    transform: translateY(24px);
     opacity: 0;
   }
-  to { 
+  to {
     transform: translateY(0);
     opacity: 1;
   }
@@ -821,39 +881,43 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
+  padding: 24px 24px 20px;
   border-bottom: 1px solid #e5e7eb;
 }
 
 .modal-header h2 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
-  color: #1f2937;
+  color: #0088ff;
   margin: 0;
+  text-align: center;
+  flex: 1;
 }
 
 .modal-close {
-  background: none;
+  background: transparent;
   border: none;
-  font-size: 32px;
+  font-size: 22px;
+  line-height: 1;
   color: #6b7280;
   cursor: pointer;
-  transition: all 0.3s ease;
-  width: 40px;
-  height: 40px;
+  transition: color 0.2s ease;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .modal-close:hover {
-  background: #f3f4f6;
   color: #1f2937;
+  background: #f3f4f6;
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 24px 24px 28px;
 }
 
 .form-group {
@@ -942,6 +1006,206 @@ body {
   min-width: 120px;
   padding: 12px 24px;
   font-size: 15px;
+}
+
+.modal-body .review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-body .review-form .rating-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-body .review-form .rating-field .label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-align: left;
+  display: block;
+}
+
+.modal-body .review-form .rating-stars {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.modal-body .review-form .rating-stars .star {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #d1d5db;
+  transition: color 0.2s ease, -webkit-text-stroke 0.2s ease;
+}
+
+.modal-body .review-form .rating-stars .star.filled {
+  color: #fbbf24;
+  -webkit-text-stroke-color: #fbbf24;
+}
+
+.modal-body .review-form .rating-stars .star:hover {
+  -webkit-text-stroke-color: #9ca3af;
+}
+
+.modal-body .review-form .rating-text {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+  margin: 0;
+}
+
+.modal-body .review-form .review-form-title-input,
+.modal-body .review-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  resize: vertical;
+}
+
+.modal-body .review-form textarea {
+  min-height: 100px;
+}
+
+.modal-body .review-form .review-form-title-input::placeholder,
+.modal-body .review-form textarea::placeholder {
+  color: #9ca3af;
+}
+
+.modal-body .review-form .review-form-title-input:focus,
+.modal-body .review-form textarea:focus {
+  outline: none;
+  border-color: #0088ff;
+  box-shadow: 0 0 0 2px rgba(0, 136, 255, 0.15);
+}
+
+/* Nút trong form đánh giá */
+.modal-body .form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.modal-body .form-actions .btn {
+  min-width: auto;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.modal-body .form-actions .btn-secondary {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #e0e0e0;
+}
+
+.modal-body .form-actions .btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.modal-body .form-actions .btn-primary {
+  background: #0088ff;
+  color: #fff;
+  border: none;
+}
+
+.modal-body .form-actions .btn-primary:hover:not(:disabled) {
+  background: #0088dd;
+}
+
+.modal-body .form-actions .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== MODAL THÔNG BÁO THÀNH CÔNG===== */
+.order-tracking-alert-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 10001;
+  animation: orderTrackingAlertFadeIn 0.2s ease forwards;
+}
+
+.order-tracking-alert-modal__dialog {
+  width: min(440px, 100%);
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.25);
+  padding: 28px 28px 26px;
+  position: relative;
+  display: grid;
+  gap: 18px;
+}
+
+.order-tracking-alert-modal__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0088FF;
+  text-align: center;
+}
+
+.order-tracking-alert-modal__message {
+  margin: 0;
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.5;
+  text-align: center;
+  font-weight: 700;
+}
+
+.order-tracking-alert-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.order-tracking-alert-modal__btn {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.order-tracking-alert-modal__btn--primary {
+  background: #0088FF;
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
+}
+
+.order-tracking-alert-modal__btn--primary:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes orderTrackingAlertFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ===== RESPONSIVE ===== */
@@ -1037,9 +1301,12 @@ body {
   .timeline-number {
     width: 24px;
     height: 24px;
+    min-width: 24px;
+    min-height: 24px;
     margin-bottom: 0;
     margin-right: 8px;
     flex-shrink: 0;
+    object-fit: contain;
   }
 
   .timeline-marker {

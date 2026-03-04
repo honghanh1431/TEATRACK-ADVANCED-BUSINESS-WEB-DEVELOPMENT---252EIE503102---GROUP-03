@@ -286,7 +286,6 @@ export class Cart implements OnInit, OnDestroy {
     this.clearScanTimers();
   }
 
-  /** Gọi khi đổi phương thức thanh toán (từ template (ngModelChange)); selectedPayment đã được cập nhật bởi ngModel. */
   onPaymentMethodChange(): void {
     this.clearScanTimers();
     this.startScanTimerIfNeeded();

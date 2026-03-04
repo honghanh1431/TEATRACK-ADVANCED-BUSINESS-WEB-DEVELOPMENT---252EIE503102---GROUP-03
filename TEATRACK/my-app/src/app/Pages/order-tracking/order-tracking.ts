@@ -17,8 +17,10 @@ export class OrderTracking implements OnInit, OnDestroy {
 
   // UI states
   showReviewModal = false;
+  showReviewSuccessModal = false;
   review = {
     rating: 0,
+    title: '',
     comment: '',
     reviewerName: '',
   };
@@ -250,9 +252,21 @@ export class OrderTracking implements OnInit, OnDestroy {
   // ==================== REVIEW MODAL ====================
   openReviewModal(): void {
     this.showReviewModal = true;
-    this.review = { rating: 0, comment: '', reviewerName: '' };
+    this.review = { rating: 0, title: '', comment: '', reviewerName: '' };
     this.ratingText = 'Chưa chọn';
     document.body.style.overflow = 'hidden';
+  }
+
+  setReviewRating(star: number): void {
+    this.review.rating = Math.min(5, Math.max(1, star));
+    const texts: Record<number, string> = {
+      5: 'Tuyệt vời!',
+      4: 'Rất tốt!',
+      3: 'Tốt!',
+      2: 'Trung bình',
+      1: 'Kém',
+    };
+    this.ratingText = texts[this.review.rating] || 'Chưa chọn';
   }
 
   closeReviewModal(): void {
@@ -260,28 +274,16 @@ export class OrderTracking implements OnInit, OnDestroy {
     document.body.style.overflow = '';
   }
 
-  onRatingChange(value: number): void {
-    this.review.rating = value;
-    const texts: Record<number, string> = {
-      5: 'Tuyệt vời! ⭐⭐⭐⭐⭐',
-      4: 'Rất tốt! ⭐⭐⭐⭐',
-      3: 'Tốt! ⭐⭐⭐',
-      2: 'Trung bình ⭐⭐',
-      1: 'Kém ⭐',
-    };
-    this.ratingText = texts[value] || 'Chưa chọn';
-  }
-
   submitReview(): void {
     if (this.review.rating === 0 || !this.review.comment.trim()) {
-      alert('Vui lòng chọn số sao và nhập nhận xét.');
       return;
     }
 
     const reviewData = {
       orderId: this.orderId,
       rating: this.review.rating,
-      comment: this.review.comment,
+      title: (this.review.title || '').trim() || undefined,
+      comment: this.review.comment.trim(),
       reviewerName: this.review.reviewerName.trim() || 'Khách hàng',
       date: new Date().toISOString(),
       productIds: this.order?.items?.map((i: any) => i.id) || [],
@@ -291,11 +293,15 @@ export class OrderTracking implements OnInit, OnDestroy {
       const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
       reviews.push(reviewData);
       localStorage.setItem('reviews', JSON.stringify(reviews));
-      alert('Cảm ơn bạn đã đánh giá!');
       this.closeReviewModal();
+      this.showReviewSuccessModal = true;
     } catch (err) {
       console.error('Lỗi lưu review', err);
     }
+  }
+
+  closeReviewSuccessModal(): void {
+    this.showReviewSuccessModal = false;
   }
 
   // ==================== ERROR HANDLING ====================

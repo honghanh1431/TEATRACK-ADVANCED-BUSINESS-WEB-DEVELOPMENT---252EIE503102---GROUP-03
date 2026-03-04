@@ -80,16 +80,17 @@
         <div class="timeline-item" id="timeline-pending"
              [ngClass]="getStatusClass('pending')">
           <img src="/assets/icons/1.png" alt="1" class="timeline-number" />
-          <div class="timeline-marker">
-            <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Confirmed" />
-            </div>
-          </div>
           <div class="timeline-content">
+            <span class="timeline-check" aria-hidden="true">✓</span>
             <h3 class="timeline-title">Xác nhận đơn hàng</h3>
             <span class="timeline-time" id="time-pending">
               {{ order.status === 'pending' ? formatDate(order.date) : (order.statusProgress?.pending || 'Đang xử lý...') }}
             </span>
+          </div>
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Confirmed" />
+            </div>
           </div>
         </div>
 
@@ -97,16 +98,17 @@
         <div class="timeline-item" id="timeline-processing"
              [ngClass]="getStatusClass('processing')">
           <img src="/assets/icons/2.png" alt="2" class="timeline-number" />
-          <div class="timeline-marker">
-            <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Processing" />
-            </div>
-          </div>
           <div class="timeline-content">
+            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.1.png" alt="" /></span>
             <h3 class="timeline-title">Chuẩn bị đơn hàng</h3>
             <span class="timeline-time" id="time-processing">
               {{ order.status === 'processing' ? formatDate(order.date) : (order.statusProgress?.processing || 'Đang xử lý...') }}
             </span>
+          </div>
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Processing" />
+            </div>
           </div>
         </div>
 
@@ -114,16 +116,17 @@
         <div class="timeline-item" id="timeline-ready"
              [ngClass]="getStatusClass('ready')">
           <img src="/assets/icons/3.png" alt="3" class="timeline-number" />
-          <div class="timeline-marker">
-            <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Ready" />
-            </div>
-          </div>
           <div class="timeline-content">
+            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.2.png" alt="" /></span>
             <h3 class="timeline-title">Chờ lấy hàng</h3>
             <span class="timeline-time" id="time-ready">
               {{ order.status === 'ready' ? formatDate(order.date) : (order.statusProgress?.ready || 'Chờ xử lý') }}
             </span>
+          </div>
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Ready" />
+            </div>
           </div>
         </div>
 
@@ -131,16 +134,17 @@
         <div class="timeline-item" id="timeline-shipping"
              [ngClass]="getStatusClass('shipping')">
           <img src="/assets/icons/4.png" alt="4" class="timeline-number" />
-          <div class="timeline-marker">
-            <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Shipping" />
-            </div>
-          </div>
           <div class="timeline-content">
+            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.3.png" alt="" /></span>
             <h3 class="timeline-title">Đang giao hàng</h3>
             <span class="timeline-time" id="time-shipping">
               {{ order.status === 'shipping' ? formatDate(order.date) : (order.statusProgress?.shipping || 'Chờ xử lý') }}
             </span>
+          </div>
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Shipping" />
+            </div>
           </div>
         </div>
 
@@ -148,19 +152,28 @@
         <div class="timeline-item" id="timeline-completed"
              [ngClass]="getStatusClass('completed')">
           <img src="/assets/icons/5.png" alt="5" class="timeline-number" />
-          <div class="timeline-marker">
-            <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Delivered" />
-            </div>
-          </div>
           <div class="timeline-content">
+            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.4.png" alt="" /></span>
             <h3 class="timeline-title">Giao thành công</h3>
             <span class="timeline-time" id="time-completed">
               {{ order.status === 'completed' ? formatDate(order.date) : (order.statusProgress?.completed || 'Chờ xử lý') }}
             </span>
           </div>
+          <div class="timeline-marker">
+            <div class="marker-inner">
+              <img src="/assets/icons/tick2.png" alt="Delivered" />
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+    <!-- Demo Button phía dưới tracking -->
+    <div class="demo-btn-wrap" *ngIf="demoMode">
+      <button id="btnNextStatus" class="btn-demo-float"
+              [disabled]="btnNextDisabled" [title]="btnNextTitle"
+              (click)="nextStatus()">
+        ⏭️
+      </button>
     </div>
   </section>
 
@@ -222,41 +235,40 @@
         <button class="modal-close" (click)="closeReviewModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <form (ngSubmit)="submitReview()" #reviewForm="ngForm">
-          <!-- Rating Stars -->
-          <div class="form-group">
-            <label>Đánh giá của bạn:</label>
-            <div class="star-rating">
-              <ng-container *ngFor="let star of [5,4,3,2,1]">
-                <input type="radio" name="rating" [id]="'star'+star"
-                       [value]="star" (change)="onRatingChange(star)" required />
-                <label [for]="'star'+star" title="{{star}} sao">★</label>
-              </ng-container>
+        <form class="review-form" (ngSubmit)="submitReview()" #reviewForm="ngForm" aria-label="Gửi đánh giá đơn hàng">
+          <div class="rating-field">
+            <span class="label">Chất lượng sản phẩm:</span>
+            <div class="rating-stars" role="group" aria-label="Chọn 1 đến 5 sao">
+              <button
+                *ngFor="let star of [1,2,3,4,5]; let i = index"
+                type="button"
+                class="star"
+                [class.filled]="(i + 1) <= review.rating"
+                (click)="setReviewRating(i + 1)"
+                [attr.aria-label]="(i + 1) + ' sao'"
+                [attr.aria-pressed]="(i + 1) <= review.rating"
+              >★</button>
             </div>
-            <span class="rating-text" [style.color]="review.rating ? '#0088ff' : '#6b7280'">
-              {{ ratingText }}
-            </span>
           </div>
-
-          <!-- Review Text -->
-          <div class="form-group">
-            <label for="reviewText">Nhận xét của bạn:</label>
-            <textarea id="reviewText" name="reviewText" rows="5"
-                      placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm và dịch vụ..."
-                      [(ngModel)]="review.comment" required></textarea>
-          </div>
-
-          <!-- Customer Name -->
-          <div class="form-group">
-            <label for="reviewerName">Tên của bạn (tùy chọn):</label>
-            <input type="text" id="reviewerName" name="reviewerName"
-                   placeholder="Nhập tên của bạn" [(ngModel)]="review.reviewerName" />
-          </div>
-
-          <!-- Footer Buttons -->
-          <div class="modal-footer">
+          <span class="rating-text" [style.color]="review.rating ? '#0088ff' : '#6b7280'">{{ ratingText }}</span>
+          <input
+            type="text"
+            class="review-form-title-input"
+            [(ngModel)]="review.title"
+            name="reviewTitle"
+            placeholder="Để lại đánh giá chi tiết tại đây"
+            aria-label="Tiêu đề đánh giá"
+          />
+          <textarea
+            name="reviewComment"
+            rows="4"
+            [(ngModel)]="review.comment"
+            placeholder="Hãy để lại nhận xét cho đơn hàng này bạn nhé! Ngô Gia xin chân thành cảm ơn."
+            required
+          ></textarea>
+          <div class="form-actions">
             <button type="button" class="btn btn-secondary" (click)="closeReviewModal()">Hủy</button>
-            <button type="submit" class="btn btn-primary" [disabled]="reviewForm.invalid">
+            <button type="submit" class="btn btn-primary submit-review" [disabled]="review.rating === 0 || !review.comment?.trim()">
               Gửi Đánh Giá
             </button>
           </div>
@@ -265,10 +277,21 @@
     </div>
   </div>
 
-  <!-- Demo Button (Floating) -->
-  <button *ngIf="demoMode" id="btnNextStatus" class="btn-demo-float"
-          [disabled]="btnNextDisabled" [title]="btnNextTitle"
-          (click)="nextStatus()">
-    ⏭️
-  </button>
+  <div
+    class="order-tracking-alert-modal"
+    *ngIf="showReviewSuccessModal"
+    (click)="closeReviewSuccessModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="review-success-title"
+  >
+    <div class="order-tracking-alert-modal__dialog" (click)="$event.stopPropagation()">
+      <h3 class="order-tracking-alert-modal__title" id="review-success-title">Thông báo</h3>
+      <p class="order-tracking-alert-modal__message">Cảm ơn bạn đã đánh giá! 
+        <br/>Đánh giá của bạn rất quan trọng với chúng tôi!</p>
+      <div class="order-tracking-alert-modal__actions">
+        <button type="button" class="order-tracking-alert-modal__btn order-tracking-alert-modal__btn--primary" (click)="closeReviewSuccessModal()">OK</button>
+      </div>
+    </div>
+  </div>
 </div>
