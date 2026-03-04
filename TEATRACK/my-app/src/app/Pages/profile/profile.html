@@ -11,34 +11,14 @@
     <aside class="account-sidebar">
       <h3 class="sidebar-title">Tài khoản</h3>
       <nav class="sidebar-nav">
-        <a
-          class="nav-link"
-          id="link-profile"
-          [class.active]="activeTab === 'profile'"
-          (click)="setTab('profile')"
-          >Thông tin cá nhân</a
-        >
-        <a
-          class="nav-link"
-          id="link-security"
-          [class.active]="activeTab === 'security'"
-          (click)="setTab('security')"
-          >Tài khoản &amp; bảo mật</a
-        >
-        <a
-          class="nav-link"
-          id="link-policy"
-          [class.active]="activeTab === 'policy'"
-          (click)="setTab('policy')"
-          >Chính sách &amp; điều khoản</a
-        >
-        <a
-          class="nav-link"
-          id="link-support"
-          [class.active]="activeTab === 'support'"
-          (click)="setTab('support')"
-          >Trung tâm trợ giúp</a
-        >
+        <a class="nav-link" id="link-profile" [class.active]="activeTab === 'profile'" (click)="setTab('profile')">Thông
+          tin cá nhân</a>
+        <a class="nav-link" id="link-security" [class.active]="activeTab === 'security'"
+          (click)="setTab('security')">Tài khoản &amp; bảo mật</a>
+        <a class="nav-link" id="link-policy" [class.active]="activeTab === 'policy'" (click)="setTab('policy')">Chính
+          sách &amp; điều khoản</a>
+        <a class="nav-link" id="link-support" [class.active]="activeTab === 'support'" (click)="setTab('support')">Trung
+          tâm trợ giúp</a>
         <a class="nav-link danger" (click)="logout()" role="button">Đăng xuất</a>
       </nav>
     </aside>
@@ -58,13 +38,7 @@
           <div class="avatar-label">Hình ảnh:</div>
           <div class="avatar">
             <img id="avatarPreview" [src]="avatarSrc" alt="Ảnh đại diện" />
-            <input
-              id="avatarInput"
-              type="file"
-              accept="image/*"
-              hidden
-              (change)="onAvatarChange($event)"
-            />
+            <input id="avatarInput" type="file" accept="image/*" hidden (change)="onAvatarChange($event)" />
           </div>
           <div class="avatar-actions" *ngIf="isEditing">
             <button type="button" class="btn btn-text" (click)="uploadAvatar()">
@@ -80,29 +54,28 @@
           <div class="kv-row">
             <div class="kv-label">Họ và tên:</div>
             <div class="kv-value">
-              <input
-                class="input-plain"
-                id="fullName"
-                [(ngModel)]="user.fullName"
-                [readonly]="!isEditing"
-              />
+              <input class="input-plain" id="fullName" [(ngModel)]="user.fullName" [readonly]="!isEditing" />
             </div>
           </div>
           <div class="kv-row">
             <div class="kv-label">Ngày sinh:</div>
             <div class="kv-value">
-              <input class="input-plain" id="dob" [(ngModel)]="user.dob" [readonly]="!isEditing" />
+              <input class="input-plain" id="dob" type="date" [(ngModel)]="user.dob" [readonly]="!isEditing" />
             </div>
           </div>
           <div class="kv-row">
             <div class="kv-label">Giới tính:</div>
             <div class="kv-value">
-              <input
-                class="input-plain"
-                id="gender"
-                [(ngModel)]="user.gender"
-                [readonly]="!isEditing"
-              />
+              <select class="input-plain" id="gender" [(ngModel)]="user.gender" [disabled]="!isEditing"
+                *ngIf="isEditing; else genderReadonly">
+                <option value="">Chưa chọn</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Khác">Khác</option>
+              </select>
+              <ng-template #genderReadonly>
+                <input class="input-plain" id="gender" [(ngModel)]="user.gender" readonly />
+              </ng-template>
             </div>
           </div>
         </div>
@@ -116,34 +89,19 @@
           <div class="kv-row">
             <div class="kv-label">Email:</div>
             <div class="kv-value">
-              <input
-                class="input-plain"
-                id="email"
-                [(ngModel)]="user.email"
-                [readonly]="!isEditing"
-              />
+              <input class="input-plain" id="email" [(ngModel)]="user.email" [readonly]="!isEditing" />
             </div>
           </div>
           <div class="kv-row">
             <div class="kv-label">Số điện thoại:</div>
             <div class="kv-value">
-              <input
-                class="input-plain"
-                id="phone"
-                [(ngModel)]="user.phone"
-                [readonly]="!isEditing"
-              />
+              <input class="input-plain" id="phone" [(ngModel)]="user.phone" [readonly]="!isEditing" />
             </div>
           </div>
           <div class="kv-row">
             <div class="kv-label">Địa chỉ giao hàng:</div>
             <div class="kv-value">
-              <input
-                class="input-plain"
-                id="address"
-                [(ngModel)]="user.address"
-                [readonly]="!isEditing"
-              />
+              <input class="input-plain" id="address" [(ngModel)]="user.address" [readonly]="!isEditing" />
             </div>
           </div>
         </div>
@@ -161,15 +119,16 @@
     </section>
 
     <!-- ══════════════════════════════════════
-         TAB: TÀI KHOẢN & BẢO MẬT
-    ══════════════════════════════════════ -->
+     TAB: TÀI KHOẢN & BẢO MẬT
+══════════════════════════════════════ -->
     <section class="account-content" id="account-content2" *ngIf="activeTab === 'security'">
       <header class="block-header">
         <h3>Tài khoản và bảo mật</h3>
       </header>
 
       <div class="account-block">
-        <div class="kv-table">
+        <div class="kv-table" *ngIf="!isEditingSecurity">
+          <!-- Chế độ xem -->
           <div class="kv-row">
             <div class="kv-label">Tên đăng nhập:</div>
             <div class="kv-value">
@@ -189,28 +148,49 @@
             </div>
           </div>
         </div>
+
+        <!-- Chế độ chỉnh sửa -->
+        <div *ngIf="isEditingSecurity">
+          <div class="form-group">
+            <label>Tên đăng nhập:</label>
+            <input type="text" class="form-control" [(ngModel)]="securityEditData.username"
+              placeholder="Nhập username mới" />
+          </div>
+
+          <h4 class="block-title mt-4">Đổi mật khẩu</h4>
+          <div class="form-group">
+            <label>Mật khẩu hiện tại:</label>
+            <input type="password" class="form-control" [(ngModel)]="securityEditData.currentPassword"
+              placeholder="Nhập mật khẩu hiện tại" />
+          </div>
+          <div class="form-group">
+            <label>Mật khẩu mới:</label>
+            <input type="password" class="form-control" [(ngModel)]="securityEditData.newPassword"
+              placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)" />
+          </div>
+          <div class="form-group">
+            <label>Xác nhận mật khẩu mới:</label>
+            <input type="password" class="form-control" [(ngModel)]="securityEditData.confirmPassword"
+              placeholder="Xác nhận mật khẩu mới" />
+          </div>
+
+          <!-- Thông báo lỗi / thành công -->
+          <div *ngIf="securityError" class="alert alert-danger">{{ securityError }}</div>
+          <div *ngIf="securitySuccess" class="alert alert-success">{{ securitySuccess }}</div>
+        </div>
       </div>
 
       <div class="actions">
-        <button
-          class="btn btn-primary"
-          *ngIf="!isEditingSecurity"
-          (click)="isEditingSecurity = true"
-        >
+        <button class="btn btn-primary" *ngIf="!isEditingSecurity" (click)="startEditSecurity()">
           Chỉnh sửa thông tin
         </button>
-        <button
-          class="btn btn-primary"
-          *ngIf="isEditingSecurity"
-          (click)="isEditingSecurity = false"
-        >
+        <button class="btn btn-primary" *ngIf="isEditingSecurity" (click)="saveSecurityChanges()"
+          [disabled]="isChangingPassword">
+          <span *ngIf="isChangingPassword" class="spinner-border spinner-border-sm me-2"></span>
           Lưu thay đổi
         </button>
-        <button
-          class="btn btn-outline"
-          *ngIf="isEditingSecurity"
-          (click)="isEditingSecurity = false"
-        >
+        <button class="btn btn-outline" *ngIf="isEditingSecurity" (click)="cancelEditSecurity()"
+          [disabled]="isChangingPassword">
           Hủy
         </button>
       </div>
@@ -331,30 +311,18 @@
       <div class="support-hero">
         <div class="support-hero-inner">
           <h2 class="support-hero-title">
-            Xin chào <span>{{ user.fullName || 'Bạn' }}</span
-            >,<br />
+            Xin chào <span>{{ user.fullName || 'Bạn' }}</span>,<br />
             Hồng trà Ngô gia giúp được gì cho bạn?
           </h2>
           <form class="searchbar" (submit)="$event.preventDefault()">
             <button class="searchbar__menu" type="button" aria-label="Mở menu">
               <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                <path
-                  d="M3 6h18M3 12h18M3 18h18"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
+                <path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" />
               </svg>
             </button>
-            <input
-              id="q"
-              name="q"
-              type="search"
-              placeholder="Bạn có đang gặp khó khăn gì không nè?"
-              autocomplete="off"
-              aria-label="Tìm kiếm"
-            />
+            <input id="q" name="q" type="search" placeholder="Bạn có đang gặp khó khăn gì không nè?" autocomplete="off"
+              aria-label="Tìm kiếm" />
             <button class="searchbar__submit" type="submit" aria-label="Tìm">
               <img src="assets/icons/search.png" alt="Tìm" width="32" height="32" />
             </button>
@@ -375,65 +343,50 @@
             </div>
           </div>
           <!-- giữ grid cân bằng nếu lẻ -->
-          <div
-            class="contact-item contact-empty"
-            aria-hidden="true"
-            *ngIf="contacts.length % 2 !== 0"
-          ></div>
+          <div class="contact-item contact-empty" aria-hidden="true" *ngIf="contacts.length % 2 !== 0"></div>
         </div>
       </div>
     </section>
   </div>
 
-  <div
-    class="profile-alert-modal"
-    *ngIf="showLogoutModal"
-    (click)="closeLogoutModal()"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="logout-modal-title"
-  >
+  <div class="profile-alert-modal" *ngIf="showLogoutModal" (click)="closeLogoutModal()" role="dialog" aria-modal="true"
+    aria-labelledby="logout-modal-title">
     <div class="profile-alert-modal__dialog" (click)="$event.stopPropagation()">
       <h3 class="profile-alert-modal__title" id="logout-modal-title">Xác nhận đăng xuất</h3>
       <p class="profile-alert-modal__message">Bạn có chắc muốn đăng xuất?</p>
       <div class="profile-alert-modal__actions">
-        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--ghost" (click)="closeLogoutModal()">Đóng</button>
-        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary" (click)="confirmLogout()">Xác nhận</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--ghost"
+          (click)="closeLogoutModal()">Đóng</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary"
+          (click)="confirmLogout()">Xác nhận</button>
       </div>
     </div>
   </div>
 
-  <div
-    class="profile-alert-modal"
-    *ngIf="showAvatarModal"
-    (click)="closeAvatarModal()"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="avatar-modal-title"
-  >
+  <!-- Modal xác nhận gỡ ảnh đại diện -->
+  <div class="profile-alert-modal" *ngIf="showAvatarModal" (click)="closeAvatarModal()" role="dialog" aria-modal="true"
+    aria-labelledby="avatar-modal-title">
     <div class="profile-alert-modal__dialog" (click)="$event.stopPropagation()">
       <h3 class="profile-alert-modal__title" id="avatar-modal-title">Gỡ ảnh đại diện</h3>
       <p class="profile-alert-modal__message">Bạn có chắc muốn gỡ ảnh đại diện?</p>
       <div class="profile-alert-modal__actions">
-        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--ghost" (click)="closeAvatarModal()">Đóng</button>
-        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary" (click)="confirmRemoveAvatar()">Xác nhận</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--ghost"
+          (click)="closeAvatarModal()">Đóng</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary"
+          (click)="confirmRemoveAvatar()">Xác nhận</button>
       </div>
     </div>
   </div>
 
-  <div
-    class="profile-alert-modal"
-    *ngIf="showSavedModal"
-    (click)="closeSavedModal()"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="saved-modal-title"
-  >
+  <!-- Modal thông báo đã lưu hồ sơ -->
+  <div class="profile-alert-modal" *ngIf="showSavedModal" (click)="closeSavedModal()" role="dialog" aria-modal="true"
+    aria-labelledby="saved-modal-title">
     <div class="profile-alert-modal__dialog" (click)="$event.stopPropagation()">
       <h3 class="profile-alert-modal__title" id="saved-modal-title">Thông báo</h3>
       <p class="profile-alert-modal__message">Đã lưu hồ sơ</p>
       <div class="profile-alert-modal__actions">
-        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary" (click)="closeSavedModal()">OK</button>
+        <button type="button" class="profile-alert-modal__btn profile-alert-modal__btn--primary"
+          (click)="closeSavedModal()">OK</button>
       </div>
     </div>
   </div>

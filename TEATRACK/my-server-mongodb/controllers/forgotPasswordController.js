@@ -5,7 +5,9 @@ const nodemailer = require("nodemailer");
 
 const getLang = (req) => {
   const lang = (req.body && req.body.lang) || (req.query && req.query.lang) || "";
-  if (lang === "en") return "en";
+  // Nếu có lang hợp lệ từ client thì dùng ngay
+  if (lang === "vi" || lang === "en") return lang;
+  // Fallback dùng Accept-Language nếu không có lang
   const accept = (req.get && req.get("Accept-Language")) || "";
   if (accept.startsWith("en")) return "en";
   return "vi";

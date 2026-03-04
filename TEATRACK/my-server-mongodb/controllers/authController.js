@@ -71,4 +71,132 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, email, phone, address, dob, gender } = req.body;
+
+    // Xử lý avatar
+    let avatarPath;
+    if (req.file) {
+      // Trường hợp 1: có upload file mới
+      avatarPath = '/uploads/avatars/' + req.file.filename;
+    } else if (req.body.avatar !== undefined) {
+      // Trường hợp 2: không có file nhưng có trường avatar (có thể là '' để xóa)
+      avatarPath = req.body.avatar;
+    }
+    // Trường hợp 3: không có file và không có trường avatar -> không cập nhật avatar
+
+    // Kiểm tra email trùng (giữ nguyên)
+    if (email) {
+      const existingUser = await User.findUserByEmail(email);
+      if (existingUser && !existingUser._id.equals(userId)) {
+        return res.status(400).json({ message: 'Email đã được sử dụng' });
+      }
+    }
+
+    // Tạo object chỉ chứa các trường có thay đổi
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+    if (dob !== undefined) updateData.dob = dob;
+    if (gender !== undefined) updateData.gender = gender;
+    if (avatarPath !== undefined) updateData.avatar = avatarPath;
+
+    // Nếu không có gì để cập nhật
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'Không có thông tin nào được cập nhật' });
+    }
+
+    // Thực hiện cập nhật
+    const updated = await User.updateUserById(userId, updateData);
+
+    if (!updated) {
+      return res.status(400).json({ message: 'Cập nhật thất bại' });
+    }
+
+    // Lấy thông tin user mới nhất
+    const user = await User.findUserById(userId);
+    const { password, ...userWithoutPassword } = user;
+
+    res.json({ message: 'Cập nhật thành công', user: userWithoutPassword });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+// @desc    Update username
+// @route   PUT /api/auth/username
+const updateUsername = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ message: 'Username không được để trống' });
+    }
+
+    // Kiểm tra username đã tồn tại chưa (loại trừ user hiện tại)
+    const existingUser = await User.findUserByUsername(username);
+    if (existingUser && !existingUser._id.equals(userId)) {
+      return res.status(400).json({ message: 'Username đã được sử dụng' });
+    }
+
+    // Cập nhật username
+    const updated = await User.updateUserById(userId, { username });
+    if (!updated) {
+      return res.status(400).json({ message: 'Cập nhật thất bại' });
+    }
+
+    const user = await User.findUserById(userId);
+    const { password, ...userWithoutPassword } = user;
+    res.json({ message: 'Cập nhật username thành công', user: userWithoutPassword });
+  } catch (error) {
+    console.error('Update username error:', error);
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// @desc    Change password
+// @route   POST /api/auth/change-password
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Vui lòng nhập đầy đủ mật khẩu cũ và mới' });
+    }
+
+    // Lấy user từ DB (có password)
+    const user = await User.findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Không tìm thấy user' });
+    }
+
+    // Kiểm tra mật khẩu cũ
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Mật khẩu cũ không đúng' });
+    }
+
+    // Hash mật khẩu mới
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Cập nhật
+    const updated = await User.updateUserById(userId, { password: hashedPassword });
+    if (!updated) {
+      return res.status(400).json({ message: 'Đổi mật khẩu thất bại' });
+    }
+
+    res.json({ message: 'Đổi mật khẩu thành công' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Export thêm hai hàm này
+module.exports = { register, login, updateProfile, updateUsername, changePassword };

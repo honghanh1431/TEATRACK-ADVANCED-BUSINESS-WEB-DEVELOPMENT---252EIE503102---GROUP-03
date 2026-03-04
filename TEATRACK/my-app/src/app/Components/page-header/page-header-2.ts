@@ -18,7 +18,9 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
   /** Số lượng giỏ hàng (binding template, tránh bị script khác ghi đè thành 1) */
   cartCount = 0;
   cartTotalStr = '0đ';
+  avatarSrc = 'assets/icons/user.png';
   private cartUpdatedHandler = () => this.updateCartBadge();
+  private userUpdatedHandler = () => this.updateUserInfo();
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
 
@@ -30,7 +32,7 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
 
   /** Username từ ngogia_user (đăng nhập/đăng ký), hiển thị thay "Tài khoản" */
   get userName(): string {
-    if (typeof localStorage === 'undefined') return 'Tài khoản';
+    if (!isPlatformBrowser(this.platformId)) return 'Tài khoản';
     try {
       const raw = localStorage.getItem(USER_KEY);
       if (!raw) return 'Tài khoản';
@@ -43,15 +45,22 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    // Cập nhật giỏ hàng và thông tin user lần đầu
     this.updateCartBadge();
+    this.updateUserInfo();
+
+    // Lắng nghe sự kiện cập nhật
     if (typeof window !== 'undefined') {
       window.addEventListener('cart:updated', this.cartUpdatedHandler);
+      window.addEventListener('user:updated', this.userUpdatedHandler);
     }
   }
 
   ngOnDestroy(): void {
     if (typeof window !== 'undefined') {
       window.removeEventListener('cart:updated', this.cartUpdatedHandler);
+      window.removeEventListener('user:updated', this.userUpdatedHandler);
     }
   }
 
@@ -84,6 +93,7 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
   }
 
   confirmLogout(): void {
+    localStorage.removeItem('token');
     localStorage.removeItem('authAdmin');
     localStorage.removeItem('ngogia_user');
     localStorage.removeItem('cart_items');
@@ -118,5 +128,32 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
     this.cartCount = count;
     this.cartTotalStr = total.toLocaleString('vi-VN') + 'đ';
     this.cdr.detectChanges();
+  }
+
+  private updateUserInfo(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      if (raw) {
+        const user = JSON.parse(raw) as { avatar?: string; username?: string; name?: string };
+
+        // Cập nhật avatar
+        if (user.avatar) {
+          const apiBaseUrl = 'http://localhost:3002'; // Nên chuyển vào environment
+          if (user.avatar.startsWith('/uploads')) {
+            this.avatarSrc = apiBaseUrl + user.avatar;
+          } else {
+            this.avatarSrc = user.avatar;
+          }
+        } else {
+          this.avatarSrc = 'assets/icons/user.png';
+        }
+
+        // Trigger change detection để cập nhật giao diện
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.error('Lỗi cập nhật thông tin user:', error);
+    }
   }
 }
