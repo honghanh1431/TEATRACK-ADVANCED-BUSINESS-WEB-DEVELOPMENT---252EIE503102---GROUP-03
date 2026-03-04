@@ -617,7 +617,7 @@ export class Product implements OnInit, OnDestroy {
     return this.product?.note || 'Chi tiết bổ sung về sản phẩm sẽ được cập nhật tại đây.';
   }
 
-  /** Thêm sản phẩm related vào giỏ (giống JS renderRelated .cart2-btn) */
+  /** Thêm sản phẩm related vào giỏ */
   addRelatedToCart(event: Event, p: ProductItem): void {
     event.preventDefault();
     event.stopPropagation();

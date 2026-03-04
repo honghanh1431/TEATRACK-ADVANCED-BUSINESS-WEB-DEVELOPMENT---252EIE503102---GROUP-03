@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
@@ -15,6 +15,9 @@ const USER_KEY = 'ngogia_user';
 export class PageHeader2 implements AfterViewInit, OnDestroy {
   userMenuOpen = false;
   showLogoutModal = false;
+  /** Số lượng giỏ hàng (binding template, tránh bị script khác ghi đè thành 1) */
+  cartCount = 0;
+  cartTotalStr = '0đ';
   private cartUpdatedHandler = () => this.updateCartBadge();
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
@@ -22,6 +25,7 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   /** Username từ ngogia_user (đăng nhập/đăng ký), hiển thị thay "Tài khoản" */
@@ -111,12 +115,8 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
         }
       }
     } catch (_) {}
-    const totalStr = total.toLocaleString('vi-VN') + 'đ';
-    document.querySelectorAll('[data-cart-count], #headerCartCount, .header-cart-count').forEach((el) => {
-      (el as HTMLElement).textContent = String(count);
-    });
-    document.querySelectorAll('[data-cart-total], #headerCartTotal, .header-cart-total').forEach((el) => {
-      (el as HTMLElement).textContent = totalStr;
-    });
+    this.cartCount = count;
+    this.cartTotalStr = total.toLocaleString('vi-VN') + 'đ';
+    this.cdr.detectChanges();
   }
 }

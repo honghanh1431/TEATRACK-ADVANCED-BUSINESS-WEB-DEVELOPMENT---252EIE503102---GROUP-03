@@ -146,6 +146,7 @@
 .status-badge {
   display: inline-flex;
   align-items: center;
+  text-align: center;
   gap: 6px;
   padding: 5px 14px;
   border-radius: 999px;
@@ -157,11 +158,11 @@
   background: #fff7ed;
   color: #ea580c;
 }
-.status-badge.preparing {
+.status-badge.processing {
   background: #eff6ff;
   color: #2563eb;
 }
-.status-badge.pickup {
+.status-badge.ready {
   background: #f5f3ff;
   color: #7c3aed;
 }
@@ -169,7 +170,7 @@
   background: #ecfdf5;
   color: #059669;
 }
-.status-badge.delivered {
+.status-badge.completed {
   background: #f0fdf4;
   color: #16a34a;
 }
@@ -184,17 +185,17 @@
 .pending .status-dot {
   background: #ea580c;
 }
-.preparing .status-dot {
+.processing .status-dot {
   background: #2563eb;
 }
-.pickup .status-dot {
+.ready .status-dot {
   background: #7c3aed;
 }
 .shipping .status-dot {
   background: #059669;
   animation: blink 1.2s ease-in-out infinite;
 }
-.delivered .status-dot {
+.completed .status-dot {
   background: #16a34a;
 }
 

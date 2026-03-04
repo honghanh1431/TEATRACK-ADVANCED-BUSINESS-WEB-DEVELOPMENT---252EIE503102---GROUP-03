@@ -10,12 +10,12 @@
       <a class="cart-link" routerLink="/cart/">
         <span class="icon-wrap">
           <img src="assets/icons/Cart.png" alt="Giỏ hàng">
-          <span class="cart-badge" data-cart-count>0</span>
+          <span class="cart-badge" *ngIf="cartCount > 0" [attr.data-cart-count]="cartCount">{{ cartCount }}</span>
         </span>
         <div class="cart-meta">
           <span class="label">Giỏ hàng</span>
-          <span id="headerCartCount" class="header-cart-count">0</span>
-          <span id="headerCartTotal" class="header-cart-total">0đ</span>
+          <span id="headerCartCount" class="header-cart-count">{{ cartCount }}</span>
+          <span id="headerCartTotal" class="header-cart-total">{{ cartTotalStr }}</span>
         </div>
       </a>
 

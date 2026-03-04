@@ -412,15 +412,20 @@ export class OrderHistory implements OnInit {
   reorder(order: Order): void {
     if (order.products.length > 1) {
       this.router.navigate(['/menu']);
-      return;
-    }
-    if (order.products.length === 1 && order.products[0].id) {
+    } else if (order.products.length === 1 && order.products[0].id) {
       const p = order.products[0];
       const name = (p.name || '').replace(/\s+/g, '-').toLowerCase() || 'product';
       this.router.navigate(['/menu/product', p.id, name]);
     } else {
       this.router.navigate(['/menu']);
     }
+    // Sau 0.5 giây tự mở trang order-tracking và bấm Viết đánh giá (modal điền đánh giá)
+    setTimeout(() => {
+      this.router.navigate(['/order-tracking'], {
+        queryParams: { orderId: order.id, openReview: '1' },
+        fragment: 'review-section',
+      });
+    }, 500);
   }
 
   reviewOrder(order: Order): void {

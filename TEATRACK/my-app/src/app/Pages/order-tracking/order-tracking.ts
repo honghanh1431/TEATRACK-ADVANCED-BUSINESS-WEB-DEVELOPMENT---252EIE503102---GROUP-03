@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -26,8 +26,15 @@ export class OrderTracking implements OnInit, OnDestroy {
   };
   ratingText = 'Chưa chọn';
 
-  // Timeline status
   statusFlow = ['pending', 'processing', 'ready', 'shipping', 'completed'];
+  private readonly progressByStep = [7, 30, 50, 72, 100];
+
+  get timelineProgressPercent(): number {
+    if (!this.order?.status) return 0;
+    const stepIndex = this.statusFlow.indexOf(this.order.status);
+    return stepIndex < 0 ? 0 : (this.progressByStep[stepIndex] ?? this.progressByStep[this.progressByStep.length - 1]);
+  }
+
   statusNames: Record<string, string> = {
     pending: 'Xác nhận đơn hàng',
     processing: 'Chuẩn bị đơn hàng',
@@ -44,7 +51,10 @@ export class OrderTracking implements OnInit, OnDestroy {
   // Auto refresh interval
   private refreshInterval: any;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.orderId = this.route.snapshot.queryParamMap.get('orderId');
@@ -73,8 +83,9 @@ export class OrderTracking implements OnInit, OnDestroy {
         const reviewEl = document.getElementById('review-section');
         if (reviewEl) reviewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         this.openReviewModal();
+        this.cdr.detectChanges();
       }
-    }, 200);
+    }, 350);
   }
 
   ngOnDestroy(): void {
@@ -147,12 +158,70 @@ export class OrderTracking implements OnInit, OnDestroy {
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
     const d = new Date(dateStr);
+    return this.formatDateFromDate(d);
+  }
+
+  /** Format Date object thành dd/mm/yyyy hh:mm */
+  formatDateFromDate(d: Date): string {
+    if (!d || isNaN(d.getTime())) return '';
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
     const year = d.getFullYear();
     const hours = d.getHours().toString().padStart(2, '0');
     const minutes = d.getMinutes().toString().padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+
+  private addMinutes(date: Date, minutes: number): Date {
+    const d = new Date(date.getTime());
+    d.setMinutes(d.getMinutes() + minutes);
+    return d;
+  }
+
+  /**
+   * Tính mốc thời gian cho từng bước timeline từ thời gian đặt hàng:
+   * Pending = orderDate + 5 phút
+   * Processing = pending + 2 phút
+   * Ready = processing + (số sản phẩm × 3 phút)
+   * Shipping = ready + 5 phút
+   * Completed = shipping + 30 phút
+   */
+  getStatusTimestamp(step: string): Date | null {
+    if (!this.order) return null;
+    const raw = this.order.date || this.order.createdAt;
+    if (!raw) return null;
+    const orderDate = new Date(raw);
+    if (isNaN(orderDate.getTime())) return null;
+    const itemCount = Array.isArray(this.order.items) ? this.order.items.length : 0;
+    const pending = this.addMinutes(orderDate, 5);
+    const processing = this.addMinutes(pending, 2);
+    const readyMinutes = itemCount * 3;
+    const ready = this.addMinutes(processing, readyMinutes);
+    const shipping = this.addMinutes(ready, 5);
+    const completed = this.addMinutes(shipping, 30);
+    const map: Record<string, Date> = {
+      pending,
+      processing,
+      ready,
+      shipping,
+      completed,
+    };
+    return map[step] ?? null;
+  }
+
+  /** True nếu đã tới bước này (active hoặc completed); dùng để ẩn ô chữ/icon khi chưa tới. */
+  isStepReached(step: string): boolean {
+    const status = this.order?.status || 'pending';
+    const statusIndex = this.statusFlow.indexOf(status);
+    const stepIndex = this.statusFlow.indexOf(step);
+    return stepIndex >= 0 && statusIndex >= stepIndex;
+  }
+
+  /** Hiển thị thời gian bước: chỉ khi đã tới bước mới hiện thời gian, chưa tới thì trả về rỗng. */
+  getStatusTimeDisplay(step: string): string {
+    if (!this.isStepReached(step)) return '';
+    const ts = this.getStatusTimestamp(step);
+    return ts ? this.formatDateFromDate(ts) : '';
   }
 
   /** Nhiều dòng mô tả sản phẩm (giống cart: Size, Ngọt, Đá, Topping; Số lượng xuống dòng riêng). */
@@ -195,17 +264,14 @@ export class OrderTracking implements OnInit, OnDestroy {
     };
   }
 
-  // Cập nhật timeline với animation (nếu animate = true)
   updateTimeline(status: string, animate: boolean): void {
     this.order = { ...this.order, status };
-    // Animation được xử lý bằng CSS class + setTimeout delay
     if (animate) {
       const steps = this.statusFlow;
       const newIndex = steps.indexOf(status);
       for (let i = 0; i <= newIndex; i++) {
         const step = steps[i];
         setTimeout(() => {
-          // Kích hoạt animation cho icon số (thêm class)
           const el = document.getElementById(`timeline-${step}`);
           const numberIcon = el?.querySelector('.timeline-number');
           if (numberIcon) {
@@ -250,22 +316,30 @@ export class OrderTracking implements OnInit, OnDestroy {
 
     this.updateTimeline(nextStatus, true);
 
-    // Hiển thị thông báo nhỏ
-    this.showToast(`✅ ${this.statusNames[nextStatus]}`);
+    this.showToast(this.statusNames[nextStatus]);
   }
 
-  private showToast(message: string): void {
+  private showToast(statusName: string): void {
     const toast = document.createElement('div');
     toast.className = 'status-toast';
-    toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed; top: 20px; right: 20px;
-      background: #10b981; color: white; padding: 12px 24px;
-      border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 9999; animation: slideIn 0.3s ease-out;
-    `;
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.innerHTML = `<span class="status-toast-icon" aria-hidden="true">✓</span><strong class="status-toast-name">${this.escapeHtml(statusName)}</strong>`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
+    // Đợi 1 frame để browser áp style opacity:0 rồi mới thêm visible (transition chạy đúng)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => toast.classList.add('status-toast-visible'));
+    });
+    setTimeout(() => {
+      toast.classList.remove('status-toast-visible');
+      setTimeout(() => toast.remove(), 280);
+    }, 2000);
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   // ==================== REVIEW MODAL ====================

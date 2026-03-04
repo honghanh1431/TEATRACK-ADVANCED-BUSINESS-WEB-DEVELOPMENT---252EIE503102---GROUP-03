@@ -416,8 +416,7 @@ body {
   position: relative;
 }
 
-.timeline-horizontal::before {
-  content: '';
+.timeline-track-wrap {
   position: absolute;
   left: 50px;
   right: 50px;
@@ -426,6 +425,14 @@ body {
   background: #e5e7eb;
   z-index: 0;
   border-radius: 999px;
+  overflow: hidden;
+}
+
+.timeline-fill {
+  height: 100%;
+  background: #0088ff;
+  border-radius: 999px;
+  transition: width 0.6s ease;
 }
 
 .timeline-item {
@@ -435,6 +442,7 @@ body {
   align-items: center;
   text-align: center;
   position: relative;
+  min-height: 250px;
   opacity: 1;
   transition: all 0.3s ease;
   z-index: 1;
@@ -442,6 +450,11 @@ body {
 
 .timeline-item.active {
   opacity: 1;
+}
+
+.timeline-placeholder {
+  min-height: 152px;
+  width: 100%;
 }
 
 .timeline-number {
@@ -489,9 +502,13 @@ body {
   animation: bounceIn 0.6s ease-out !important;
 }
 
+/* Chấm tròn cố định cùng một hàng với đường timeline (top canh với .timeline-horizontal::before) */
 .timeline-marker {
+  position: absolute;
+  top: 154px;
   width: 56px;
   height: 56px;
+  margin-top: 0;
   background: white;
   border: 4px solid #e5e7eb;
   border-radius: 50%;
@@ -500,8 +517,6 @@ body {
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 2;
-  margin-top: 15px;
-  position: relative;
 }
 
 .timeline-item.active .timeline-marker {
@@ -516,35 +531,7 @@ body {
   animation: none;
 }
 
-/* Progress line for completed items (ngang tâm marker) */
-.timeline-item.completed::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  right: -50%;
-  height: 4px;
-  background: #0088ff;
-  z-index: 0;
-  transform-origin: left center;
-  animation: progressSlide 0.8s ease-out forwards;
-  top: 175px;
-  height: 14px;
-  border-radius: 999px;
-  max-width: 1400px;
-}
-
-@keyframes progressSlide {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.timeline-item:last-child.completed::after {
-  display: none;
-}
+/* Thanh xanh đã dùng timeline-track-wrap + timeline-fill (%), không vẽ từng đoạn completed nữa */
 
 .marker-inner {
   width: 32px;
@@ -587,7 +574,6 @@ body {
   align-items: center;
 }
 
-/* Mũi tên chỉ xuống dưới (về phía timeline marker) */
 .timeline-content::after {
   content: '';
   position: absolute;

@@ -76,19 +76,24 @@
       <h2 class="section-title">Trạng Thái Đơn Hàng</h2>
 
       <div class="timeline-horizontal">
+        <!-- Thanh tiến trình màu xanh (giống order-history: 10, 30, 50, 70, 100%) -->
+        <div class="timeline-track-wrap">
+          <div class="timeline-fill" [style.width.%]="timelineProgressPercent"></div>
+        </div>
         <!-- Pending -->
         <div class="timeline-item" id="timeline-pending"
              [ngClass]="getStatusClass('pending')">
-          <img src="/assets/icons/1.png" alt="1" class="timeline-number" />
-          <div class="timeline-content">
+          <img *ngIf="isStepReached('pending')" src="/assets/icons/1.png" alt="1" class="timeline-number" />
+          <div class="timeline-placeholder" *ngIf="!isStepReached('pending')"></div>
+          <div class="timeline-content" *ngIf="isStepReached('pending')">
             <h3 class="timeline-title">Xác nhận đơn hàng</h3>
             <span class="timeline-time" id="time-pending">
-              {{ order.status === 'pending' ? formatDate(order.date) : (order.statusProgress?.pending || 'Đang xử lý...') }}
+              {{ getStatusTimeDisplay('pending') }}
             </span>
           </div>
           <div class="timeline-marker">
             <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Confirmed" />
+              <img *ngIf="isStepReached('pending')" src="/assets/icons/tick2.png" alt="Confirmed" />
             </div>
           </div>
         </div>
@@ -96,16 +101,17 @@
         <!-- Processing -->
         <div class="timeline-item" id="timeline-processing"
              [ngClass]="getStatusClass('processing')">
-          <img src="/assets/icons/2.png" alt="2" class="timeline-number" />
-          <div class="timeline-content">
+          <img *ngIf="isStepReached('processing')" src="/assets/icons/2.png" alt="2" class="timeline-number" />
+          <div class="timeline-placeholder" *ngIf="!isStepReached('processing')"></div>
+          <div class="timeline-content" *ngIf="isStepReached('processing')">
             <h3 class="timeline-title">Chuẩn bị đơn hàng</h3>
             <span class="timeline-time" id="time-processing">
-              {{ order.status === 'processing' ? formatDate(order.date) : (order.statusProgress?.processing || 'Đang xử lý...') }}
+              {{ getStatusTimeDisplay('processing') }}
             </span>
           </div>
           <div class="timeline-marker">
             <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Processing" />
+              <img *ngIf="isStepReached('processing')" src="/assets/icons/tick2.png" alt="Processing" />
             </div>
           </div>
         </div>
@@ -113,16 +119,17 @@
         <!-- Ready -->
         <div class="timeline-item" id="timeline-ready"
              [ngClass]="getStatusClass('ready')">
-          <img src="/assets/icons/3.png" alt="3" class="timeline-number" />
-          <div class="timeline-content">
+          <img *ngIf="isStepReached('ready')" src="/assets/icons/3.png" alt="3" class="timeline-number" />
+          <div class="timeline-placeholder" *ngIf="!isStepReached('ready')"></div>
+          <div class="timeline-content" *ngIf="isStepReached('ready')">
             <h3 class="timeline-title">Chờ lấy hàng</h3>
             <span class="timeline-time" id="time-ready">
-              {{ order.status === 'ready' ? formatDate(order.date) : (order.statusProgress?.ready || 'Chờ xử lý') }}
+              {{ getStatusTimeDisplay('ready') }}
             </span>
           </div>
           <div class="timeline-marker">
             <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Ready" />
+              <img *ngIf="isStepReached('ready')" src="/assets/icons/tick2.png" alt="Ready" />
             </div>
           </div>
         </div>
@@ -130,16 +137,17 @@
         <!-- Shipping -->
         <div class="timeline-item" id="timeline-shipping"
              [ngClass]="getStatusClass('shipping')">
-          <img src="/assets/icons/4.png" alt="4" class="timeline-number" />
-          <div class="timeline-content">
+          <img *ngIf="isStepReached('shipping')" src="/assets/icons/4.png" alt="4" class="timeline-number" />
+          <div class="timeline-placeholder" *ngIf="!isStepReached('shipping')"></div>
+          <div class="timeline-content" *ngIf="isStepReached('shipping')">
             <h3 class="timeline-title">Đang giao hàng</h3>
             <span class="timeline-time" id="time-shipping">
-              {{ order.status === 'shipping' ? formatDate(order.date) : (order.statusProgress?.shipping || 'Chờ xử lý') }}
+              {{ getStatusTimeDisplay('shipping') }}
             </span>
           </div>
           <div class="timeline-marker">
             <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Shipping" />
+              <img *ngIf="isStepReached('shipping')" src="/assets/icons/tick2.png" alt="Shipping" />
             </div>
           </div>
         </div>
@@ -147,16 +155,17 @@
         <!-- Completed -->
         <div class="timeline-item" id="timeline-completed"
              [ngClass]="getStatusClass('completed')">
-          <img src="/assets/icons/5.png" alt="5" class="timeline-number" />
-          <div class="timeline-content">
+          <img *ngIf="isStepReached('completed')" src="/assets/icons/5.png" alt="5" class="timeline-number" />
+          <div class="timeline-placeholder" *ngIf="!isStepReached('completed')"></div>
+          <div class="timeline-content" *ngIf="isStepReached('completed')">
             <h3 class="timeline-title">Giao thành công</h3>
             <span class="timeline-time" id="time-completed">
-              {{ order.status === 'completed' ? formatDate(order.date) : (order.statusProgress?.completed || 'Chờ xử lý') }}
+              {{ getStatusTimeDisplay('completed') }}
             </span>
           </div>
           <div class="timeline-marker">
             <div class="marker-inner">
-              <img src="/assets/icons/tick2.png" alt="Delivered" />
+              <img *ngIf="isStepReached('completed')" src="/assets/icons/tick2.png" alt="Delivered" />
             </div>
           </div>
         </div>
