@@ -459,10 +459,12 @@ export class Profile implements OnInit, OnDestroy {
     localStorage.removeItem('ngogia_coupon');
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('cart:updated'));
+      window.dispatchEvent(new CustomEvent('user:logout'));
     }
     this.showLogoutModal = false;
-    this.router.navigate(['']);
+    this.router.navigate(['/']);
   }
+
 
   closeSavedModal(): void {
     this.showSavedModal = false;

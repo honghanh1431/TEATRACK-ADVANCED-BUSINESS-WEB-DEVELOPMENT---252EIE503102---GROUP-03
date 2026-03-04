@@ -1,5 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ReviewCountService } from '../../review-count.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
@@ -58,6 +59,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   showDrinksModal = false;
   selectedSlug = '';
   modalItems: Product[] = [];
+  showLoginPromptModal = false;
 
   // swipers
   private heroSwiper: Swiper | null = null;
@@ -87,7 +89,13 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     return this.selectedSlug ? (this.CAT_MAP[this.selectedSlug] || '') : '';
   }
 
+  get isGuest(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    return !localStorage.getItem('ngogia_user') && !localStorage.getItem('authAdmin');
+  }
+
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -281,10 +289,18 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  closeLoginPromptModal(): void {
+    this.showLoginPromptModal = false;
+  }
+
   /** Thêm sản phẩm vào giỏ, hiện toast và cập nhật badge */
   addToCart(e: MouseEvent, p: Product): void {
     e.preventDefault();
     e.stopPropagation();
+    if (this.isGuest) {
+      this.showLoginPromptModal = true;
+      return;
+    }
     if (!(window as any).NGCart) return;
     (window as any).NGCart.addItem({
       id: p.id ?? '',

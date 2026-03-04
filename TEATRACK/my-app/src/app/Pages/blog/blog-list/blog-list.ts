@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { BLOG_DATA } from '../blog-data';
 
 const PAGE_SIZE = 8;
+/** Pagination chỉ hiển thị tối đa 5 số, sau đó là dấu ... */
+const PAGINATION_VISIBLE = 5;
 
 @Component({
   selector: 'app-blog-list',
@@ -17,9 +19,27 @@ export class BlogList implements OnInit {
   displayedBlogs: any[] = [];
   currentPage = 1;
   totalPages = 1;
-  pageNumbers: number[] = [];
 
   constructor(private router: Router) {}
+
+  /** Chỉ hiển thị tối đa 5 số trang, trượt theo currentPage. */
+  get visiblePageNumbers(): number[] {
+    const n = PAGINATION_VISIBLE;
+    const total = this.totalPages;
+    if (total <= n) return Array.from({ length: total }, (_, i) => i + 1);
+    const start = Math.floor((this.currentPage - 1) / n) * n + 1;
+    const end = Math.min(start + n - 1, total);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  /** Hiện "..." chỉ khi còn trang sau cửa sổ 5 số. */
+  get showEllipsisAfter(): boolean {
+    if (this.totalPages <= PAGINATION_VISIBLE) return false;
+    const n = PAGINATION_VISIBLE;
+    const start = Math.floor((this.currentPage - 1) / n) * n + 1;
+    const end = Math.min(start + n - 1, this.totalPages);
+    return end < this.totalPages;
+  }
 
   /** Cuộn mượt lên đầu trang (dùng cho breadcrumb links) */
   scrollToTop() {
@@ -34,7 +54,6 @@ export class BlogList implements OnInit {
       })
     );
     this.totalPages = Math.max(1, Math.ceil(this.blogsArray.length / PAGE_SIZE));
-    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
     this.updateDisplayedBlogs();
   }
 

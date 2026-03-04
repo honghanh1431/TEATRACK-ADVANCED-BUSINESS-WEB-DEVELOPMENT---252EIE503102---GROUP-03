@@ -1,0 +1,199 @@
+<!-- Breadcrumb-->
+<section class="breadcrumb-banner">
+  <h1 class="breadcrumb-title">Đơn hàng của tôi</h1>
+  <p class="breadcrumb-path">
+    <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/order-history" (click)="scrollToTop()">Lịch sử đơn hàng</a>
+  </p>
+</section>
+
+<div class="page-wrapper">
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button
+      *ngFor="let tab of tabs"
+      class="tab-btn"
+      [class.active]="activeTab === tab.status"
+      (click)="filterOrders(tab.status)"
+    >
+      {{ tab.icon }} {{ tab.label }}
+      <span class="badge">{{ tab.count }}</span>
+    </button>
+  </div>
+
+  <!-- Orders List -->
+  <ng-container *ngIf="filteredOrders.length > 0; else emptyState">
+    <div class="order-card" *ngFor="let order of pagedOrders">
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="header-left">
+          <span class="order-meta">Mã đơn hàng</span>
+          <span class="order-id-value">{{ order.id }}</span>
+          <span class="order-meta order-date">{{ order.date }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="order.status">
+          <span class="status-dot"></span>
+          {{ order.statusLabel }}
+        </span>
+      </div>
+
+      <!-- Products -->
+      <div class="card-products">
+        <div class="product-row" *ngFor="let product of order.products">
+          <div class="product-thumb" [ngClass]="product.colorClass">
+            {{ product.emoji }}
+          </div>
+          <div class="product-info">
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-meta">{{ product.meta }}</div>
+          </div>
+          <div class="product-price">{{ product.price }}</div>
+        </div>
+      </div>
+
+      <!-- Mini Timeline -->
+      <div class="card-timeline">
+        <div class="mini-timeline">
+          <div class="timeline-track">
+            <div class="timeline-fill" [style.width.%]="order.progressPercent"></div>
+          </div>
+          <div
+            class="mt-step"
+            *ngFor="let step of timelineSteps; let i = index"
+            [ngClass]="{
+              done: i < order.activeStep,
+              active: i === order.activeStep
+            }"
+          >
+            <div
+              class="mt-dot"
+              [ngClass]="{
+                done: i < order.activeStep,
+                active: i === order.activeStep
+              }"
+            >
+              {{ i < order.activeStep ? '✓' : step.icon }}
+            </div>
+            <div class="mt-label">{{ step.label }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <div class="footer-total">
+          <div class="total-label">Tổng thanh toán</div>
+          <div class="total-value">{{ order.total }}</div>
+        </div>
+        <div class="card-actions">
+          <button
+            *ngIf="order.status === 'pending'"
+            class="btn-sm danger"
+            (click)="cancelOrder(order)"
+          >
+            Huỷ đơn
+          </button>
+          <button
+            *ngIf="order.status === 'shipping'"
+            class="btn-sm outline"
+            (click)="trackOrder(order)"
+          >
+            Theo dõi đơn
+          </button>
+          <button
+            *ngIf="order.status === 'completed'"
+            class="btn-sm outline"
+            (click)="reorder(order)"
+          >
+            Mua lại
+          </button>
+          <button
+            *ngIf="order.status === 'completed'"
+            class="btn-sm solid"
+            (click)="reviewOrder(order)"
+          >
+            ⭐ Đánh giá
+          </button>
+          <button
+            *ngIf="order.status !== 'completed'"
+            class="btn-sm outline"
+            (click)="viewDetail(order)"
+          >
+            Xem chi tiết
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- Empty State -->
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">Không có đơn hàng</div>
+      <div class="empty-sub">Bạn chưa có đơn hàng nào trong trạng thái này.</div>
+    </div>
+  </ng-template>
+
+  <!-- Pagination -->
+  <nav class="pagination-wrap" *ngIf="totalPages > 1">
+    <button
+      type="button"
+      class="pagination-btn"
+      (click)="prevPage()"
+      [disabled]="currentPage <= 1"
+      [attr.aria-disabled]="currentPage <= 1"
+      aria-label="Trang trước"
+    >
+      ‹
+    </button>
+    <button
+      *ngFor="let p of visiblePageNumbers"
+      type="button"
+      class="pagination-num"
+      [class.active]="p === currentPage"
+      (click)="goToPage(p)"
+    >
+      {{ p }}
+    </button>
+    <span class="pagination-ellipsis" *ngIf="showEllipsisAfter">...</span>
+    <button
+      type="button"
+      class="pagination-btn"
+      (click)="nextPage()"
+      [disabled]="currentPage >= totalPages"
+      [attr.aria-disabled]="currentPage >= totalPages"
+      aria-label="Trang sau"
+    >
+      ›
+    </button>
+  </nav>
+
+  <div
+    class="order-history-cancel-modal"
+    *ngIf="showCancelModal"
+    (click)="closeCancelModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cancel-modal-title"
+  >
+    <div class="order-history-cancel-modal__dialog" (click)="$event.stopPropagation()">
+      <h3 class="order-history-cancel-modal__title" id="cancel-modal-title">Xác nhận huỷ đơn</h3>
+      <p class="order-history-cancel-modal__message">
+        Bạn có chắc muốn huỷ đơn hàng <strong>{{ orderToCancel?.id }}</strong> ?
+        <br/> Thao tác này không thể hoàn tác.
+      </p>
+      <div class="order-history-cancel-modal__actions">
+        <button type="button" class="order-history-cancel-modal__btn order-history-cancel-modal__btn--secondary" (click)="closeCancelModal()">
+          Không
+        </button>
+        <button type="button" class="order-history-cancel-modal__btn order-history-cancel-modal__btn--danger" (click)="confirmCancelOrder()">
+          Huỷ đơn
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

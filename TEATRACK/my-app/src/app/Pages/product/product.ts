@@ -125,6 +125,14 @@ export class Product implements OnInit, OnDestroy {
   reviewFormContent = '';
   /** Set key cho review đã được bấm Thích (trái tim đỏ tô full) */
   likedReviewKeys = new Set<string>();
+  showLoginPromptModal = false;
+
+  /** Guest = chưa đăng nhập */
+  get isGuest(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    return !localStorage.getItem('ngogia_user') && !localStorage.getItem('authAdmin');
+  }
+
   reviews: ReviewItem[] = [
     { name: 'Hồng Hạnh', title: 'Tôi yêu HTVT!!!!!!!', content: 'HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!', time: '2 ngày trước', rating: 5, createdAt: 0 },
     { name: 'Bảo Vy', title: 'So good, so yummy', content: 'HTVT rất ngon, tuyệt vời!', time: '3 ngày trước', rating: 5, createdAt: 0 },
@@ -370,7 +378,15 @@ export class Product implements OnInit, OnDestroy {
     return base + add;
   }
 
+  closeLoginPromptModal(): void {
+    this.showLoginPromptModal = false;
+  }
+
   addToCart(): void {
+    if (this.isGuest) {
+      this.showLoginPromptModal = true;
+      return;
+    }
     if (!this.product || !window.NGCart) return;
     const sweetnessLabel = this.selectedSweetness === 'it' ? 'Ít' : this.selectedSweetness === 'vua' ? 'Vừa' : 'Nhiều';
     const iceLabel = this.selectedIce === 'it' ? 'Ít' : this.selectedIce === 'vua' ? 'Vừa' : 'Nhiều';
@@ -389,6 +405,10 @@ export class Product implements OnInit, OnDestroy {
   }
 
   buyNow(): void {
+    if (this.isGuest) {
+      this.showLoginPromptModal = true;
+      return;
+    }
     this.addToCart();
     this.router.navigate(['/cart']);
   }
@@ -475,11 +495,25 @@ export class Product implements OnInit, OnDestroy {
     return p?.reviews ?? 0;
   }
 
-  get pageNumbers(): number[] {
-    if (this.totalPages <= 5) {
-      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    }
-    return [1, 2, 3, 4];
+  private static readonly PAGINATION_VISIBLE = 5;
+
+  /** Chỉ hiển thị tối đa 5 số trang, trượt theo currentPage. */
+  get visiblePageNumbers(): number[] {
+    const n = Product.PAGINATION_VISIBLE;
+    const total = this.totalPages;
+    if (total <= n) return Array.from({ length: total }, (_, i) => i + 1);
+    const start = Math.floor((this.currentPage - 1) / n) * n + 1;
+    const end = Math.min(start + n - 1, total);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  /** Hiện "..." chỉ khi còn trang sau cửa sổ 5 số. */
+  get showEllipsisAfter(): boolean {
+    if (this.totalPages <= Product.PAGINATION_VISIBLE) return false;
+    const n = Product.PAGINATION_VISIBLE;
+    const start = Math.floor((this.currentPage - 1) / n) * n + 1;
+    const end = Math.min(start + n - 1, this.totalPages);
+    return end < this.totalPages;
   }
 
   prevPage(): void {
@@ -518,6 +552,10 @@ export class Product implements OnInit, OnDestroy {
 
   /** Gửi đánh giá: gửi lên API (nếu có), thêm vào danh sách (mới nhất lên đầu) và reset form */
   submitReview(): void {
+    if (this.isGuest) {
+      this.showLoginPromptModal = true;
+      return;
+    }
     const rating = this.reviewFormRating;
     if (rating < 1) return;
     const content = (this.reviewFormContent || '').trim();
@@ -583,6 +621,10 @@ export class Product implements OnInit, OnDestroy {
   addRelatedToCart(event: Event, p: ProductItem): void {
     event.preventDefault();
     event.stopPropagation();
+    if (this.isGuest) {
+      this.showLoginPromptModal = true;
+      return;
+    }
     if (!window.NGCart) return;
     const price = this.getPriceM(p);
     window.NGCart.addItem({

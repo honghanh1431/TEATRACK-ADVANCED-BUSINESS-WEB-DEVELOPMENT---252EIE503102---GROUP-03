@@ -169,7 +169,12 @@
           >
         </label>
 
-        <button class="checkout-btn" type="button" (click)="checkout()">
+        <button
+          class="checkout-btn"
+          type="button"
+          (click)="checkout()"
+          [disabled]="isCheckoutDisabled"
+        >
           Kiểm tra đơn hàng
         </button>
       </article>
@@ -257,7 +262,7 @@
               </p>
             </div>
 
-            <!-- Time Modal -->
+            <!-- Time Modal: 24h + 60 phút, mặc định giờ hiện tại, khóa giờ/phút đã qua -->
             <div *ngSwitchCase="'time'" class="cart-modal__row">
               <label>
                 <span>Ngày nhận hàng</span>
@@ -270,19 +275,42 @@
                   #dateInput="ngModel"
                 />
               </label>
-              <label>
-                <span>Thời gian</span>
-                <select
-                  name="deliveryTime"
-                  required
-                  [(ngModel)]="modalData.deliveryTime"
-                  #timeInput="ngModel"
-                >
-                  <option *ngFor="let opt of timeOptions" [value]="opt">{{ opt }}</option>
-                </select>
-              </label>
+              <div class="cart-modal__time-picker">
+                <label>
+                  <span>Giờ (24h)</span>
+                  <select
+                    name="deliveryHour"
+                    [ngModel]="modalHour"
+                    (ngModelChange)="setModalHour($event)"
+                  >
+                    <option
+                      *ngFor="let h of hourOptions"
+                      [value]="h"
+                      [disabled]="isHourDisabled(h)"
+                    >
+                      {{ padTime(h) }}
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  <span>Phút</span>
+                  <select
+                    name="deliveryMinute"
+                    [ngModel]="modalMinute"
+                    (ngModelChange)="setModalMinute($event)"
+                  >
+                    <option
+                      *ngFor="let m of minuteOptions"
+                      [value]="m"
+                      [disabled]="isMinuteDisabled(m)"
+                    >
+                      {{ padTime(m) }}
+                    </option>
+                  </select>
+                </label>
+              </div>
               <span class="cart-modal__hint"
-                >Cửa hàng sẽ giao trong vòng +/-30 phút quanh thời gian bạn chọn.</span
+                >Cửa hàng sẽ giao trong vòng +/-30 phút quanh thời gian bạn chọn. Mặc định: giờ hiện tại.</span
               >
             </div>
 
@@ -407,22 +435,27 @@
       </div>
     </div>
 
+    <!-- Alert sau 3s khi chọn MoMo / Payoo / ZaloPay: "Chuyển khoản đã ghi nhận" → bấm OK để tự chuyển trang kiểm tra đơn -->
     <div
       class="alert-overlay scan-success-overlay"
       [class.show]="showScanSuccessModal"
+      (click)="showScanSuccessModal && closeScanSuccessAndCheckout()"
       role="dialog"
       aria-modal="true"
       aria-labelledby="scan-success-title"
     >
-      <div class="alert-dialog alert-info">
+      <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
         <div class="alert-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M9 12l2 2 4-4"></path>
           </svg>
         </div>
-        <h3 class="alert-title" id="scan-success-title">Đã nhận chuyển khoản</h3>
-        <p class="alert-message">Mã đơn: <strong>{{ scanSuccessOrderId }}</strong>. Đang chuyển đến trang đơn hàng...</p>
+        <h3 class="alert-title" id="scan-success-title">Thông báo</h3>
+        <p class="alert-message">Chuyển khoản của bạn đã được ghi nhận thành công.</p>
+        <div class="alert-actions">
+          <button type="button" class="alert-btn alert-btn-primary" (click)="closeScanSuccessAndCheckout()">Kiểm tra đơn hàng</button>
+        </div>
       </div>
     </div>
   </div>

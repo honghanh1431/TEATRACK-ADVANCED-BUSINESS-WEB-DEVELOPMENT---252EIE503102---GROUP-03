@@ -4,7 +4,7 @@
   <section class="breadcrumb-banner">
     <h1 class="breadcrumb-title">Đơn hàng</h1>
     <p class="breadcrumb-path">
-      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/order-tracking" (click)="scrollToTop()">Đơn hàng</a>
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/order-history" (click)="scrollToTop()">Lịch sử đơn hàng</a> / <a routerLink="/order-tracking" [queryParams]="{ orderId: orderId }" (click)="scrollToTop()"> Đơn hàng - {{ orderId || order?.id || order?.orderId || 'Đơn hàng' }}</a>
     </p>
   </section>
   <!-- Hero Section -->
@@ -71,7 +71,7 @@
   </ng-template>
 
   <!-- Order Status Timeline -->
-  <section class="timeline-section" *ngIf="order">
+  <section class="timeline-section" id="order-status" *ngIf="order">
     <div class="container">
       <h2 class="section-title">Trạng Thái Đơn Hàng</h2>
 
@@ -81,7 +81,6 @@
              [ngClass]="getStatusClass('pending')">
           <img src="/assets/icons/1.png" alt="1" class="timeline-number" />
           <div class="timeline-content">
-            <span class="timeline-check" aria-hidden="true">✓</span>
             <h3 class="timeline-title">Xác nhận đơn hàng</h3>
             <span class="timeline-time" id="time-pending">
               {{ order.status === 'pending' ? formatDate(order.date) : (order.statusProgress?.pending || 'Đang xử lý...') }}
@@ -99,7 +98,6 @@
              [ngClass]="getStatusClass('processing')">
           <img src="/assets/icons/2.png" alt="2" class="timeline-number" />
           <div class="timeline-content">
-            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.1.png" alt="" /></span>
             <h3 class="timeline-title">Chuẩn bị đơn hàng</h3>
             <span class="timeline-time" id="time-processing">
               {{ order.status === 'processing' ? formatDate(order.date) : (order.statusProgress?.processing || 'Đang xử lý...') }}
@@ -117,7 +115,6 @@
              [ngClass]="getStatusClass('ready')">
           <img src="/assets/icons/3.png" alt="3" class="timeline-number" />
           <div class="timeline-content">
-            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.2.png" alt="" /></span>
             <h3 class="timeline-title">Chờ lấy hàng</h3>
             <span class="timeline-time" id="time-ready">
               {{ order.status === 'ready' ? formatDate(order.date) : (order.statusProgress?.ready || 'Chờ xử lý') }}
@@ -135,7 +132,6 @@
              [ngClass]="getStatusClass('shipping')">
           <img src="/assets/icons/4.png" alt="4" class="timeline-number" />
           <div class="timeline-content">
-            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.3.png" alt="" /></span>
             <h3 class="timeline-title">Đang giao hàng</h3>
             <span class="timeline-time" id="time-shipping">
               {{ order.status === 'shipping' ? formatDate(order.date) : (order.statusProgress?.shipping || 'Chờ xử lý') }}
@@ -153,7 +149,6 @@
              [ngClass]="getStatusClass('completed')">
           <img src="/assets/icons/5.png" alt="5" class="timeline-number" />
           <div class="timeline-content">
-            <span class="timeline-check" aria-hidden="true"><img src="/assets/icons/2.4.png" alt="" /></span>
             <h3 class="timeline-title">Giao thành công</h3>
             <span class="timeline-time" id="time-completed">
               {{ order.status === 'completed' ? formatDate(order.date) : (order.statusProgress?.completed || 'Chờ xử lý') }}
@@ -167,7 +162,6 @@
         </div>
       </div>
     </div>
-    <!-- Demo Button phía dưới tracking -->
     <div class="demo-btn-wrap" *ngIf="demoMode">
       <button id="btnNextStatus" class="btn-demo-float"
               [disabled]="btnNextDisabled" [title]="btnNextTitle"
@@ -183,7 +177,16 @@
       <h2 class="section-title">Sản Phẩm Đã Đặt</h2>
       <div class="items-list">
         <div class="order-item" *ngFor="let item of order.items">
-          <img [src]="item.image || '/assets/images/products/default.jpg'"
+          <a *ngIf="item.id"
+             [routerLink]="['/menu/product', item.id, item.name || item.id]"
+             class="item-image-link"
+             [attr.aria-label]="'Xem chi tiết ' + (item.name || 'sản phẩm')">
+            <img [src]="item.image || '/assets/images/products/default.jpg'"
+                 [alt]="item.name"
+                 class="item-image" />
+          </a>
+          <img *ngIf="!item.id"
+               [src]="item.image || '/assets/images/products/default.jpg'"
                [alt]="item.name"
                class="item-image" />
           <div class="item-info">
@@ -201,7 +204,7 @@
   </section>
 
   <!-- Action Buttons -->
-  <section class="action-section" *ngIf="order">
+  <section class="action-section" id="review-section" *ngIf="order">
     <div class="container">
       <div class="action-buttons">
         <a href="#" class="btn btn-primary" (click)="openReviewModal(); $event.preventDefault()">

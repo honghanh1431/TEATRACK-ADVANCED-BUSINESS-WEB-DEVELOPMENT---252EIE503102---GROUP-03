@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { Payment } from '../payment/payment';
+import { CartService } from '../../cart.service';
 
 interface CartItem {
   id: string;
@@ -60,7 +61,12 @@ interface Totals {
   styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit, OnDestroy {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private cartService: CartService,
+  ) {}
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
   private readonly COUPON_KEY = 'ngogia_coupon';
@@ -89,37 +95,79 @@ export class Cart implements OnInit, OnDestroy {
     },
   };
 
-  // Time options
-  readonly timeOptions = [
-    '08:00',
-    '08:30',
-    '09:00',
-    '09:30',
-    '10:00',
-    '10:30',
-    '11:00',
-    '11:30',
-    '12:00',
-    '12:30',
-    '13:00',
-    '13:30',
-    '14:00',
-    '14:30',
-    '15:00',
-    '15:30',
-    '16:00',
-    '16:30',
-    '17:00',
-    '17:30',
-    '18:00',
-    '18:30',
-    '19:00',
-    '19:30',
-    '20:00',
-    '20:30',
-    '21:00',
-    '21:30',
-  ];
+  /** Giờ hiện tại dạng "HH:mm" (24h, 60 phút) */
+  getCurrentTimeString(): string {
+    const d = new Date();
+    const h = d.getHours();
+    const m = d.getMinutes();
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  /** 0–23 cho dropdown giờ */
+  readonly hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  /** 0–59 cho dropdown phút */
+  readonly minuteOptions = Array.from({ length: 60 }, (_, i) => i);
+
+  /** Giờ hiện tại (0–23) */
+  get currentHour(): number {
+    return new Date().getHours();
+  }
+  /** Phút hiện tại (0–59) */
+  get currentMinute(): number {
+    return new Date().getMinutes();
+  }
+
+  /** Ngày hôm nay dạng YYYY-MM-DD */
+  get todayDateString(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  /** Đang chọn đúng ngày hôm nay (để khóa giờ/phút đã qua) */
+  get isTodaySelected(): boolean {
+    const date = (this.modalData?.deliveryDate || '').trim();
+    return date === this.todayDateString;
+  }
+
+  /** Giờ đang chọn trong modal (0–23) */
+  get modalHour(): number {
+    const t = (this.modalData?.deliveryTime || '').trim();
+    const match = t.match(/^(\d{1,2})/);
+    return match ? Math.min(23, Math.max(0, parseInt(match[1], 10))) : this.currentHour;
+  }
+  /** Phút đang chọn trong modal (0–59) */
+  get modalMinute(): number {
+    const t = (this.modalData?.deliveryTime || '').trim();
+    const match = t.match(/:(\d{1,2})/);
+    return match ? Math.min(59, Math.max(0, parseInt(match[1], 10))) : this.currentMinute;
+  }
+
+  setModalHour(h: number): void {
+    const m = this.modalMinute;
+    this.modalData = this.modalData || {};
+    this.modalData.deliveryTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+  setModalMinute(m: number): void {
+    const h = this.modalHour;
+    this.modalData = this.modalData || {};
+    this.modalData.deliveryTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  /** Format số 0–9 thành "00"-"09" cho hiển thị giờ/phút */
+  padTime(n: number): string {
+    return String(n).padStart(2, '0');
+  }
+
+  /** Khóa giờ đã qua khi chọn ngày hôm nay */
+  isHourDisabled(h: number): boolean {
+    return this.isTodaySelected && h < this.currentHour;
+  }
+  /** Khóa phút đã qua khi chọn hôm nay và đúng giờ hiện tại */
+  isMinuteDisabled(m: number): boolean {
+    if (!this.isTodaySelected) return false;
+    if (this.modalHour < this.currentHour) return true;
+    if (this.modalHour === this.currentHour) return m < this.currentMinute;
+    return false;
+  }
 
   readonly minDate = new Date().toISOString().split('T')[0];
 
@@ -168,11 +216,10 @@ export class Cart implements OnInit, OnDestroy {
   }
   termsAgreed = false;
 
-  // Scan success (sau 3s khi xem QR)
+  // Scan success (sau 3s khi chọn MoMo/Payoo/ZaloPay → alert "Chuyển khoản đã ghi nhận" → user bấm "Kiểm tra đơn hàng")
   showScanSuccessModal = false;
   scanSuccessOrderId = '';
   private scanSuccessTimer: ReturnType<typeof setTimeout> | null = null;
-  private scanSuccessAutoTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Modal state
   showModal = false;
@@ -204,6 +251,16 @@ export class Cart implements OnInit, OnDestroy {
     const date = (s.deliveryDate || '').trim();
     const time = (s.deliveryTime || '').trim();
     return addr.length > 0 && receiver.length > 0 && phone.length > 0 && date.length > 0 && time.length > 0;
+  }
+
+  /** Disable nút "Kiểm tra đơn hàng" khi: giỏ trống, thiếu shipping, chưa tick điều khoản, hoặc chọn MoMo/ZaloPay/Payoo. */
+  get isCheckoutDisabled(): boolean {
+    return (
+      !this.cartItems.length ||
+      !this.isShippingComplete ||
+      !this.termsAgreed ||
+      this.isNonCashPayment
+    );
   }
 
   get coupon(): CouponData {
@@ -286,6 +343,7 @@ export class Cart implements OnInit, OnDestroy {
     this.clearScanTimers();
   }
 
+  /** Khi đổi phương thức thanh toán: clear timer rồi bật lại nếu đang chọn MoMo/ZaloPay/Payoo (nút bị disable nên timer tự chạy 3s). */
   onPaymentMethodChange(): void {
     this.clearScanTimers();
     this.startScanTimerIfNeeded();
@@ -296,27 +354,48 @@ export class Cart implements OnInit, OnDestroy {
       clearTimeout(this.scanSuccessTimer);
       this.scanSuccessTimer = null;
     }
-    if (this.scanSuccessAutoTimer != null) {
-      clearTimeout(this.scanSuccessAutoTimer);
-      this.scanSuccessAutoTimer = null;
-    }
   }
 
+  /** Tạo orderId tránh trùng (6 số cuối timestamp + 2 số random). */
+  private generateOrderId(): string {
+    return 'HTNGTD' + Date.now().toString().slice(-6) + String(Math.floor(Math.random() * 100)).padStart(2, '0');
+  }
+
+  /** Chọn MoMo/ZaloPay/Payoo → sau 3s tự hiện modal "Chuyển khoản đã ghi nhận". Dùng NgZone + detectChanges để UI cập nhật ngay không cần bấm gì. */
   private startScanTimerIfNeeded(): void {
     if (!this.isNonCashPayment) return;
     this.clearScanTimers();
+    const delayMs = 5000;
     this.scanSuccessTimer = setTimeout(() => {
       this.scanSuccessTimer = null;
       if (!this.termsAgreed || !this.cartItems.length || !this.isShippingComplete) return;
-      const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
-      this.scanSuccessOrderId = orderId;
-      this.showScanSuccessModal = true;
-      this.scanSuccessAutoTimer = setTimeout(() => {
-        this.scanSuccessAutoTimer = null;
-        this.showScanSuccessModal = false;
-        this.doCheckoutWithOrderId(orderId);
-      }, 1500);
-    }, 3000);
+      const orderId = this.generateOrderId();
+      this.ngZone.run(() => {
+        this.scanSuccessOrderId = orderId;
+        this.showScanSuccessModal = true;
+        this.cdr.detectChanges();
+      });
+    }, delayMs);
+  }
+
+  private startScanTimerAfterCheckoutClick(orderId: string): void {
+    this.clearScanTimers();
+    this.scanSuccessOrderId = orderId;
+    this.scanSuccessTimer = setTimeout(() => {
+      this.scanSuccessTimer = null;
+      this.ngZone.run(() => {
+        this.showScanSuccessModal = true;
+        this.cdr.detectChanges();
+      });
+    }, 5000);
+  }
+
+  /** Đóng modal "Chuyển khoản đã ghi nhận" và tạo đơn với status 'paid' rồi chuyển order-tracking. */
+  closeScanSuccessAndCheckout(): void {
+    const orderId = this.scanSuccessOrderId;
+    this.showScanSuccessModal = false;
+    this.scanSuccessOrderId = '';
+    if (orderId) this.doCheckoutWithOrderId(orderId, 'paid');
   }
 
   scrollToTop(): void {
@@ -330,7 +409,11 @@ export class Cart implements OnInit, OnDestroy {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          this.cartItems = parsed;
+          // Gộp món trùng đặc điểm (cùng id, size, sweetness, ice, toppings, note) và cộng quantity
+          this.cartItems = this.cartService.mergeDuplicateItems(parsed);
+          if (this.cartItems.length !== parsed.length) {
+            this.saveItems();
+          }
         }
       }
     } catch (err) {
@@ -565,7 +648,7 @@ export class Cart implements OnInit, OnDestroy {
         this.modalTitle = 'Thời gian nhận hàng';
         this.modalData = {
           deliveryDate: this.shippingInfo.deliveryDate || this.minDate,
-          deliveryTime: this.shippingInfo.deliveryTime || this.timeOptions[0],
+          deliveryTime: this.shippingInfo.deliveryTime || this.getCurrentTimeString(),
         };
         break;
       case 'note':
@@ -746,15 +829,6 @@ export class Cart implements OnInit, OnDestroy {
 
   // Checkout
   async checkout(): Promise<void> {
-    if (!this.termsAgreed) {
-      await this.showAlertModal(
-        'warning',
-        'Chưa đồng ý điều khoản',
-        'Vui lòng đồng ý với các điều khoản trước khi thanh toán.',
-        false,
-      );
-      return;
-    }
 
     if (!this.cartItems.length) {
       await this.showAlertModal('info', 'Giỏ hàng trống', 'Giỏ hàng hiện đang trống.', false);
@@ -770,13 +844,26 @@ export class Cart implements OnInit, OnDestroy {
       );
       return;
     }
-
-    const orderId = 'HTNGTD' + Date.now().toString().slice(-6);
-    this.doCheckoutWithOrderId(orderId);
+    if (!this.termsAgreed) {
+      await this.showAlertModal(
+        'warning',
+        'Chưa đồng ý điều khoản',
+        'Vui lòng đồng ý với các điều khoản trước khi thanh toán.',
+        false,
+      );
+      return;
+    }
+    if (this.isNonCashPayment) {
+      const orderId = this.generateOrderId();
+      this.startScanTimerAfterCheckoutClick(orderId);
+      return;
+    }
+    const orderId = this.generateOrderId();
+    this.doCheckoutWithOrderId(orderId, 'pending');
   }
 
   /** Tạo đơn với orderId có sẵn và chuyển sang order-tracking (dùng cho cả checkout thường và sau khi “scan” 3s). */
-  doCheckoutWithOrderId(orderId: string): void {
+  doCheckoutWithOrderId(orderId: string, status: 'pending' | 'paid' = 'pending'): void {
     const user = this.getCurrentUser();
     const pm = this.paymentMethods.find((m) => m.value === this.selectedPayment);
     const paymentLabel = pm ? pm.label : 'Tiền mặt';
@@ -789,7 +876,7 @@ export class Cart implements OnInit, OnDestroy {
       customerPhone: this.shippingInfo.phone || '0123456789',
       customerAddress: this.shippingInfo.address || '',
       paymentMethod: paymentLabel,
-      status: 'pending',
+      status,
       subtotal: this.totals.subtotal,
       shipping: this.totals.shipping,
       discount: this.totals.discount,
@@ -819,6 +906,13 @@ export class Cart implements OnInit, OnDestroy {
       localStorage.setItem('orders', JSON.stringify(existingOrders));
     } catch (err) {
       console.error('Error saving order:', err);
+    }
+
+    // Xoá giỏ hàng đã thanh toán và cập nhật badge header
+    this.cartItems = [];
+    localStorage.setItem(this.STORAGE_KEY, '[]');
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
     }
 
     this.router.navigate(['/order-tracking'], { queryParams: { orderId } });

@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostBinding, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
@@ -52,18 +52,21 @@ export class App implements OnInit, OnDestroy {
     this.headerMode = 'guest';
   }
 
-  /** Màu nền dải phía trên footer: khớp với aboutus/menu để không bị tách màu */
+  /** Màu nền dải phía trên footer: thống nhất cho tất cả giao diện customer */
   @HostBinding('style.--footer-overlap-bg') get footerOverlapBg(): string {
-    const path = this.router.url.split('?')[0];
-    if (path === '/aboutus') return '#f6f9ff';
-    if (path === '/menu' || path.startsWith('/menu?')) return '#f3f9fe';
-    return '#ffffff';
+    return '#f6f9ff';
   }
+
+  private logoutHandler = () => {
+    this.updateHeaderMode();
+    this.cdr.detectChanges();
+  };
 
   constructor(
     private router: Router,
     private titleService: Title,
     private cartService: CartService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.router.events.subscribe(event => {
     if (event instanceof NavigationEnd) {
@@ -93,6 +96,9 @@ export class App implements OnInit, OnDestroy {
     this.showLayout = !this.hideLayoutPaths.includes(path);
     this.updateHeaderMode();
     this.updateTitle(path || '/');
+    if (typeof window !== 'undefined') {
+      window.addEventListener('user:logout', this.logoutHandler);
+    }
     this.sub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => this.updateTitle((e.urlAfterRedirects || '/').split('?')[0]));
@@ -114,6 +120,9 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('user:logout', this.logoutHandler);
+    }
     this.sub?.unsubscribe();
     this.toastSub?.unsubscribe();
   }

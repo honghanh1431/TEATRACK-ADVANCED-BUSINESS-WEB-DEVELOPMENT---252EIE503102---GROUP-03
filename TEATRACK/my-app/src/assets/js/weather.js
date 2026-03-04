@@ -606,14 +606,14 @@ function initializeWeatherPopup() {
     // Thêm popup vào body
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-    // Ẩn popup trên login, signup, pagenotfound, và khi đang dùng giao diện admin (guest + customer mới hiện)
+    // Ẩn popup trên login, signup, forgot-password, pagenotfound, và khi đang dùng giao diện admin (guest + customer mới hiện)
     var container = document.getElementById('weatherPopupContainer');
     function updateWeatherVisibility() {
         if (!container) return;
         var path = (window.location.pathname || '').split('?')[0];
         var isAdminPath = path.indexOf('admin') !== -1;
         var isAdminUser = typeof localStorage !== 'undefined' && !!localStorage.getItem('authAdmin');
-        var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/404' || isAdminPath || isAdminUser;
+        var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/forgot-password' || path === '/404' || isAdminPath || isAdminUser;
         container.style.display = hide ? 'none' : '';
     }
     updateWeatherVisibility();
@@ -623,7 +623,7 @@ function initializeWeatherPopup() {
             var path = e.detail.path;
             var isAdminPath = path.indexOf('admin') !== -1;
             var isAdminUser = typeof localStorage !== 'undefined' && !!localStorage.getItem('authAdmin');
-            var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/404' || isAdminPath || isAdminUser;
+            var hide = path === '/login' || path === '/login-admin' || path === '/register' || path === '/forgot-password' || path === '/404' || isAdminPath || isAdminUser;
             container.style.display = hide ? 'none' : '';
         }
     });

@@ -65,6 +65,13 @@ export class Menu implements OnInit, AfterViewInit {
   sectionTitle = 'Tất cả thức uống';
   sectionSubtitle = 'Danh sách đầy đủ các món tại Hồng Trà Ngô Gia.';
   loadError = false;
+  showLoginPromptModal = false;
+
+  /** Guest = chưa đăng nhập */
+  get isGuest(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    return !localStorage.getItem('ngogia_user') && !localStorage.getItem('authAdmin');
+  }
 
   constructor(
     private http: HttpClient,
@@ -278,9 +285,17 @@ export class Menu implements OnInit, AfterViewInit {
     this.router.navigate(['/menu/product', id, name]);
   }
 
+  closeLoginPromptModal(): void {
+    this.showLoginPromptModal = false;
+  }
+
   onAddToCart(event: Event, product: Product): void {
     event.preventDefault();
     event.stopPropagation();
+    if (this.isGuest) {
+      this.showLoginPromptModal = true;
+      return;
+    }
     if (!window.NGCart) return;
     window.NGCart.addItem({
       id: product.id || '',

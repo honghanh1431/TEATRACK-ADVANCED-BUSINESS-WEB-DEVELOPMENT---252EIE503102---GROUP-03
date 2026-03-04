@@ -3,7 +3,7 @@
     <div class="hero-content">
     <p class="eyebrow">Menu thức uống</p>
     <h1>Thoải mái chọn món yêu thích của bạn</h1>
-    <p class="tagline">Từ trà truyền thống, trà sữa đến những công thức mới lạ – mọi hương vị đều được pha chế tươi mới mỗi ngày.</p>
+    <p class="tagline">Từ trà truyền thống, trà sữa đến những công thức mới lạ - mọi hương vị đều được pha chế tươi mới mỗi ngày.</p>
     </div>
     <div class="hero-art" aria-hidden="true">
     <img src="assets/images/tra-sua.png" alt="" />
@@ -87,7 +87,8 @@
                             <span class="value">{{ formatVND(getVipPriceL(product)) }}đ</span>
                         </div>
                     </div>
-                    <button class="price-cart" type="button" [attr.aria-label]="'Mở sản phẩm ' + product.name"
+                    <button class="price-cart" type="button" [class.guest-disabled]="isGuest"
+                            [attr.aria-label]="'Mở sản phẩm ' + product.name"
                             (click)="onAddToCart($event, product)">
                         <img src="assets/icons/Cart2.png" alt="" aria-hidden="true">
                     </button>
@@ -101,3 +102,23 @@
     </div>
 </section>
 </main>
+
+<!-- Modal mời đăng nhập (guest bấm thêm vào giỏ) -->
+<div
+  class="guest-login-prompt-modal"
+  *ngIf="showLoginPromptModal"
+  (click)="closeLoginPromptModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="guest-prompt-title-menu"
+>
+  <div class="guest-login-prompt-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="guest-login-prompt-modal__title" id="guest-prompt-title-menu">Thông báo</h3>
+    <p class="guest-login-prompt-modal__message">
+      Mời bạn đăng nhập hoặc đăng ký để thưởng trọn hương vị dịch vụ và trải nghiệm tinh hoa trà Việt cùng Hồng Trà Ngô Gia.
+    </p>
+    <div class="guest-login-prompt-modal__actions">
+      <button type="button" class="guest-login-prompt-modal__btn--primary" (click)="closeLoginPromptModal()">OK</button>
+    </div>
+  </div>
+</div>

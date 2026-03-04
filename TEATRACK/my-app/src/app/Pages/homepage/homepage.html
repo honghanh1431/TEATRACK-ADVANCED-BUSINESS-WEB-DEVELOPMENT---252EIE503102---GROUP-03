@@ -148,7 +148,7 @@
                     <span class="value">{{ priceVN(vipPrice((p.price || 0) + 3000)) }}đ</span>
                   </div>
                 </div>
-                <button type="button" class="price-cart" (click)="addToCart($event, p)" [attr.aria-label]="'Thêm ' + p.name + ' vào giỏ'">
+                <button type="button" class="price-cart" [class.guest-disabled]="isGuest" (click)="addToCart($event, p)" [attr.aria-label]="'Thêm ' + p.name + ' vào giỏ'">
                   <img src="assets/icons/Cart2.png" alt="" aria-hidden="true" />
                 </button>
               </div>
@@ -218,6 +218,25 @@
       </div>
 
       <div class="swiper-button-next drinks-nav"></div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="guest-login-prompt-modal"
+  *ngIf="showLoginPromptModal"
+  (click)="closeLoginPromptModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="guest-prompt-title-home"
+>
+  <div class="guest-login-prompt-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="guest-login-prompt-modal__title" id="guest-prompt-title-home">Thông báo</h3>
+    <p class="guest-login-prompt-modal__message">
+      Mời bạn đăng nhập hoặc đăng ký để thưởng trọn hương vị dịch vụ và trải nghiệm tinh hoa trà Việt cùng Hồng Trà Ngô Gia.
+    </p>
+    <div class="guest-login-prompt-modal__actions">
+      <button type="button" class="guest-login-prompt-modal__btn--primary" (click)="closeLoginPromptModal()">OK</button>
     </div>
   </div>
 </div>

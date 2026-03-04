@@ -19,6 +19,7 @@ import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
 import { AdminOrder } from './Pages/Admin/admin-order/admin-order';
 import { OrderTracking } from './Pages/order-tracking/order-tracking';
 import { ForgotPassword } from './Pages/forgot-password/forgot-password';
+import { OrderHistory } from './Pages/order-history/order-history';
 
 
 
@@ -48,6 +49,8 @@ const routes: Routes = [
   { path: 'admin/blog', component: AdminBlog },
   { path: 'admin/blog', loadComponent: () => import('./Pages/Admin/admin-blog/admin-blog').then(m => m.AdminBlog) },
   { path: 'admin/order', component: AdminOrder },
+  { path: 'order-history', component: OrderHistory },
+
   { path: '**', redirectTo: '404', pathMatch: 'full' },
 ];
 

@@ -10,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './payment.css',
 })
 export class Payment implements OnInit {
-  /** Khi dùng trong cart: parent truyền method. Khi vào route /payment: lấy từ queryParam. */
   @Input() method: string = 'momo';
 
   constructor(private route: ActivatedRoute) {}

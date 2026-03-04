@@ -57,9 +57,35 @@ export class CartService {
     this.toastMessage$.next({ pre: 'Thêm ', name: normalized.name, post: ' vào giỏ hàng' });
   }
 
-  /** Signature để so sánh gộp món: cùng sản phẩm + cùng chi tiết (size, ngọt, đá, topping) */
-  private itemSignature(it: { id?: string; name?: string; size?: string; sweetness?: string; ice?: string; toppings?: string[] }): string {
+  /** Signature để so sánh gộp món: cùng sản phẩm + cùng chi tiết (size, ngọt, đá, topping, note) */
+  private itemSignature(it: { id?: string; name?: string; size?: string; sweetness?: string; ice?: string; toppings?: string[]; note?: string }): string {
+    const id = String(it.id ?? '').trim();
+    const name = String(it.name ?? '').trim();
+    const size = String(it.size ?? '').trim();
+    const sweetness = String(it.sweetness ?? '').trim();
+    const ice = String(it.ice ?? '').trim();
+    const note = String(it.note ?? '').trim();
     const top = Array.isArray(it.toppings) ? [...it.toppings].sort().join('|') : '';
-    return `${it.id ?? ''}\t${it.name ?? ''}\t${it.size ?? ''}\t${it.sweetness ?? ''}\t${it.ice ?? ''}\t${top}`;
+    return `${id}\t${name}\t${size}\t${sweetness}\t${ice}\t${note}\t${top}`;
+  }
+
+  /**
+   * Gộp các món trùng đặc điểm (cùng id, size, sweetness, ice, toppings, note) thành một dòng và cộng quantity.
+   * Gọi khi load giỏ để đảm bảo hiển thị đã gộp (kể cả dữ liệu cũ hoặc thêm từ nhiều nguồn).
+   */
+  mergeDuplicateItems(items: any[]): any[] {
+    if (!Array.isArray(items) || items.length === 0) return items;
+    const map = new Map<string, any>();
+    for (const it of items) {
+      const sig = this.itemSignature(it);
+      const qty = Math.max(1, Math.min(99, Number(it.qty) || 1));
+      if (map.has(sig)) {
+        const existing = map.get(sig)!;
+        existing.qty = Math.min(99, (existing.qty || 1) + qty);
+      } else {
+        map.set(sig, { ...it, qty });
+      }
+    }
+    return Array.from(map.values());
   }
 }

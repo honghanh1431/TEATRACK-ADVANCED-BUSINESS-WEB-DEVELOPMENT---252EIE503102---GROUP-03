@@ -205,3 +205,31 @@
     </div>
   </main>
 </section>
+
+<!-- Modal thông báo đăng ký thành công / lỗi (CSS giống mẫu login) -->
+<div
+  class="registion-alert-modal"
+  *ngIf="showAlertModal"
+  (click)="closeAlertModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="registion-alert-title"
+>
+  <div class="registion-alert-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="registion-alert-modal__title" id="registion-alert-title">
+      {{ alertTitle }}
+    </h3>
+    <p class="registion-alert-modal__message">
+      {{ alertMessage }}
+    </p>
+    <div class="registion-alert-modal__actions">
+      <button
+        type="button"
+        class="registion-alert-modal__btn registion-alert-modal__btn--primary"
+        (click)="closeAlertModal()"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+</div>

@@ -21,6 +21,12 @@ export class Registion {
   address = '';
   isLoading = false;
 
+  /** Modal thông báo đăng ký (thành công / lỗi) */
+  showAlertModal = false;
+  alertType: 'success' | 'error' = 'error';
+  alertTitle = '';
+  alertMessage = '';
+
   showPassword = false;
   showConfirmPassword = false;
 
@@ -167,16 +173,27 @@ export class Registion {
 
     this.http.post<{ message: string; user: any }>('http://localhost:3002/api/auth/register', userData)
       .subscribe({
-        next: (res) => {
+        next: () => {
           this.isLoading = false;
-          alert('Đăng ký thành công! Vui lòng đăng nhập.');
-          this.router.navigate(['/login']);
+          this.alertType = 'success';
+          this.alertTitle = 'Thành công';
+          this.alertMessage = 'Đăng ký thành công! Vui lòng đăng nhập.';
+          this.showAlertModal = true;
         },
         error: (err) => {
           this.isLoading = false;
-          const msg = err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
-          alert(msg);
+          this.alertType = 'error';
+          this.alertTitle = 'Đăng ký thất bại';
+          this.alertMessage = err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
+          this.showAlertModal = true;
         }
       });
+  }
+
+  closeAlertModal(): void {
+    this.showAlertModal = false;
+    if (this.alertType === 'success') {
+      this.router.navigate(['/login']);
+    }
   }
 }

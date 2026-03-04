@@ -581,45 +581,6 @@
     "detail": "Trà Ô Long thơm nồng phủ lớp kem cheese đặc biệt. Kem cheese béo mịn, mặn nhẹ kết hợp trà ngọt thanh tạo nên vị mặn ngọt hài hòa. Thức uống mới lạ, thu hút người yêu thích sự độc đáo."
   },
   {
-    "id": "NG43",
-    "name": "Trà Xanh Kem Cheese",
-    "image": "/assets/images/products/tra-xanh-kem-cheese.png",
-    "price": 26000,
-    "priceL": 29000,
-    "vipPriceM": 29000,
-    "vipPriceL": 32000,
-    "rating": 4,
-    "category": "Thức Uống Mới",
-    "description": "Trà xanh kem cheese thanh mát, lớp cheese béo mịn",
-    "detail": "Trà xanh thanh mát phủ lớp kem cheese béo mịn. Trà xanh đắng nhẹ, kem cheese mặn béo tạo nên sự tương phản thú vị. Thức uống mới lạ, giàu chất chống oxi hóa, giúp làm đẹp da."
-  },
-  {
-    "id": "NG44",
-    "name": "Hồng Trà Kem Cheese",
-    "image": "/assets/images/products/hong-tra-kem-cheese.png",
-    "price": 23000,
-    "priceL": 26000,
-    "vipPriceM": 26000,
-    "vipPriceL": 29000,
-    "rating": 4,
-    "category": "Thức Uống Mới",
-    "description": "Hồng trà kem cheese đậm đà, lớp cheese béo mịn",
-    "detail": "Hồng trà Đài Loan đậm đà phủ lớp kem cheese béo mịn. Vị trà thơm nồng, kem cheese mặn béo hòa quyện hoàn hảo. Thức uống độc đáo, thu hút người yêu thích sự mới lạ."
-  },
-  {
-    "id": "NG45",
-    "name": "Trà Xí Muội Ô Long",
-    "image": "/assets/images/products/tra-xi-muoi-o-long.png",
-    "price": 23000,
-    "priceL": 26000,
-    "vipPriceM": 26000,
-    "vipPriceL": 29000,
-    "rating": 3,
-    "category": "Thức Uống Mới",
-    "description": "Trà xí muội ô long chua ngọt, xí muội thơm nồng",
-    "detail": "Trà Ô Long kết hợp xí muội (mơ muối Trung Quốc) tạo nên vị chua ngọt độc đáo. Xí muội chua chua, thơm nồng hòa quyện cùng trà thanh mát. Thức uống giải nhiệt, kích thích vị giác, phù hợp khẩu vị người yêu chua."
-  },
-  {
     "id": "NG46",
     "name": "Trà Xí Muội Bí Đao",
     "image": "/assets/images/products/tra-xi-muoi-bi-dao.png",
