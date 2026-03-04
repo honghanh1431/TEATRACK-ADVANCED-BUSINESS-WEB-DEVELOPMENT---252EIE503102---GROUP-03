@@ -27,10 +27,30 @@ const createUser = async (userData) => {
     role: userData.role || 'customer',
     phone: userData.phone || '',
     address: userData.address || '',
+    dob: userData.dob || null,
+    gender: userData.gender || '',
+    avatar: userData.avatar || '', 
     createdAt: new Date()
   };
   const result = await users.insertOne(newUser);
   return { ...newUser, _id: result.insertedId };
+};
+// Cập nhật thông tin user (chỉ cho phép sửa các trường cơ bản)
+const updateUserById = async (id, updateData) => {
+  const users = collection();
+  // Loại bỏ các trường không được phép sửa
+  const allowed = ['name', 'email', 'phone', 'address', 'dob', 'gender', 'avatar', 'username', 'password'];
+  const update = {};
+  for (let key of allowed) {
+    if (updateData[key] !== undefined) update[key] = updateData[key];
+  }
+  if (Object.keys(update).length === 0) return null;
+  
+  const result = await users.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: update }
+  );
+  return result.modifiedCount > 0;
 };
 
 // Tìm user theo username hoặc email (dùng cho login)
@@ -63,4 +83,14 @@ const updatePassword = async (email, hashedPassword) => {
   return await users.updateOne({ email }, { $set: { password: hashedPassword } });
 };
 
-module.exports = { init, createUser, findUserByIdentifier, findUserByEmail, findUserByUsername, findUserById, collection, updatePassword };
+module.exports = {
+  init,
+  createUser,
+  findUserByIdentifier,
+  findUserByEmail,
+  findUserByUsername,
+  findUserById,
+  updateUserById,
+  updatePassword,
+  collection
+};

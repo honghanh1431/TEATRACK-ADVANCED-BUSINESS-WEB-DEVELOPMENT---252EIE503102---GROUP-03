@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
@@ -15,15 +15,20 @@ const USER_KEY = 'ngogia_user';
 export class PageHeader2 implements AfterViewInit, OnDestroy {
   userMenuOpen = false;
   showLogoutModal = false;
+  avatarSrc = 'assets/icons/user.png';
   private cartUpdatedHandler = () => this.updateCartBadge();
+  private userUpdatedHandler = () => this.updateUserInfo();
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   /** Username từ ngogia_user (đăng nhập/đăng ký), hiển thị thay "Tài khoản" */
   get userName(): string {
-    if (typeof localStorage === 'undefined') return 'Tài khoản';
+    if (!isPlatformBrowser(this.platformId)) return 'Tài khoản';
     try {
       const raw = localStorage.getItem(USER_KEY);
       if (!raw) return 'Tài khoản';
@@ -36,15 +41,22 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    // Cập nhật giỏ hàng và thông tin user lần đầu
     this.updateCartBadge();
+    this.updateUserInfo();
+
+    // Lắng nghe sự kiện cập nhật
     if (typeof window !== 'undefined') {
       window.addEventListener('cart:updated', this.cartUpdatedHandler);
+      window.addEventListener('user:updated', this.userUpdatedHandler);
     }
   }
 
   ngOnDestroy(): void {
     if (typeof window !== 'undefined') {
       window.removeEventListener('cart:updated', this.cartUpdatedHandler);
+      window.removeEventListener('user:updated', this.userUpdatedHandler);
     }
   }
 
@@ -114,5 +126,32 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
     document.querySelectorAll('[data-cart-total], #headerCartTotal, .header-cart-total').forEach((el) => {
       (el as HTMLElement).textContent = totalStr;
     });
+  }
+
+  private updateUserInfo(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      if (raw) {
+        const user = JSON.parse(raw) as { avatar?: string; username?: string; name?: string };
+
+        // Cập nhật avatar
+        if (user.avatar) {
+          const apiBaseUrl = 'http://localhost:3002'; // Nên chuyển vào environment
+          if (user.avatar.startsWith('/uploads')) {
+            this.avatarSrc = apiBaseUrl + user.avatar;
+          } else {
+            this.avatarSrc = user.avatar;
+          }
+        } else {
+          this.avatarSrc = 'assets/icons/user.png';
+        }
+
+        // Trigger change detection để cập nhật giao diện
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.error('Lỗi cập nhật thông tin user:', error);
+    }
   }
 }

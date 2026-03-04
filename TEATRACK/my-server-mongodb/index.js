@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const port = 3002;
+const path = require('path');      
+const fs = require('fs'); 
 
 const morgan = require("morgan");
 app.use(morgan("combined"));
@@ -14,6 +16,15 @@ app.use(cors());
 
 // Load environment variables (optional but recommended)
 require('dotenv').config();
+
+// Tạo thư mục uploads/avatars nếu chưa tồn tại
+const uploadDir = path.join(__dirname, 'uploads/avatars');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('Đã tạo thư mục uploads/avatars');
+}
+// Phục vụ file tĩnh từ thư mục uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB connection
 const { MongoClient, ObjectId } = require("mongodb");
