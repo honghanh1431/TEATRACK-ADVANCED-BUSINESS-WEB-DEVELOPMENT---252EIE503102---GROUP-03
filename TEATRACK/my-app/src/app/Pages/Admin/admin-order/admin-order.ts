@@ -19,15 +19,15 @@ export class AdminOrder implements OnInit {
 
   // Dữ liệu đơn hàng
   orders = [
-    { stt: 1, maDonHang: 'HTNGTD273', thoiGian: '07:28 am 20/10/2025', tinhTrang: 'Đã giao hàng', thanhToan: 'Tồn mật' },
-    { stt: 2, maDonHang: 'HTNGTD274', thoiGian: '08:09 am 21/10/2025', tinhTrang: 'Chờ xác nhận', thanhToan: 'Momo' },
-    { stt: 3, maDonHang: 'HTNGTD275', thoiGian: '03:08 pm 21/10/2025', tinhTrang: 'Chờ xác nhận', thanhToan: 'Zalo pay' },
-    { stt: 4, maDonHang: 'HTNGTD276', thoiGian: '03:56 pm 21/10/2025', tinhTrang: 'Đã giao hàng', thanhToan: 'Tồn mật' },
-    { stt: 5, maDonHang: 'HTNGTD277', thoiGian: '09:45 pm 21/10/2025', tinhTrang: 'Đã giao hàng', thanhToan: 'Tồn mật' },
-    { stt: 6, maDonHang: 'HTNGTD278', thoiGian: '02:22 pm 22/10/2025', tinhTrang: 'Đã giao hàng', thanhToan: 'Vì điện tử' },
-    { stt: 7, maDonHang: 'HTNGTD279', thoiGian: '10:42 pm 22/10/2025', tinhTrang: 'Đã giao hàng', thanhToan: 'Momo' },
-    { stt: 8, maDonHang: 'HTNGTD280', thoiGian: '11:11 am 23/10/2025', tinhTrang: 'Chờ xác nhận', thanhToan: 'Zalo pay' },
-    { stt: 9, maDonHang: 'HTNGTD281', thoiGian: '08:15 pm 23/10/2025', tinhTrang: 'Đang giao hàng', thanhToan: 'Tiền mặt' }
+    { stt: 1, maDonHang: 'HTNGTD273', thoiGian: '07:28 am 03/03/2026', tinhTrang: 'Đã giao hàng', thanhToan: 'Tiền mặt' },
+    { stt: 2, maDonHang: 'HTNGTD274', thoiGian: '08:09 am 03/03/2026', tinhTrang: 'Chờ xác nhận', thanhToan: 'Momo' },
+    { stt: 3, maDonHang: 'HTNGTD275', thoiGian: '03:08 pm 03/03/2026', tinhTrang: 'Chờ xác nhận', thanhToan: 'Zalo pay' },
+    { stt: 4, maDonHang: 'HTNGTD276', thoiGian: '03:56 pm 03/03/2026', tinhTrang: 'Đã giao hàng', thanhToan: 'Ví điện tử' },
+    { stt: 5, maDonHang: 'HTNGTD277', thoiGian: '09:45 pm 03/03/2026', tinhTrang: 'Đã giao hàng', thanhToan: 'Tiền mặt' },
+    { stt: 6, maDonHang: 'HTNGTD278', thoiGian: '02:22 pm 04/03/2026', tinhTrang: 'Đã giao hàng', thanhToan: 'Ví điện tử' },
+    { stt: 7, maDonHang: 'HTNGTD279', thoiGian: '10:42 pm 04/03/2026', tinhTrang: 'Đã giao hàng', thanhToan: 'Momo' },
+    { stt: 8, maDonHang: 'HTNGTD280', thoiGian: '11:11 am 05/03/2026', tinhTrang: 'Chờ xác nhận', thanhToan: 'Zalo pay' },
+    { stt: 9, maDonHang: 'HTNGTD281', thoiGian: '08:15 pm 05/03/2026', tinhTrang: 'Đang giao hàng', thanhToan: 'Tiền mặt' }
   ];
 
   constructor() { }
