@@ -280,7 +280,7 @@
           ></textarea>
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" (click)="closeReviewModal()">Hủy</button>
-            <button type="submit" class="btn btn-primary submit-review" [disabled]="review.rating === 0 || !review.comment?.trim()">
+            <button type="submit" class="btn btn-primary submit-review" [disabled]="review.rating === 0 || !review.comment.trim()">
               Gửi Đánh Giá
             </button>
           </div>
