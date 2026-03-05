@@ -73,6 +73,7 @@ export class App implements OnInit, OnDestroy {
       const path = event.urlAfterRedirects?.split('?')[0] || '';
       this.showLayout = !this.hideLayoutPaths.includes(path);
       this.updateHeaderMode();
+      this.cdr.detectChanges();
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('routeChange', { detail: { path: path } }));
       }

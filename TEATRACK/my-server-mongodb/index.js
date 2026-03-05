@@ -38,6 +38,12 @@ const User = require('./models/User');
 User.init(database);
 const Otp = require('./models/Otp');
 Otp.init(database);
+const Product = require('./models/Product');
+Product.init(database);
+const Blog = require('./models/Blog');
+Blog.init(database);
+const Review = require('./models/Review');
+Review.init(database);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -59,6 +65,12 @@ app.use((req, res, next) => {
 // Sử dụng auth routes (bao gồm cả forgot-password, verify-otp, reset-password)
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
+
+// Products, Blog, Reviews (chuyển từ my-server in-memory sang MongoDB)
+const { productsRouter, blogRouter, reviewsRouter } = require('./routes/productsBlogReviewsRoutes');
+app.use('/products', productsRouter);
+app.use('/blog', blogRouter);
+app.use('/reviews', reviewsRouter);
 
 app.listen(port, () => {
   console.log(`My Server listening on port ${port}`);

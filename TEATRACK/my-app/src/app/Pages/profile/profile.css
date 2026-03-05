@@ -147,6 +147,7 @@
   overflow: hidden;
   border: 2px solid #e0e8ff;
   flex-shrink: 0;
+  margin-left: 50px;
 }
 .avatar img {
   width: 100%;

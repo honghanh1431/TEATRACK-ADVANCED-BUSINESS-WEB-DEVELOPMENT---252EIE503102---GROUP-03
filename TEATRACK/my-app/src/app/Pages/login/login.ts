@@ -128,7 +128,7 @@ export class Login implements OnInit {
           name: res.user.username,
           role: 'admin'
         }));
-        window.location.href = '/admin-dashboard';
+        this.router.navigate(['/admin-dashboard']).then(() => this.cdr.detectChanges());
       } else {
         localStorage.removeItem('authAdmin');
         this.router.navigate(['/']).then(() => this.cdr.detectChanges());

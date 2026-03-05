@@ -447,6 +447,7 @@ html.navigating {
   color: #1f2937;
   line-height: 1.5;
   text-align: center;
+  font-weight: 700;
 }
 
 .header-alert-modal__actions {

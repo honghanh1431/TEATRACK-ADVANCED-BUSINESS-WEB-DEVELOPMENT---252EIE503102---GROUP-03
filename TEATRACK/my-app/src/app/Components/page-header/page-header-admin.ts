@@ -1,5 +1,5 @@
 import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,6 +14,8 @@ export class PageHeaderAdmin {
   showLogoutModal = false;
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
+
+  constructor(private router: Router) {}
 
   /** Username từ authAdmin hoặc ngogia_user (đăng nhập manager) */
   get userName(): string {
@@ -69,8 +71,9 @@ export class PageHeaderAdmin {
     localStorage.removeItem('ngogia_coupon');
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('cart:updated'));
+      window.dispatchEvent(new CustomEvent('user:logout'));
     }
     this.showLogoutModal = false;
-    window.location.href = '/login-admin';
+    this.router.navigate(['/login-admin']);
   }
 }

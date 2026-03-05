@@ -21,6 +21,8 @@ interface Product {
   image?: string;
   rating?: number;
   reviews?: number;
+  /** Nếu false thì ẩn khỏi menu (chỉ hiện khi admin bật "Hiển thị sản phẩm"). */
+  visible?: boolean;
 }
 
 interface CartItem {
@@ -109,13 +111,27 @@ export class Menu implements OnInit, AfterViewInit {
 
   // ─── Fetch ────────────────────────────────────────────────────────────────
   private fetchProducts(): void {
+    const fromStorage = this.getProductsFromStorage();
+    if (fromStorage.length > 0) {
+      this.allData = fromStorage.filter((item) => item.visible !== false);
+      this.categories = Array.from(
+        new Set(
+          this.allData
+            .map((item) => (item.category || '').trim())
+            .filter(Boolean)
+        )
+      );
+      this.updateProducts();
+      this.cdr.detectChanges();
+      return;
+    }
     const url = `${Menu.STATIC_BASE}data/products.json`;
     this.http.get<Product[]>(url).subscribe({
       next: (data) => {
-        this.allData = data;
+        this.allData = (data || []).filter((item) => item.visible !== false);
         this.categories = Array.from(
           new Set(
-            data
+            this.allData
               .map((item) => (item.category || '').trim())
               .filter(Boolean)
           )
@@ -128,6 +144,18 @@ export class Menu implements OnInit, AfterViewInit {
         this.loadError = true;
       },
     });
+  }
+
+  /** Sản phẩm từ localStorage (admin lưu); trả về [] nếu không có. */
+  private getProductsFromStorage(): Product[] {
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('products') : null;
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as Product[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 
   // ─── Format / Normalize helpers ──────────────────────────────────────────

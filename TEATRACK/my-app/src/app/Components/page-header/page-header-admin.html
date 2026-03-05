@@ -1,7 +1,7 @@
 <header class="shop-header logged admin">
   <div class="header-top">
     <div class="brand">
-      <a href="/admin-dashboard">
+      <a routerLink="/admin-dashboard">
         <img src="/assets/images/logo ngo gia.png" alt="Hồng Trà Ngô Gia" class="logo" />
       </a>
     </div>
@@ -24,30 +24,30 @@
   </div>
 
   <nav class="nav-bar">
-    <a href="/admin-dashboard" class="nav-item" data-action="navigate">
+    <a routerLink="/admin-dashboard" routerLinkActive="active" class="nav-item">
       <img src="/assets/icons/Home.png" alt="">
       <span data-i18n="header.admin.overview">Tổng quan</span>
     </a>
-    <a href="/admin-dashboard#productsPager" class="nav-item" data-action="scroll" data-target="productsPager">
+    <a routerLink="/admin-dashboard" fragment="productsPager" class="nav-item">
       <img src="/assets/icons/sanpham.png" alt="">
       <span data-i18n="header.admin.products">Sản phẩm</span>
     </a>
-    <a href="/admin-order" class="nav-item" data-action="navigate">
+    <a routerLink="/admin/order" routerLinkActive="active" class="nav-item">
       <img src="/assets/icons/Cart.png" alt="">
       <span data-i18n="header.admin.orders">Đơn hàng</span>
     </a>
-    <a href="/admin-account" class="nav-item" data-action="navigate">
+    <a routerLink="/admin-account" routerLinkActive="active" class="nav-item">
       <img src="/assets/icons/account.png" alt="">
       <span data-i18n="header.admin.account">Tài khoản</span>
     </a>
-    <a href="/admin-blog" class="nav-item" data-action="navigate">
+    <a routerLink="/admin/blog" routerLinkActive="active" class="nav-item">
       <img src="/assets/icons/dien_dan.png" alt="">
       <span data-i18n="header.admin.forums">Diễn đàn</span>
     </a>
   </nav>
 </header>
 
-<!-- Modal xác nhận đăng xuất (CSS giống mẫu profile/cart) -->
+<!-- Modal xác nhận đăng xuất -->
 <div
   class="header-alert-modal"
   *ngIf="showLogoutModal"

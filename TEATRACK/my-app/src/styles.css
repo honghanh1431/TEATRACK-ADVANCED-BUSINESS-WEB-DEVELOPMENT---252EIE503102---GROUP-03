@@ -278,3 +278,215 @@ textarea:focus {
   color: #fff;
   font-size: 16px;
 }
+
+#orders table tbody tr:nth-child(odd),
+#products table tbody tr:nth-child(odd) {
+  background: #72D5EC;
+  color: #ffffff;
+}
+#orders table tbody tr:nth-child(even),
+#products table tbody tr:nth-child(even) {
+  background: #FFF8EC;
+  color: #0088ff;
+}
+#orders table tbody td,
+#products table tbody td {
+  padding: 12px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  vertical-align: middle;
+  text-align: center;
+}
+/* Cột 2 (Khách / Tên): căn trái – áp dụng cho HTML chèn bằng innerHTML */
+#orders table tbody td:nth-child(2),
+#orders table thead th:nth-child(2),
+#products table tbody td:nth-child(2),
+#products table thead th:nth-child(2) {
+  text-align: left;
+}
+#products table tbody td:nth-child(4) {
+  width: 64px;
+  max-width: 64px;
+  text-align: center;
+  overflow: hidden;
+}
+#products table td:nth-child(4) img,
+#products table td:nth-child(4) .product-thumb {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Icon nút sửa/xóa trong bảng admin (HTML chèn bằng innerHTML) */
+#orders table td .btn img,
+#products table td .btn img {
+  width: 20px !important;
+  height: 20px !important;
+  display: block;
+}
+
+#orders .status-badge,
+#products .status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  width: 150px;
+  margin: 0 auto;
+}
+#orders .status-badge.pending,
+#products .status-badge.pending {
+  background: #fff7ed;
+  color: #ea580c;
+  align-items: center;
+  border-color: #ea580c;
+  text-align: center !important;
+}
+#orders .status-badge.processing,
+#products .status-badge.processing {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #2563eb;
+  align-items: center;
+  text-align: center !important;
+}
+#orders .status-badge.ready,
+#products .status-badge.ready {
+  background: #f5f3ff;
+  align-items: center;
+  color: #7c3aed;
+  border-color: #7c3aed;
+  text-align: center !important;
+}
+#orders .status-badge.shipping,
+#products .status-badge.shipping {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #059669;
+  align-items: center;
+  text-align: center !important;
+}
+#orders .status-badge.completed,
+#products .status-badge.completed {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #16a34a;
+  align-items: center;
+  text-align: center !important;
+}
+#orders .status-badge.cancelled,
+#products .status-badge.cancelled {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #dc2626;
+  align-items: center;
+  text-align: center !important;
+}
+
+#modal-delete-confirm .confirm-message {
+  text-align: center;
+}
+#modal-delete-confirm .confirm-message .confirm-product-name {
+  font-weight: 700 !important;
+  color: #0088ff !important;
+}
+#modal-delete-confirm .confirm-message .confirm-warning-line {
+  display: block;
+  margin-top: 8px;
+}
+
+#modal-order-detail .order-items-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+}
+#modal-order-detail .order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+#modal-order-detail .order-items-list::-webkit-scrollbar {
+  width: 5px;
+}
+#modal-order-detail .order-items-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+#modal-order-detail .order-items-list .order-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+#modal-order-detail .order-items-list .order-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+#modal-order-detail .order-items-list .item-image {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #f3f4f6;
+}
+#modal-order-detail .order-items-list .item-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+#modal-order-detail .order-items-list .item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+#modal-order-detail .order-items-list .item-specs {
+  font-size: 13px;
+  font-weight: 400;
+  color: #4b5563;
+  line-height: 1.5;
+  margin: 0;
+}
+#modal-order-detail .order-items-list .item-specs .item-detail-line {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: #4b5563;
+  line-height: 1.5;
+}
+#modal-order-detail .order-items-list .item-specs .item-detail-line:last-child {
+  margin-bottom: 0;
+}
+#modal-order-detail .order-items-list .item-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0088ff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
