@@ -60,6 +60,14 @@ export class CartService {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     window.dispatchEvent(new CustomEvent('cart:updated'));
     this.toastMessage$.next({ pre: 'Thêm ', name: normalized.name, post: ' vào giỏ hàng' });
+
+    // Tự động đồng bộ lên server nếu đã đăng nhập
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.syncCart(items).subscribe({
+        error: (err) => console.error('Failed to sync newly added item to server', err)
+      });
+    }
   }
 
   /** Signature để so sánh gộp món: cùng sản phẩm + cùng chi tiết (size, ngọt, đá, topping, note) */

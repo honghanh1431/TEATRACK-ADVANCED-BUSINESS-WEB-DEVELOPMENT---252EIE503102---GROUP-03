@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { Payment } from '../payment/payment';
 import { CartService } from '../../cart.service';
+import { OrderService } from '../../order.service';
 
 interface CartItem {
   id: string;
@@ -66,7 +67,8 @@ export class Cart implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private cartService: CartService,
-  ) {}
+    private orderService: OrderService,
+  ) { }
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
   private readonly COUPON_KEY = 'ngogia_coupon';
@@ -336,12 +338,21 @@ export class Cart implements OnInit, OnDestroy {
     this.updateShippingFields();
     this.setupStorageListener();
     this.startScanTimerIfNeeded();
+    // Đồng bộ giỏ hàng từ server khi trang load (nếu user đã đăng nhập)
+    this.syncCartFromServer();
+    // Lắng nghe sự kiện đăng nhập để load giỏ từ server
+    window.addEventListener('user-login', this.handleUserLogin);
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.handleStorageEvent);
+    window.removeEventListener('user-login', this.handleUserLogin);
     this.clearScanTimers();
   }
+
+  private handleUserLogin = (): void => {
+    this.syncCartFromServer();
+  };
 
   /** Khi đổi phương thức thanh toán: clear timer rồi bật lại nếu đang chọn MoMo/ZaloPay/Payoo (nút bị disable nên timer tự chạy 3s). */
   onPaymentMethodChange(): void {
@@ -427,6 +438,36 @@ export class Cart implements OnInit, OnDestroy {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('cart:updated'));
     }
+    // Đồng bộ giỏ hàng lên server sau mỗi thay đổi
+    this.syncCartToServer();
+  }
+
+  /** Lấy giỏ từ server và cập nhật localStorage + UI (không gọi saveItems để tránh vòng lặp) */
+  private syncCartFromServer(): void {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    this.cartService.fetchCart().subscribe({
+      next: (res) => {
+        const serverItems = res.items || [];
+        if (serverItems.length > 0) {
+          this.cartItems = this.cartService.mergeDuplicateItems(serverItems);
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.cartItems));
+          this.updateShippingFields();
+          window.dispatchEvent(new CustomEvent('cart:updated'));
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Failed to fetch cart from server', err)
+    });
+  }
+
+  /** Đẩy giỏ hiện tại lên server (nếu đã đăng nhập) */
+  private syncCartToServer(): void {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    this.cartService.syncCart(this.cartItems).subscribe({
+      error: (err) => console.error('Failed to sync cart to server', err)
+    });
   }
 
   private loadShippingInfo(): void {
@@ -908,7 +949,17 @@ export class Cart implements OnInit, OnDestroy {
       console.error('Error saving order:', err);
     }
 
-    // Xoá giỏ hàng đã thanh toán và cập nhật badge header
+    // Xóa giỏ hàng trên server (nếu đã đăng nhập) và local
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.orderService.createOrder(order).subscribe({
+        next: () => console.log('Order saved to server successfully'),
+        error: (err) => console.error('Failed to save order to server', err)
+      });
+      this.cartService.clearCart().subscribe({
+        error: (err) => console.error('Failed to clear cart on server', err)
+      });
+    }
     this.cartItems = [];
     localStorage.setItem(this.STORAGE_KEY, '[]');
     if (typeof window !== 'undefined') {
