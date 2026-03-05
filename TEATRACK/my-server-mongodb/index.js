@@ -46,6 +46,8 @@ const Review = require('./models/Review');
 Review.init(database);
 const Order = require('./models/Order');
 Order.init(database);
+const Cart = require('./models/Cart');
+Cart.init(database);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -76,6 +78,9 @@ app.use('/reviews', reviewsRouter);
 
 const orderRoutes = require('./routes/orderRoutes');
 app.use('/api/orders', orderRoutes);
+
+const cartRoutes = require('./routes/cartRoutes');
+app.use('/api/cart', cartRoutes);
 
 app.listen(port, () => {
   console.log(`My Server listening on port ${port}`);

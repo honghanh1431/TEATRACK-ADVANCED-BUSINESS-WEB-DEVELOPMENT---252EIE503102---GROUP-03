@@ -475,18 +475,37 @@ export class Cart implements OnInit, OnDestroy {
       const raw = localStorage.getItem(this.SHIPPING_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        this.shippingInfo = this.normalizeShipping(parsed);
+        const shipping = this.normalizeShipping(parsed);
+        // Nếu một số trường trống, bổ sung từ thông tin user đã đăng ký
+        const user = this.getCurrentUser();
+        if (user) {
+          if (!shipping.receiver?.trim()) {
+            shipping.receiver = (user.name || user.fullName || '').trim();
+          }
+          if (!shipping.phone?.trim()) {
+            shipping.phone = (user.phone || '').trim();
+          }
+          if (!shipping.address?.trim()) {
+            shipping.address = (user.address || '').trim();
+          }
+        }
+        this.shippingInfo = shipping;
       } else {
-        // Không có dữ liệu (vd: sau logout) → form địa chỉ trống
+        // Chưa có dữ liệu shipping → dùng thông tin user đã đăng ký
+        const user = this.getCurrentUser();
         this.shippingInfo = {
-          address: '',
-          receiver: '',
-          phone: '',
+          address: (user?.address || '').trim(),
+          receiver: (user?.name || user?.fullName || '').trim(),
+          phone: (user?.phone || '').trim(),
           deliveryDate: '',
           deliveryTime: '',
           time: '',
           note: '',
         };
+        // Lưu luôn vào localStorage để lần sau không mất
+        if (user && (this.shippingInfo.receiver || this.shippingInfo.phone || this.shippingInfo.address)) {
+          this.saveShippingInfo();
+        }
       }
     } catch (err) {
       console.warn('Cannot parse shipping info', err);
