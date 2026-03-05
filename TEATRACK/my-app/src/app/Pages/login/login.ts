@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Title } from '@angular/platform-browser';
+import { CartService } from '../../cart.service';
 
 @Component({
   selector: 'app-login',
@@ -32,8 +33,9 @@ export class Login implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private title: Title
-  ) {}
+    private title: Title,
+    private cartService: CartService
+  ) { }
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
@@ -84,69 +86,113 @@ export class Login implements OnInit {
   }
 
   onLogin(): void {
-  const u = this.username.trim();
-  const p = this.password.trim();
+    const u = this.username.trim();
+    const p = this.password.trim();
 
-  if (!u || !p) {
-    this.showError(this.currentLang === 'vi'
-      ? 'Vui lòng nhập email và mật khẩu.'
-      : 'Please enter email and password.');
-    return;
-  }
-
-  this.isLoading = true;
-
-  this.http.post<{ token: string; user: any }>('http://localhost:3002/api/auth/login', {
-  identifier: u,
-  password: p
-  }).subscribe({
-    next: (res) => {
-      this.isLoading = false;
-
-      // Kiểm tra quyền dựa trên route hiện tại (isAdmin từ route data)
-      if (this.isAdmin && res.user.role !== 'admin') {
-        this.showError(this.currentLang === 'vi'
-          ? 'Tài khoản này không có quyền quản lý.'
-          : 'This account does not have admin access.');
-        this.cdr.detectChanges();
-        return;
-      }
-      if (!this.isAdmin && res.user.role !== 'customer') {
-        this.showError(this.currentLang === 'vi'
-          ? 'Vui lòng đăng nhập tại trang quản lý.'
-          : 'Please login at the admin page.');
-        this.cdr.detectChanges();
-        return;
-      }
-
-      // Lưu token và thông tin user
-      localStorage.setItem('token', res.token);
-      localStorage.setItem('ngogia_user', JSON.stringify(res.user));
-
-      if (res.user.role === 'admin') {
-        localStorage.setItem('authAdmin', JSON.stringify({
-          name: res.user.username,
-          role: 'admin'
-        }));
-        this.router.navigate(['/admin-dashboard']).then(() => this.cdr.detectChanges());
-      } else {
-        localStorage.removeItem('authAdmin');
-        this.router.navigate(['/']).then(() => this.cdr.detectChanges());
-      }
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      this.isLoading = false;
-      const raw = (err.error?.message || '').trim();
-      const isInvalidCreds = /invalid\s*credentials/i.test(raw);
-      const msg = isInvalidCreds
-        ? (this.t['error.invalidCredentials'] || (this.currentLang === 'vi' ? 'Thông tin đăng nhập không hợp lệ' : 'Invalid credentials'))
-        : (raw || (this.t['error.loginFailed'] || (this.currentLang === 'vi' ? 'Đăng nhập thất bại' : 'Login failed')));
-      this.showError(msg);
-      this.cdr.detectChanges();
+    if (!u || !p) {
+      this.showError(this.currentLang === 'vi'
+        ? 'Vui lòng nhập email và mật khẩu.'
+        : 'Please enter email and password.');
+      return;
     }
-  });
-}
+
+    this.isLoading = true;
+
+    this.http.post<{ token: string; user: any }>('http://localhost:3002/api/auth/login', {
+      identifier: u,
+      password: p
+    }).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+
+        // Kiểm tra quyền dựa trên route hiện tại (isAdmin từ route data)
+        if (this.isAdmin && res.user.role !== 'admin') {
+          this.showError(this.currentLang === 'vi'
+            ? 'Tài khoản này không có quyền quản lý.'
+            : 'This account does not have admin access.');
+          this.cdr.detectChanges();
+          return;
+        }
+        if (!this.isAdmin && res.user.role !== 'customer') {
+          this.showError(this.currentLang === 'vi'
+            ? 'Vui lòng đăng nhập tại trang quản lý.'
+            : 'Please login at the admin page.');
+          this.cdr.detectChanges();
+          return;
+        }
+
+        // Lưu token và thông tin user
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('ngogia_user', JSON.stringify(res.user));
+
+        // Xử lý đồng bộ giỏ hàng sau đăng nhập
+        this.cartService.fetchCart().subscribe({
+          next: (cartRes) => {
+            const serverItems = cartRes.items || [];
+            let localItems: any[] = [];
+            try {
+              const raw = localStorage.getItem('cart_items');
+              if (raw) localItems = JSON.parse(raw);
+            } catch { }
+            const merged = this.cartService.mergeDuplicateItems([...localItems, ...serverItems]);
+            localStorage.setItem('cart_items', JSON.stringify(merged));
+            localStorage.removeItem('cart_needs_merge'); // Xóa flag merge
+            window.dispatchEvent(new CustomEvent('cart:updated'));
+
+            const syncAndNotify = () => {
+              window.dispatchEvent(new Event('user-login'));
+              // Điều hướng SAU KHI sync xong để không bị gián đoạn request
+              if (res.user.role === 'admin') {
+                localStorage.setItem('authAdmin', JSON.stringify({
+                  name: res.user.username,
+                  role: 'admin'
+                }));
+                window.location.href = '/admin-dashboard';
+              } else {
+                localStorage.removeItem('authAdmin');
+                this.router.navigate(['/']).then(() => this.cdr.detectChanges());
+              }
+              this.cdr.detectChanges();
+            };
+
+            if (merged.length > 0) {
+              this.cartService.syncCart(merged).subscribe({
+                next: () => syncAndNotify(),
+                error: (err) => {
+                  console.error('Failed to sync cart to server after login', err);
+                  syncAndNotify();
+                }
+              });
+            } else {
+              syncAndNotify();
+            }
+          },
+          error: (err) => {
+            console.error('Failed to fetch cart after login', err);
+            window.dispatchEvent(new Event('user-login'));
+            // Điều hướng ngay cả khi fetch cart lỗi
+            if (res.user.role === 'admin') {
+              localStorage.setItem('authAdmin', JSON.stringify({ name: res.user.username, role: 'admin' }));
+              window.location.href = '/admin-dashboard';
+            } else {
+              localStorage.removeItem('authAdmin');
+              this.router.navigate(['/']).then(() => this.cdr.detectChanges());
+            }
+          }
+        });
+      },
+      error: (err) => {
+        this.isLoading = false;
+        const raw = (err.error?.message || '').trim();
+        const isInvalidCreds = /invalid\s*credentials/i.test(raw);
+        const msg = isInvalidCreds
+          ? (this.t['error.invalidCredentials'] || (this.currentLang === 'vi' ? 'Thông tin đăng nhập không hợp lệ' : 'Invalid credentials'))
+          : (raw || (this.t['error.loginFailed'] || (this.currentLang === 'vi' ? 'Đăng nhập thất bại' : 'Login failed')));
+        this.showError(msg);
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') this.onLogin();

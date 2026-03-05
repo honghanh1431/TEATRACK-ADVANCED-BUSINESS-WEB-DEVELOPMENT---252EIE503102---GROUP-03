@@ -1,5 +1,6 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export interface CartItemInput {
   id: string | number;
@@ -19,6 +20,10 @@ const STORAGE_KEY = 'cart_items';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
+  private readonly apiUrl = 'http://localhost:3002/api/cart';
+
+  constructor(private http: HttpClient) { }
+
   /** Emits toast data: pre + name (in đậm) + post */
   readonly toastMessage$ = new Subject<{ pre: string; name: string; post: string }>();
 
@@ -44,7 +49,7 @@ export class CartService {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) items = parsed;
       }
-    } catch (_) {}
+    } catch (_) { }
     const sig = this.itemSignature(normalized);
     const existingIdx = items.findIndex((it) => this.itemSignature(it) === sig);
     if (existingIdx >= 0) {
@@ -87,5 +92,25 @@ export class CartService {
       }
     }
     return Array.from(map.values());
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({ Authorization: `Bearer ${token || ''}` });
+  }
+
+  /** Lấy giỏ hàng từ server */
+  fetchCart(): Observable<{ items: any[] }> {
+    return this.http.get<{ items: any[] }>(this.apiUrl, { headers: this.getHeaders() });
+  }
+
+  /** Đồng bộ giỏ hàng lên server */
+  syncCart(items: any[]): Observable<any> {
+    return this.http.post(this.apiUrl, { items }, { headers: this.getHeaders() });
+  }
+
+  /** Xóa giỏ hàng trên server (sau khi checkout) */
+  clearCart(): Observable<any> {
+    return this.http.delete(this.apiUrl, { headers: this.getHeaders() });
   }
 }
