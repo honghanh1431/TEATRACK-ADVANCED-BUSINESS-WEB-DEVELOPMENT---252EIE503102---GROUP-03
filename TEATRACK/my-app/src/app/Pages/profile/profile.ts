@@ -210,6 +210,15 @@ export class Profile implements OnInit, OnDestroy {
         this.showSavedModal = true;
         this.isSaving = false;
         localStorage.setItem('ngogia_user', JSON.stringify(updatedUser));
+        // Đồng bộ thông tin giao hàng: cập nhật ngogia_shipping ngay để cart đọc được khi mount
+        try {
+          const shippingRaw = localStorage.getItem('ngogia_shipping');
+          const shipping = shippingRaw ? JSON.parse(shippingRaw) : {};
+          if (updatedUser.name) shipping.receiver = updatedUser.name.trim();
+          if (updatedUser.phone) shipping.phone = updatedUser.phone.trim();
+          if (updatedUser.address) shipping.address = updatedUser.address.trim();
+          localStorage.setItem('ngogia_shipping', JSON.stringify(shipping));
+        } catch (_) { }
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('user:updated'));
         }
@@ -276,7 +285,7 @@ export class Profile implements OnInit, OnDestroy {
   }
   // Lưu thay đổi (có thể gọi cả hai API nếu có thay đổi)
   saveSecurityChanges(): void {
-     // Kiểm tra dữ liệu
+    // Kiểm tra dữ liệu
     if (!this.securityEditData.username) {
       this.showError('Username không được để trống'); // 👈 sửa
       return;

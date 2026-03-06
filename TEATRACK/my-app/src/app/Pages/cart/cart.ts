@@ -342,16 +342,36 @@ export class Cart implements OnInit, OnDestroy {
     this.syncCartFromServer();
     // Lắng nghe sự kiện đăng nhập để load giỏ từ server
     window.addEventListener('user-login', this.handleUserLogin);
+    // Lắng nghe khi user cập nhật profile → đồng bộ thông tin giao hàng
+    window.addEventListener('user:updated', this.handleUserUpdated);
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.handleStorageEvent);
     window.removeEventListener('user-login', this.handleUserLogin);
+    window.removeEventListener('user:updated', this.handleUserUpdated);
     this.clearScanTimers();
   }
 
   private handleUserLogin = (): void => {
     this.syncCartFromServer();
+  };
+
+  /** Khi profile user cập nhật: đồng bộ tên, SĐT, địa chỉ vào thông tin giao hàng */
+  private handleUserUpdated = (): void => {
+    const user = this.getCurrentUser();
+    if (!user) return;
+    if (user.name || user.fullName) {
+      this.shippingInfo.receiver = (user.name || user.fullName || '').trim();
+    }
+    if (user.phone) {
+      this.shippingInfo.phone = (user.phone || '').trim();
+    }
+    if (user.address) {
+      this.shippingInfo.address = (user.address || '').trim();
+    }
+    this.saveShippingInfo();
+    this.cdr.detectChanges();
   };
 
   /** Khi đổi phương thức thanh toán: clear timer rồi bật lại nếu đang chọn MoMo/ZaloPay/Payoo (nút bị disable nên timer tự chạy 3s). */
