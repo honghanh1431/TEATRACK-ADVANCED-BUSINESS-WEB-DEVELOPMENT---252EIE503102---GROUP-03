@@ -107,6 +107,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   /** Tối đa 4 ảnh khi chỉnh sửa sản phẩm (data URLs). */
   private editProductImageUrls: string[] = [];
   private readonly EDIT_PRODUCT_MAX_IMAGES = 4;
+  /** Data URI 1x1 transparent PNG: dùng thay placeholder.png để tránh 404 và vòng lặp onerror. */
+  private static readonly PLACEHOLDER_IMG =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
   pendingDeleteProductId: string | null = null;
   private routerSub?: Subscription;
   private _productFiltersInitialized = false;
@@ -838,10 +841,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       const tr = document.createElement('tr');
       const price = this.fmtMoney(p.price ?? 0);
       const imageUrl =
-        p.image || p.img || p.imageUrl || p.thumbnail || 'assets/images/placeholder.png';
+        p.image || p.img || p.imageUrl || p.thumbnail || Admin.PLACEHOLDER_IMG;
       const visible = p.visible !== false;
       const pid = (p?.id ?? '').replace(/"/g, '&quot;');
-      tr.innerHTML = `<td>${p?.id ?? ''}</td><td>${p?.name ?? ''}</td><td>${p?.category ?? p?.type ?? ''}</td><td><img src="${imageUrl}" alt="${(p?.name ?? '').replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='assets/images/placeholder.png'"></td><td>${price}</td><td class="col-visible"><label class="visible-check-wrap"><input type="checkbox" class="product-visible-cb" data-product-id="${pid}" ${visible ? 'checked' : ''} aria-label="Hiển thị trên menu"></label></td><td><span class="btns"><button class="btn" data-edit="${pid}"><img src="assets/icons/edit2.png" alt="" aria-hidden="true"></button><button class="btn" data-delete="${pid}"><img src="assets/icons/delete2.png" alt="" aria-hidden="true"></button></span></td>`;
+      tr.innerHTML = `<td>${p?.id ?? ''}</td><td>${p?.name ?? ''}</td><td>${p?.category ?? p?.type ?? ''}</td><td><img src="${imageUrl}" alt="${(p?.name ?? '').replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='${Admin.PLACEHOLDER_IMG}'"></td><td>${price}</td><td class="col-visible"><label class="visible-check-wrap"><input type="checkbox" class="product-visible-cb" data-product-id="${pid}" ${visible ? 'checked' : ''} aria-label="Hiển thị trên menu"></label></td><td><span class="btns"><button class="btn" data-edit="${pid}"><img src="assets/icons/edit2.png" alt="" aria-hidden="true"></button><button class="btn" data-delete="${pid}"><img src="assets/icons/delete2.png" alt="" aria-hidden="true"></button></span></td>`;
       body.appendChild(tr);
     });
     if (body) this.bindVisibleCheckboxes(body as HTMLElement);
@@ -947,7 +950,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             product?.image ||
             product?.img ||
             product?.imageUrl ||
-            'assets/images/placeholder.png';
+            Admin.PLACEHOLDER_IMG;
           if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('data:') && !imgUrl.startsWith('/')) {
             imgUrl = '/' + imgUrl;
           }
@@ -1164,7 +1167,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           (document.getElementById('add-product-desc') as HTMLTextAreaElement)?.value || '',
         detail: (document.getElementById('add-product-detail') as HTMLTextAreaElement)?.value || '',
         image:
-          this.addProductImageUrls[0] || 'assets/images/placeholder.png',
+          this.addProductImageUrls[0] || Admin.PLACEHOLDER_IMG,
       };
       if (!data.name?.trim()) {
         this.showAlertModal('Vui lòng nhập tên sản phẩm.');
