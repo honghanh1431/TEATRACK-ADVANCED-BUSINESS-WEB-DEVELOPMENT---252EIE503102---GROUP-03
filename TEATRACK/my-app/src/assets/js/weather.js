@@ -1,5 +1,6 @@
 // Chỉ load thời tiết TP Hồ Chí Minh
 const HCMC_CITY_ID = '2347728';
+const PLACEHOLDER_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
 // DỮ LIỆU ĐỀ XUẤT MÓN THEO THỜI TIẾT
 const WEATHER_RECOMMENDATIONS = {
@@ -797,7 +798,7 @@ function displayWeather(data) {
                 ${recommendations.products.map(product => `
                     <div class="recommendation-item" onclick="viewProduct('${product.id}', '${product.name}')">
                         <img src="${product.image}" alt="${product.name}" class="recommendation-image" 
-                             onerror="this.src='/assets/images/placeholder.png'">
+                             onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='">
                         <div class="recommendation-info">
                             <div class="recommendation-name">${product.name}</div>
                             <div class="recommendation-reason">✨ ${product.reason}</div>

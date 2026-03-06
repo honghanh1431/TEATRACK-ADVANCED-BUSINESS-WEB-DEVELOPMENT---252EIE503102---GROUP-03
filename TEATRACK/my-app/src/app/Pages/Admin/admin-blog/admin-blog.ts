@@ -259,9 +259,12 @@ export class AdminBlog implements OnInit {
     this.toast('ok', 'XÓA BÀI VIẾT THÀNH CÔNG');
   }
 
+  private static readonly PLACEHOLDER_IMG =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
   imgFallback(ev: Event): void {
     const img = ev.target as HTMLImageElement;
-    img.src = 'assets/images/placeholder.png';
+    img.src = AdminBlog.PLACEHOLDER_IMG;
   }
 
   toast(type: 'ok' | 'err', title: string, sub?: string): void {
@@ -311,7 +314,7 @@ export class AdminBlog implements OnInit {
       excerpt: String(x.excerpt || ''),
       content: String(x.content || ''),
       date: x.date ? new Date(x.date) : new Date(),
-      image: String(x.image || 'assets/images/placeholder.png'),
+      image: String(x.image || AdminBlog.PLACEHOLDER_IMG),
       images: Array.isArray(x.images) ? x.images.map((s: any) => String(s)) : [String(x.image || '')].filter(Boolean),
       status: (x.status === 'draft' ? 'draft' : 'published') as PostStatus,
       views: Number(x.views || 0),

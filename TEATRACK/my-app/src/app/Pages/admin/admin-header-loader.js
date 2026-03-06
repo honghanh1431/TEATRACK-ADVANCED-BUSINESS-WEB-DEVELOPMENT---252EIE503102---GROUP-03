@@ -11,6 +11,7 @@
 
   const $ = (s, r=document) => r.querySelector(s);
   const fmtMoney = (n) => new Intl.NumberFormat('vi-VN').format(Number(n)||0) + 'đ';
+  const PLACEHOLDER_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
   
   // Format date with time
   const fmtDate = (dateStr) => {
@@ -582,13 +583,13 @@
     pageItems.forEach(p => {
       const tr = document.createElement('tr');
       const price = fmtMoney(p.price);
-      const imageUrl = p.image || p.img || p.imageUrl || p.thumbnail || '/assets/images/placeholder.png';
+      const imageUrl = p.image || p.img || p.imageUrl || p.thumbnail || PLACEHOLDER_IMG;
       
       tr.innerHTML = `
         <td>${p?.id ?? ''}</td>
         <td>${p?.name ?? ''}</td>
         <td>${p?.category ?? p?.type ?? ''}</td>
-        <td><img src="${imageUrl}" alt="${p?.name ?? ''}" class="product-thumb" onerror="this.src='/assets/images/placeholder.png'"></td>
+        <td><img src="${imageUrl}" alt="${p?.name ?? ''}" class="product-thumb" onerror="this.src='${PLACEHOLDER_IMG}'"></td>
         <td>${price}</td>
         <td>
           <span class="btns">
@@ -728,7 +729,7 @@
     if (itemsContainer && order.items) {
       itemsContainer.innerHTML = order.items.map(item => {
         const product = PRODUCTS_ALL.find(p => p.id === item.productId);
-        const imgUrl = product?.image || '/assets/images/placeholder.png';
+        const imgUrl = product?.image || PLACEHOLDER_IMG;
         const name = product?.name || item.productName || 'Sản phẩm';
         const specs = item.specs || item.options || '';
         const price = fmtMoney(item.price || 0);
@@ -952,7 +953,7 @@
           vipPriceL: parsePrice(vipPriceLInput?.value),
           description: document.getElementById('add-product-desc')?.value || '',
           detail: document.getElementById('add-product-detail')?.value || '',
-          image: document.getElementById('add-preview-img')?.src || '/assets/images/placeholder.png'
+          image: document.getElementById('add-preview-img')?.src || PLACEHOLDER_IMG
         };
         
         // ✅ Kiểm tra dữ liệu bắt buộc
