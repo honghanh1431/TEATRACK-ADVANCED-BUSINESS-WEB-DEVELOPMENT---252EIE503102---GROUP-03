@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 const port = 3002;
-const path = require('path');      
-const fs = require('fs'); 
+const path = require('path');
+const fs = require('fs');
 
 const morgan = require("morgan");
 app.use(morgan("combined"));
@@ -44,6 +44,8 @@ const Blog = require('./models/Blog');
 Blog.init(database);
 const Review = require('./models/Review');
 Review.init(database);
+const Order = require('./models/Order');
+Order.init(database);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -71,6 +73,9 @@ const { productsRouter, blogRouter, reviewsRouter } = require('./routes/products
 app.use('/products', productsRouter);
 app.use('/blog', blogRouter);
 app.use('/reviews', reviewsRouter);
+
+const orderRoutes = require('./routes/orderRoutes');
+app.use('/api/orders', orderRoutes);
 
 app.listen(port, () => {
   console.log(`My Server listening on port ${port}`);

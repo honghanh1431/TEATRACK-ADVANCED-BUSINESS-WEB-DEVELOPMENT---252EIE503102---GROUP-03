@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { OrderService } from '../../order.service';
 
 export interface Product {
   id?: string;
@@ -46,7 +47,11 @@ export class OrderHistory implements OnInit {
   showCancelModal = false;
   orderToCancel: Order | null = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private orderService: OrderService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -203,10 +208,35 @@ export class OrderHistory implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadOrdersFromStorage();
-    this.filteredOrders = [...this.orders];
-    this.updateTabCounts();
-    this.updatePagination();
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.orderService.getMyOrders().subscribe({
+        next: (res) => {
+          if (res.orders && res.orders.length > 0) {
+            this.orders = res.orders.map((o: any) => this.mapStorageOrderToOrder(o)).filter(Boolean) as Order[];
+          } else {
+            this.loadOrdersFromStorage();
+          }
+          this.filteredOrders = [...this.orders];
+          this.updateTabCounts();
+          this.updatePagination();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load orders from server', err);
+          this.loadOrdersFromStorage();
+          this.filteredOrders = [...this.orders];
+          this.updateTabCounts();
+          this.updatePagination();
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.loadOrdersFromStorage();
+      this.filteredOrders = [...this.orders];
+      this.updateTabCounts();
+      this.updatePagination();
+    }
   }
 
   /** Load đơn từ localStorage (cart / order-tracking đã lưu) và map sang Order hiển thị. */
@@ -389,17 +419,35 @@ export class OrderHistory implements OnInit {
   confirmCancelOrder(): void {
     if (!this.orderToCancel) return;
     const id = this.orderToCancel.id;
-    this.orders = this.orders.filter((o) => o.id !== id);
-    this.filteredOrders = this.filteredOrders.filter((o) => o.id !== id);
-    try {
-      const raw = JSON.parse(localStorage.getItem('orders') || '[]') as any[];
-      const next = raw.filter((o: any) => (o.id || o.orderId) !== id);
-      localStorage.setItem('orders', JSON.stringify(next));
-    } catch (e) {
-      console.error('confirmCancelOrder sync localStorage', e);
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.orderService.cancelOrder(id).subscribe({
+        next: () => {
+          this.orders = this.orders.filter((o) => o.id !== id);
+          this.filteredOrders = this.filteredOrders.filter((o) => o.id !== id);
+          this.updateTabCounts();
+          this.closeCancelModal();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to cancel order on server', err);
+          this.closeCancelModal();
+        }
+      });
+    } else {
+      this.orders = this.orders.filter((o) => o.id !== id);
+      this.filteredOrders = this.filteredOrders.filter((o) => o.id !== id);
+      try {
+        const raw = JSON.parse(localStorage.getItem('orders') || '[]') as any[];
+        const next = raw.filter((o: any) => (o.id || o.orderId) !== id);
+        localStorage.setItem('orders', JSON.stringify(next));
+      } catch (e) {
+        console.error('confirmCancelOrder sync localStorage', e);
+      }
+      this.updateTabCounts();
+      this.closeCancelModal();
     }
-    this.updateTabCounts();
-    this.closeCancelModal();
   }
 
   trackOrder(order: Order): void {
