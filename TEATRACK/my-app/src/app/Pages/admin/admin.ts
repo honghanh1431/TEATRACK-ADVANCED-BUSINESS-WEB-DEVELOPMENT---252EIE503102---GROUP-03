@@ -138,7 +138,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => {
-        if (e.urlAfterRedirects?.includes('admin-dashboard')) this.refreshData();
+        if (e.urlAfterRedirects?.includes('admin-dashboard')) {
+          this.refreshData();
+          this.scrollToFragmentProducts();
+        }
       });
   }
 
@@ -147,10 +150,19 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       try {
         this.init();
+        this.scrollToFragmentProducts();
       } catch (err) {
         console.error('Admin init error:', err);
       }
     }, 0);
+  }
+
+  private scrollToFragmentProducts(): void {
+    if (typeof window === 'undefined' || window.location.hash !== '#products') return;
+    setTimeout(() => {
+      const el = document.getElementById('products');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
   }
 
   ngOnDestroy(): void {

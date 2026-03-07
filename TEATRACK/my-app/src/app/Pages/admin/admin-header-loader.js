@@ -703,7 +703,6 @@
     if (customerPhoneEl) customerPhoneEl.textContent = order.customerPhone || order.customer?.phone || '';
     if (customerAddressEl) customerAddressEl.textContent = order.customerAddress || order.customer?.address || '';
     
-    // ✅ XỬ LÝ STATUS DROPDOWN - CHỈ HIỂN THỊ DROPDOWN, ẨN BADGE
     const statusSelect = document.getElementById('order-status-dropdown');
     const statusTextEl = document.getElementById('order-status-text');
     
@@ -1473,10 +1472,12 @@
         
         const newStatus = statusDropdown.value;
         const statusLabels = {
-          'pending': 'Chờ xác nhận',
-          'processing': 'Đang xử lý',
-          'completed': 'Đã giao hàng',
-          'cancelled': 'Đã hủy'
+          'pending': 'Xác nhận đơn hàng',
+          'processing': 'Chuẩn bị đơn hàng',
+          'ready': 'Chờ lấy hàng',
+          'shipping': 'Đang giao hàng',
+          'completed': 'Giao thành công',
+          'cancelled': 'Đã hủy',
         };
         
         console.log('💾 Saving order:', orderId, 'Status:', statusLabels[newStatus]);

@@ -24,11 +24,11 @@
   </div>
 
   <nav class="nav-bar">
-    <a routerLink="/admin-dashboard" routerLinkActive="active" class="nav-item">
+    <a routerLink="/admin-dashboard" class="nav-item" [class.active]="isOverviewNavActive">
       <img src="/assets/icons/Home.png" alt="">
       <span data-i18n="header.admin.overview">Tổng quan</span>
     </a>
-    <a routerLink="/admin-dashboard" fragment="productsPager" class="nav-item">
+    <a routerLink="/admin-dashboard" fragment="products" class="nav-item" [class.active]="isProductsNavActive">
       <img src="/assets/icons/sanpham.png" alt="">
       <span data-i18n="header.admin.products">Sản phẩm</span>
     </a>

@@ -1,6 +1,8 @@
-import { Component, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-page-header-admin',
@@ -9,15 +11,43 @@ import { CommonModule } from '@angular/common';
   templateUrl: './page-header-admin.html',
   styleUrl: './page-header.css',
 })
-export class PageHeaderAdmin {
+export class PageHeaderAdmin implements OnInit, OnDestroy {
   userMenuOpen = false;
   showLogoutModal = false;
+  isOverviewNavActive = false;
+  isProductsNavActive = false;
+  private routerSub?: Subscription;
+  private hashSub?: () => void;
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
 
   constructor(private router: Router) {}
 
-  /** Username từ authAdmin hoặc ngogia_user (đăng nhập manager) */
+  private updateProductsActive(): void {
+    const onDashboard = this.router.url.split('?')[0].includes('admin-dashboard');
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    this.isProductsNavActive = onDashboard && hash === '#products';
+    this.isOverviewNavActive = onDashboard && hash !== '#products';
+  }
+
+  ngOnInit(): void {
+    this.updateProductsActive();
+    this.routerSub = this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(() => this.updateProductsActive());
+    if (typeof window !== 'undefined') {
+      this.hashSub = () => this.updateProductsActive();
+      window.addEventListener('hashchange', this.hashSub);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+    if (typeof window !== 'undefined' && this.hashSub) {
+      window.removeEventListener('hashchange', this.hashSub);
+    }
+  }
+
   get userName(): string {
     if (typeof localStorage === 'undefined') return 'Tài khoản';
     try {
