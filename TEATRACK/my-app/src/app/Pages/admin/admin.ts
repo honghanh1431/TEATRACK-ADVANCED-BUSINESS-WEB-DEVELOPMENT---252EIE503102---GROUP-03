@@ -118,6 +118,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   private boundClick = (e: MouseEvent) => this.onDocumentClick(e);
   private boundKeydown = (e: KeyboardEvent) => this.onDocumentKeydown(e);
   private successKeydown = (e: KeyboardEvent) => this.onSuccessEscape(e);
+  private storageOrdersHandler = (e: StorageEvent) => this.onStorageOrders(e);
 
   constructor(
     private router: Router,
@@ -167,7 +168,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
-    if (typeof window !== 'undefined') window.removeEventListener('admin:filters', this.filterListener);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('admin:filters', this.filterListener);
+      window.removeEventListener('storage', this.storageOrdersHandler);
+    }
     this.chartInstances.forEach((c) => {
       try {
         c?.destroy();
@@ -177,6 +181,26 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     document.removeEventListener('click', this.boundClick);
     document.removeEventListener('keydown', this.boundKeydown);
     document.removeEventListener('keydown', this.successKeydown);
+  }
+
+  /** Sort đơn hàng theo ngày giảm dần (mới nhất trước). */
+  private sortOrdersByDateDesc(): void {
+    this.ORDERS_ALL.sort((a, b) => {
+      const tA = new Date((a.date || a.createdAt) as string | number | undefined || 0).getTime();
+      const tB = new Date((b.date || b.createdAt) as string | number | undefined || 0).getTime();
+      return tB - tA;
+    });
+  }
+
+  /** Tab khác (admin-order) sửa orders → cập nhật lại từ localStorage. */
+  private onStorageOrders(e: StorageEvent): void {
+    if (e.key !== 'orders' || e.newValue == null) return;
+    try {
+      this.ORDERS_ALL = JSON.parse(e.newValue) as Order[];
+      this.sortOrdersByDateDesc();
+      this.renderOrdersTable(this.ORDERS_ALL);
+      this.updateOrdersStats();
+    } catch (_) {}
   }
 
   /** Gọi khi vào lại trang admin-dashboard để luôn thấy dữ liệu mới nhất (orders + products). */
@@ -516,11 +540,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             this.ORDERS_ALL.push(o);
           }
         });
-        this.ORDERS_ALL.sort((a, b) => {
-          const tA = new Date(a.date || a.createdAt || 0).getTime();
-          const tB = new Date(b.date || b.createdAt || 0).getTime();
-          return tB - tA;
-        });
+        this.sortOrdersByDateDesc();
         (window as any).currentOrders = this.ORDERS_ALL;
         this.renderOrdersTable(this.ORDERS_ALL);
         this.updateOrdersStats();
@@ -533,6 +553,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         } catch (_) {
           this.ORDERS_ALL = [];
         }
+        this.sortOrdersByDateDesc();
         const tbody = this.$('#ordersBody');
         if (tbody)
           tbody.innerHTML =
@@ -549,7 +570,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">${this.t('admin.dashboard.noOrders') || 'Không có đơn hàng'}</td></tr>`;
       return;
     }
-    const recentOrders = orders.slice(-10).reverse();
+    const recentOrders = orders.slice(0, 10);
     const statusMap: Record<string, string> = {
       pending: 'status-badge pending',
       processing: 'status-badge processing',
@@ -572,18 +593,22 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const customerName = order.customerName || order.customer?.name || 'Khách hàng';
         const orderDate = this.fmtDate(order.date || order.createdAt);
         const total = this.fmtMoney(order.total || order.totalAmount || 0);
+        const statusLower = (order.status || '').toLowerCase().trim();
+        const englishKeys = ['pending', 'processing', 'ready', 'shipping', 'completed', 'cancelled'];
         let statusKey = 'pending';
-        const statusLower = (order.status || '').toLowerCase();
-        if (statusLower.includes('hoàn') || statusLower.includes('complete'))
+        if (englishKeys.includes(statusLower)) {
+          statusKey = statusLower;
+        } else if (statusLower.includes('hoàn') || statusLower.includes('complete') || statusLower.includes('thành công')) {
           statusKey = 'completed';
-        else if (statusLower.includes('hủy') || statusLower.includes('cancel'))
+        } else if (statusLower.includes('hủy') || statusLower.includes('cancel')) {
           statusKey = 'cancelled';
-        else if (statusLower.includes('giao') && (statusLower.includes('đang') || statusLower.includes('shipping')))
+        } else if (statusLower.includes('giao') && (statusLower.includes('đang') || statusLower.includes('shipping'))) {
           statusKey = 'shipping';
-        else if (statusLower.includes('lấy hàng') || statusLower.includes('ready'))
+        } else if (statusLower.includes('lấy hàng') || statusLower.includes('chờ lấy') || statusLower.includes('ready')) {
           statusKey = 'ready';
-        else if (statusLower.includes('đang') || statusLower.includes('processing') || statusLower.includes('chuẩn bị'))
-          statusKey = 'processing';
+        } else if (statusLower.includes('đang') || statusLower.includes('processing') || statusLower.includes('chuẩn bị') || statusLower.includes('xác nhận')) {
+          statusKey = statusLower.includes('chuẩn bị') ? 'processing' : 'pending';
+        }
         const badgeClass = statusMap[statusKey] || statusMap['pending'];
         const statusText = statusLabels[statusKey] || this.t(`admin.order.status.${statusKey}`) || order.status;
         const paymentLabel = order.paymentMethod || 'Tiền mặt';
@@ -934,18 +959,31 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     set('customer-name', order.customerName || order.customer?.name || '');
     set('customer-phone', order.customerPhone ?? order.customer?.phone ?? '');
     set('customer-address', order.customerAddress ?? order.customer?.address ?? '');
-    const statusSelect = document.getElementById('order-status-dropdown');
-    const statusTextEl = document.getElementById('order-status-text');
-    if (statusSelect && order.status) {
+    const statusSelect = document.getElementById('order-status-dropdown') as HTMLSelectElement | null;
+    if (statusSelect) {
       const statusMap: Record<string, string> = {
+        pending: 'pending',
+        processing: 'processing',
+        ready: 'ready',
+        shipping: 'shipping',
+        completed: 'completed',
+        cancelled: 'cancelled',
         'Chờ xác nhận': 'pending',
+        'Xác nhận đơn hàng': 'pending',
         'Đang xử lý': 'processing',
+        'Chuẩn bị đơn hàng': 'processing',
+        'Chờ lấy hàng': 'ready',
+        'Đang giao hàng': 'shipping',
         'Hoàn tất': 'completed',
-        'Đã hủy': 'cancelled',
+        'Giao thành công': 'completed',
         'Đã giao hàng': 'completed',
+        'Đã hủy': 'cancelled',
       };
-      (statusSelect as HTMLSelectElement).value = statusMap[order.status] || 'pending';
-      if (statusTextEl) (statusTextEl as HTMLElement).style.display = 'none';
+      const st = (order.status || '').toString().trim();
+      const dropdownVal = statusMap[st] ?? statusMap[st.toLowerCase()] ?? 'pending';
+      statusSelect.value = dropdownVal;
+      statusSelect.dataset['orderId'] = order.id || order.orderId || '';
+      statusSelect.dataset['originalStatus'] = st;
     }
     const itemsContainer = document.getElementById('order-items');
     if (itemsContainer && order.items) {
@@ -1459,7 +1497,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       },
       error: () => {},
     });
-    if (typeof window !== 'undefined') window.addEventListener('admin:filters', this.filterListener);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('admin:filters', this.filterListener);
+      window.addEventListener('storage', this.storageOrdersHandler);
+    }
 
     const lang =
       typeof localStorage !== 'undefined' ? localStorage.getItem('app.lang') || 'vi' : 'vi';
@@ -1492,16 +1533,13 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const orderId = document.getElementById('order-id')?.textContent?.trim();
         if (!statusDropdown || !orderId) return;
         const newStatus = statusDropdown.value;
-        const statusLabels: Record<string, string> = {
-          pending: 'Chờ xác nhận',
-          processing: 'Đang xử lý',
-          completed: 'Đã giao hàng',
-          cancelled: 'Đã hủy',
-        };
         const order = this.ORDERS_ALL.find((o) => (o.id || o.orderId) == orderId);
         if (order) {
-          order.status = statusLabels[newStatus];
-          localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
+          order.status = newStatus;
+          this.sortOrdersByDateDesc();
+          try {
+            localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
+          } catch (_) {}
           this.renderOrdersTable(this.ORDERS_ALL);
         }
         const orderModal = document.getElementById('modal-order-detail');

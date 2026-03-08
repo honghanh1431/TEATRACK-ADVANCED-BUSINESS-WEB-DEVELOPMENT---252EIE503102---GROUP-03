@@ -1423,42 +1423,12 @@ body {
   color: #16a34a;
   border-color: #bbf7d0;
 }
-.status-dropdown[data-status='cancelled'] {
-  background: #fef2f2;
-  color: #ef4444;
-  border-color: #fecaca;
-}
-.status-dropdown option[value='pending'] {
-  background: #fff7ed;
-  color: #ea580c;
-  font-weight: 600;
-}
-.status-dropdown option[value='processing'] {
-  background: #eff6ff;
-  color: #2563eb;
-  font-weight: 600;
-}
-.status-dropdown option[value='shipping'] {
-  background: #ecfdf5;
-  color: #059669;
-  font-weight: 600;
-}
-.status-dropdown option[value='completed'] {
-  background: #f0fdf4;
-  color: #16a34a;
-  font-weight: 600;
-}
-.status-dropdown option[value='cancelled'] {
-  background: #fef2f2;
-  color: #ef4444;
-  font-weight: 600;
-}
 
 .order-items-section {
-  background: var(--white);
+  background: #fff;
   border-radius: 12px;
   padding: 16px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 .order-items-list {
   display: flex;
@@ -1558,7 +1528,6 @@ body {
 .payment-total {
   margin-top: 6px;
   padding-top: 12px !important;
-  border-top: 2px solid var(--primary) !important;
   border-bottom: none !important;
 }
 .payment-total span:first-child {

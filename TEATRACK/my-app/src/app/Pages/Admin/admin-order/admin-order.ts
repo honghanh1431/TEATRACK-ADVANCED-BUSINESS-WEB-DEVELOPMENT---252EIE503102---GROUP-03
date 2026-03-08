@@ -33,6 +33,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
   filterState = { orderId: '', search: '' };
   currentTabStatus = '';
   private escHandler = (e: KeyboardEvent) => this.onEscKey(e);
+  private storageHandler = (e: StorageEvent) => this.onStorageOrders(e);
 
   constructor(private router: Router) {}
 
@@ -58,10 +59,36 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     this.initOrderDetailModal();
     this.initEventDelegation();
     document.addEventListener('keydown', this.escHandler);
+    window.addEventListener('storage', this.storageHandler);
+    /* Cập nhật số liệu stat và bảng ngay khi DOM đã render (ngOnInit gọi update khi DOM chưa có) */
+    this.updateOrdersStats();
+    this.applyFilters();
   }
 
   ngOnDestroy(): void {
     document.removeEventListener('keydown', this.escHandler);
+    window.removeEventListener('storage', this.storageHandler);
+  }
+
+  /** Sort đơn hàng theo ngày giảm dần (mới nhất trước). */
+  private sortOrdersByDateDesc(): void {
+    this.ORDERS_ALL.sort((a, b) => {
+      const tA = new Date((a.date || a.createdAt) as string | number | undefined || 0).getTime();
+      const tB = new Date((b.date || b.createdAt) as string | number | undefined || 0).getTime();
+      return tB - tA;
+    });
+  }
+
+  /** Tab khác (admin hoặc admin-order) sửa orders → cập nhật lại từ localStorage. */
+  private onStorageOrders(e: StorageEvent): void {
+    if (e.key !== 'orders' || e.newValue == null) return;
+    try {
+      this.ORDERS_ALL = JSON.parse(e.newValue) as Order[];
+      this.normalizeOrdersStatusToEnglish();
+      this.sortOrdersByDateDesc();
+      this.updateOrdersStats();
+      this.applyFilters();
+    } catch (_) {}
   }
 
   private fmtMoney(n: number | string): string {
@@ -84,7 +111,9 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     try {
       const raw = localStorage.getItem('orders');
       if (raw) {
-        this.ORDERS_ALL = JSON.parse(raw);
+        this.ORDERS_ALL = JSON.parse(raw) as Order[];
+        this.normalizeOrdersStatusToEnglish();
+        this.sortOrdersByDateDesc();
         this.updateOrdersStats();
         this.applyFilters();
       }
@@ -93,11 +122,31 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /** Đồng nhất với admin: merge localStorage + JSON (ưu tiên storage), dedupe theo id, sort mới nhất trước */
   private async fetchOrders(): Promise<void> {
     try {
+      const fromStorage = this.ORDERS_ALL.length ? [...this.ORDERS_ALL] : (() => {
+        try {
+          const raw = localStorage.getItem('orders');
+          return raw ? (JSON.parse(raw) as Order[]) : [];
+        } catch (_) { return []; }
+      })();
       const res = await fetch('/data/orders.json', { cache: 'no-cache' });
       if (!res.ok) throw new Error('Failed to load orders');
-      this.ORDERS_ALL = await res.json();
+      const fromJson = (await res.json()) as Order[];
+      const ids = new Set<string>();
+      this.ORDERS_ALL = [];
+      [...fromStorage, ...(Array.isArray(fromJson) ? fromJson : [])].forEach((o) => {
+        const id = String(o.id || o.orderId || '').trim();
+        if (id && !ids.has(id)) {
+          ids.add(id);
+          this.ORDERS_ALL.push(o);
+        }
+      });
+      this.sortOrdersByDateDesc();
+      try {
+        localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
+      } catch (_) {}
       this.updateOrdersStats();
       this.applyFilters();
     } catch (err) {
@@ -125,34 +174,37 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
 
   private initSuccessModal(): void {
     const btn = document.getElementById('btn-close-success');
-    const modal = document.getElementById('modal-success');
     if (btn) btn.addEventListener('click', () => this.hideSuccess());
-    const overlay = modal?.querySelector('.modal-overlay');
-    if (overlay) overlay.addEventListener('click', () => this.hideSuccess());
+    document.querySelectorAll('[data-close-success]').forEach((el) => el.addEventListener('click', () => this.hideSuccess()));
   }
 
   private onEscKey(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      const orderModal = document.getElementById('modal-order-detail');
-      if (orderModal && (orderModal as HTMLElement).style.display === 'flex') {
-        this.closeOrderDetailModal();
-      }
+    if (e.key !== 'Escape') return;
+    const successModal = document.getElementById('modal-success');
+    if (successModal?.classList.contains('show')) {
+      this.hideSuccess();
+      return;
+    }
+    const orderModal = document.getElementById('modal-order-detail');
+    if (orderModal && (orderModal as HTMLElement).style.display === 'flex') {
+      this.closeOrderDetailModal();
     }
   }
 
   private updateOrdersStats(): void {
-    const setText = (id: string, val: number | string) => {
-      const el = this.$(id);
+    const setStat = (id: string, val: number | string) => {
+      const el = document.getElementById(id);
       if (el) el.textContent = String(val ?? 0);
     };
     const orders = this.ORDERS_ALL;
-    setText('statAll', orders.length);
-    setText('statPending', orders.filter((o) => o.status === 'pending').length);
-    setText('statProcessing', orders.filter((o) => o.status === 'processing').length);
-    setText('statReady', orders.filter((o) => o.status === 'ready').length);
-    setText('statShipping', orders.filter((o) => o.status === 'shipping').length);
-    setText('statCompleted', orders.filter((o) => o.status === 'completed').length);
-    setText('statCancelled', orders.filter((o) => o.status === 'cancelled').length);
+    const norm = (s: string) => (s || '').toLowerCase().trim();
+    setStat('statAll', orders.length);
+    setStat('statPending', orders.filter((o) => norm(o.status) === 'pending').length);
+    setStat('statProcessing', orders.filter((o) => norm(o.status) === 'processing').length);
+    setStat('statReady', orders.filter((o) => norm(o.status) === 'ready').length);
+    setStat('statShipping', orders.filter((o) => norm(o.status) === 'shipping').length);
+    setStat('statCompleted', orders.filter((o) => norm(o.status) === 'completed').length);
+    setStat('statCancelled', orders.filter((o) => norm(o.status) === 'cancelled').length);
   }
 
   private normalize(str: string | null | undefined): string {
@@ -162,6 +214,33 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
       .replace(/[\u0300-\u036f]/g, '')
       .trim()
       .toLowerCase();
+  }
+
+  private normalizeOrdersStatusToEnglish(): void {
+    const toEnglish: Record<string, string> = {
+      pending: 'pending',
+      processing: 'processing',
+      ready: 'ready',
+      shipping: 'shipping',
+      completed: 'completed',
+      cancelled: 'cancelled',
+      'xác nhận đơn hàng': 'pending',
+      'chuẩn bị đơn hàng': 'processing',
+      'chờ lấy hàng': 'ready',
+      'đang giao hàng': 'shipping',
+      'giao thành công': 'completed',
+      'đã hủy': 'cancelled',
+    };
+    this.ORDERS_ALL.forEach((o) => {
+      const s = (o.status || '').toString().trim().toLowerCase();
+      if (toEnglish[s] !== undefined) o.status = toEnglish[s];
+      else if (s.includes('hủy') || s.includes('cancel')) o.status = 'cancelled';
+      else if (s.includes('thành công') || s.includes('hoàn') || s.includes('complete')) o.status = 'completed';
+      else if (s.includes('giao') && s.includes('đang')) o.status = 'shipping';
+      else if (s.includes('lấy hàng') || s.includes('chờ lấy')) o.status = 'ready';
+      else if (s.includes('chuẩn bị')) o.status = 'processing';
+      else if (s.includes('xác nhận')) o.status = 'pending';
+    });
   }
 
   private filterOrders(): Order[] {
@@ -278,6 +357,41 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
       .join('');
   }
 
+  /** Giống admin: tạo dòng chi tiết cho từng item (size, ngọt, đá, số lượng, topping). */
+  private getOrderItemDetailLines(item: any): string[] {
+    const lines: string[] = [];
+    const ngot = item.sweetness || 'Ít';
+    const da = item.ice || 'Ít';
+    const qty = item.qty ?? item.quantity ?? 1;
+    if (item.size) {
+      const first = `Size ${item.size} - Ngọt: ${ngot} - Đá: ${da}`;
+      lines.push(
+        Array.isArray(item.toppings) && item.toppings.length ? first + ',' : first,
+      );
+    } else if (item.sweetness || item.ice) {
+      const part = [item.sweetness && `Ngọt: ${item.sweetness}`, item.ice && `Đá: ${item.ice}`]
+        .filter(Boolean)
+        .join(', ');
+      lines.push(part);
+    }
+    lines.push(`Số lượng: ${qty}`);
+    if (Array.isArray(item.toppings) && item.toppings.length) {
+      lines.push('Topping:');
+      item.toppings.forEach((t: string) => lines.push(t));
+    }
+    if (lines.length <= 1 && (item.specs || item.options)) {
+      const opts = Array.isArray(item.options) ? item.options.join(', ') : (item.specs || (item.options as string) || '');
+      if (opts) lines.splice(lines.length - 1, 0, opts);
+    }
+    if (item.note && !lines.some((l: string) => l.includes(item.note))) {
+      lines.push(item.note);
+    }
+    if (lines.length === 0) {
+      lines.push(`Size: ${item.size || 'M'} • SL: ${qty}`);
+    }
+    return lines;
+  }
+
   openOrderDetailModal(orderId: string): void {
     document.querySelectorAll('.modal').forEach((m) => {
       if ((m as HTMLElement).id !== 'modal-order-detail') {
@@ -291,73 +405,78 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     const order = this.ORDERS_ALL.find((o) => (o.id || o.orderId) == orderId);
     if (!order) return;
 
-    const setText = (id: string, val: string) => {
+    const set = (id: string, value: string) => {
       const el = document.getElementById(id);
-      if (el) el.textContent = val;
+      if (el) el.textContent = value;
     };
 
-    setText('order-id', order.id || order.orderId || '-');
-
+    set('order-id', order.id || order.orderId || '');
     const dateTime = this.fmtDate(order.date || order.createdAt).split(' ');
-    setText('order-date', dateTime[0] || '-');
-    setText('order-time', dateTime[1] || '-');
+    set('order-date', dateTime[0] || '');
+    set('order-time', dateTime[1] || '');
+    set('customer-name', order.customerName || (order as any).customer?.name || '');
+    set('customer-phone', order.customerPhone ?? (order as any).customer?.phone ?? '');
+    set('customer-address', order.customerAddress ?? (order as any).customer?.address ?? '');
 
-    setText('customer-name', order.customerName || '-');
-    setText('customer-phone', order.customerPhone || '-');
-    setText('customer-address', order.customerAddress || '-');
-
-    const statusLabels: Record<string, string> = {
-      pending: 'Xác nhận đơn hàng',
-      processing: 'Chuẩn bị đơn hàng',
-      ready: 'Chờ lấy hàng',
-      shipping: 'Đang giao hàng',
-      completed: 'Giao thành công',
-      cancelled: 'Đã hủy',
-    };
-    const statusBadgeClass: Record<string, string> = {
-      pending: 'status-badge status-pending',
-      processing: 'status-badge status-processing',
-      ready: 'status-badge status-ready',
-      shipping: 'status-badge status-shipping',
-      completed: 'status-badge status-completed',
-      cancelled: 'status-badge status-cancelled',
-    };
     const statusSelect = document.getElementById('order-status-dropdown') as HTMLSelectElement | null;
-    const statusTextEl = document.getElementById('order-status-text');
-    if (statusSelect && order.status) {
-      const st = order.status.toLowerCase();
-      statusSelect.value = st;
-      statusSelect.dataset['originalStatus'] = order.status;
+    if (statusSelect) {
+      const statusMap: Record<string, string> = {
+        pending: 'pending',
+        processing: 'processing',
+        ready: 'ready',
+        shipping: 'shipping',
+        completed: 'completed',
+        cancelled: 'cancelled',
+        'Chờ xác nhận': 'pending',
+        'Xác nhận đơn hàng': 'pending',
+        'Đang xử lý': 'processing',
+        'Chuẩn bị đơn hàng': 'processing',
+        'Chờ lấy hàng': 'ready',
+        'Đang giao hàng': 'shipping',
+        'Hoàn tất': 'completed',
+        'Giao thành công': 'completed',
+        'Đã giao hàng': 'completed',
+        'Đã hủy': 'cancelled',
+      };
+      const st = (order.status || '').toString().trim();
+      const dropdownVal = statusMap[st] ?? statusMap[st.toLowerCase()] ?? 'pending';
+      statusSelect.value = dropdownVal;
       statusSelect.dataset['orderId'] = order.id || order.orderId || '';
-      statusSelect.dataset['status'] = st;
-      if (statusTextEl) {
-        statusTextEl.textContent = statusLabels[st] || order.status;
-        statusTextEl.className = 'info-value status-badge ' + (statusBadgeClass[st] || 'status-badge');
-      }
+      statusSelect.dataset['originalStatus'] = st;
     }
 
     const itemsContainer = document.getElementById('order-items');
     if (itemsContainer && order.items) {
       itemsContainer.innerHTML = (order.items || [])
-        .map(
-          (item) => `
-        <div class="order-item">
-          <img src="${item.image || 'assets/images/products/default.jpg'}" alt="${item.name || ''}" class="item-image">
-          <div class="item-details">
-            <h4 class="item-name">${item.name || '-'}</h4>
-            <p class="item-specs">Size: ${item.size || 'M'} • SL: ${item.quantity || 1}</p>
-          </div>
-          <div class="item-price">${this.fmtMoney((item.price || 0) * (item.quantity || 1))}</div>
-        </div>
-      `
-        )
+        .map((item: any) => {
+          let imgUrl = item.image || item.img || 'assets/images/products/default.jpg';
+          if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('data:') && !imgUrl.startsWith('/')) {
+            imgUrl = '/' + imgUrl;
+          }
+          const rawName = item.name || item.productName || 'Sản phẩm';
+          const name = String(rawName).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+          const lines = this.getOrderItemDetailLines(item);
+          const qty = item.qty ?? item.quantity ?? 1;
+          const totalPrice = (item.price || 0) * qty;
+          const price = this.fmtMoney(totalPrice);
+          const specsHtml =
+            lines.length > 0
+              ? lines
+                  .map(
+                    (line) =>
+                      `<p class="item-detail-line">${String(line).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</p>`,
+                  )
+                  .join('')
+              : '';
+          return `<div class="order-item"><img src="${imgUrl}" alt="${name}" class="item-image"><div class="item-details"><div class="item-name">${name}</div><div class="item-specs">${specsHtml}</div></div><div class="item-price">${price}</div></div>`;
+        })
         .join('');
     }
 
-    setText('subtotal', this.fmtMoney(order.subtotal ?? order.total ?? 0));
-    setText('shipping-fee', this.fmtMoney(order.shippingFee ?? 0));
-    setText('discount', this.fmtMoney(order.discount ?? 0));
-    setText('total-amount', this.fmtMoney(order.total ?? 0));
+    set('subtotal', this.fmtMoney(order.subtotal || order.total || 0));
+    set('shipping-fee', this.fmtMoney((order as any).shippingFee || 0));
+    set('discount', this.fmtMoney((order as any).discount || 0));
+    set('total-amount', this.fmtMoney(order.total || (order as any).totalAmount || 0));
 
     (modal as HTMLElement).style.display = 'flex';
     modal.classList.add('show');
@@ -387,6 +506,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     const idx = this.ORDERS_ALL.findIndex((o) => (o.id || o.orderId) == orderId);
     if (idx !== -1) {
       this.ORDERS_ALL[idx].status = newStatus;
+      this.sortOrdersByDateDesc();
       try {
         localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
       } catch (err) {
@@ -440,29 +560,9 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
 
   private initOrderDetailModal(): void {
     const statusSelect = document.getElementById('order-status-dropdown') as HTMLSelectElement | null;
-    const statusTextEl = document.getElementById('order-status-text');
-    if (!statusSelect || !statusTextEl) return;
-    const statusLabels: Record<string, string> = {
-      pending: 'Xác nhận đơn hàng',
-      processing: 'Chuẩn bị đơn hàng',
-      ready: 'Chờ lấy hàng',
-      shipping: 'Đang giao hàng',
-      completed: 'Giao thành công',
-      cancelled: 'Đã hủy',
-    };
-    const statusBadgeClass: Record<string, string> = {
-      pending: 'status-badge status-pending',
-      processing: 'status-badge status-processing',
-      ready: 'status-badge status-ready',
-      shipping: 'status-badge status-shipping',
-      completed: 'status-badge status-completed',
-      cancelled: 'status-badge status-cancelled',
-    };
+    if (!statusSelect) return;
     statusSelect.addEventListener('change', () => {
-      const v = statusSelect.value;
-      statusSelect.dataset['status'] = v;
-      statusTextEl.textContent = statusLabels[v] || v;
-      statusTextEl.className = 'info-value status-badge ' + (statusBadgeClass[v] || 'status-badge');
+      statusSelect.dataset['status'] = statusSelect.value;
     });
   }
 

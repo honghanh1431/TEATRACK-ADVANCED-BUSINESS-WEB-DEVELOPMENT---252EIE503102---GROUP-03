@@ -39,7 +39,6 @@
     display: flex;
     flex-direction: column;
     gap: 0;
-    background-color: #F5f5f5;
   }
   
   /* Topbar */
@@ -178,14 +177,14 @@
   .stat-label {
     font-size: 18px;
     color: #1f2937;
-    font-weight: 600;
+    font-weight: 800;
     margin-bottom: 4px;
     display: block;
   }
   
   .stat-value {
-    font-size: 12px;
-    font-weight: 400;
+    font-size: 13px;
+    font-weight: 500;
     color: #6b7280;
     display: block;
   }
@@ -211,7 +210,7 @@
   /* Bộ lọc */
   .order-filters {
     background: white;
-    border-radius: 16px 16px 0 0;
+    border-radius: 0;
     padding: 16px 24px;
     margin-bottom: 0;
     display: flex;
@@ -329,8 +328,18 @@
     overflow-x: auto;
     overflow-y: auto;
   }
+  /* Ghim header bảng: khi cuộn thì thead không cuộn theo */
   #orders .table-scroll {
-    max-height: 500px;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  #orders .table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #0088ff;
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06);
   }
   #orders table {
     width: 100%;
@@ -372,16 +381,18 @@
     text-align: center;
   }
   #orders table th:nth-child(2),
-  #orders table td:nth-child(2) {
+  #orders table td:nth-child(2),
+  #orders table tbody td:nth-child(2) {
     min-width: 72px;
     width: 1%;
     white-space: nowrap;
-    text-align: left;
+    text-align: center !important;
   }
   #orders table th:nth-child(3),
-  #orders table td:nth-child(3) {
+  #orders table td:nth-child(3),
+  #orders table tbody td:nth-child(3) {
     min-width: 100px;
-    text-align: left;
+    text-align: left !important;
   }
   #orders table th:nth-child(4),
   #orders table td:nth-child(4) {
@@ -412,6 +423,7 @@
     text-align: center;
   }
   #orders table thead th:nth-child(1),
+  #orders table thead th:nth-child(2),
   #orders table thead th:nth-child(4),
   #orders table thead th:nth-child(5),
   #orders table thead th:nth-child(6),
@@ -419,11 +431,9 @@
   #orders table thead th:nth-child(8) {
     text-align: center;
   }
-  #orders table thead th:nth-child(2),
   #orders table thead th:nth-child(3) {
-    text-align: left;
+    text-align: left !important;
   }
-  /* Trạng thái cột - badge giống admin (status-badge pending / processing / completed ...) */
   #orders table td:nth-child(5) .status-badge {
     padding: 6px 14px;
     border-radius: 20px;
@@ -642,7 +652,7 @@
     letter-spacing: 3px;
   }
   
-  /* ===== MODAL CHI TIẾT ĐƠN HÀNG - GIỐNG ADMIN.CSS ===== */
+  /* ===== MODAL CHI TIẾT ĐƠN HÀNG ===== */
   #modal-order-detail {
     position: fixed;
     inset: 0;
@@ -692,12 +702,14 @@
     margin: 0;
   }
   .modal-header-order .modal-close {
-    color: rgba(255, 255, 255, 0.85);
+    position: absolute;
     top: 16px;
     right: 16px;
     background: none;
     border: none;
     font-size: 22px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
     width: 36px;
     height: 36px;
@@ -705,7 +717,8 @@
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    position: absolute;
+    transition: all 0.2s;
+    line-height: 1;
   }
   .modal-header-order .modal-close:hover {
     color: #fff;
@@ -728,10 +741,8 @@
     border-radius: 10px;
   }
   .order-info-section {
-    background: #fff;
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid rgba(0, 136, 255, 0.2);
   }
   .order-info-header {
     display: flex;
@@ -739,11 +750,11 @@
     gap: 8px;
     margin-bottom: 14px;
   }
-  .order-info-section .section-icon {
+  .section-icon {
     width: 20px;
     height: 20px;
   }
-  .order-info-section .section-title {
+  .section-title {
     font-size: 16px;
     font-weight: 800;
     color: #0088FF;
@@ -754,38 +765,25 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-  .order-info-section .info-row {
+  .info-row {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    padding: 0;
-    background: none;
-    border-radius: 0;
   }
-  .order-info-section .info-row:hover {
-    background: none;
-    box-shadow: none;
-  }
-  .order-info-section .info-row.full-width {
+  .info-row.full-width {
     grid-column: 1 / -1;
   }
-  .order-info-section .info-label {
+  .info-label {
     font-size: 11px;
     font-weight: 600;
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.4px;
   }
-  .order-info-section .info-value {
+  .info-value {
     font-size: 13px;
     font-weight: 600;
     color: #0f172a;
-  }
-  .order-status-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
   }
   .order-info-divider {
     height: 3px;
@@ -798,92 +796,35 @@
     margin: 12px 0;
     width: 100px;
   }
-  .order-info-subsection .subsection-title {
+  .subsection-title {
     font-size: 13px;
     font-weight: 700;
     color: #0088FF;
     margin-top: 20px;
     margin-bottom: 10px;
   }
-  #modal-order-detail .status-dropdown {
+  .status-dropdown {
     padding: 7px 12px;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
-    border: 2px solid #e5e7eb;
+    color: black;
     background: white;
+    border: 1px solid #e5e7eb;
     cursor: pointer;
     transition: all 0.2s;
     outline: none;
   }
-  #modal-order-detail .status-dropdown:hover,
-  #modal-order-detail .status-dropdown:focus {
+  .status-dropdown:hover,
+  .status-dropdown:focus {
     border-color: #0088FF;
     box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.08);
-  }
-  #modal-order-detail .status-dropdown[data-status='pending'] {
-    background: #fff7ed;
-    color: #ea580c;
-    border-color: #fed7aa;
-  }
-  #modal-order-detail .status-dropdown[data-status='processing'] {
-    background: #eff6ff;
-    color: #2563eb;
-    border-color: #bfdbfe;
-  }
-  #modal-order-detail .status-dropdown[data-status='ready'] {
-    background: #eff6ff;
-    color: #2563eb;
-    border-color: #bfdbfe;
-  }
-  #modal-order-detail .status-dropdown[data-status='shipping'] {
-    background: #ecfdf5;
-    color: #059669;
-    border-color: #a7f3d0;
-  }
-  #modal-order-detail .status-dropdown[data-status='completed'] {
-    background: #f0fdf4;
-    color: #16a34a;
-    border-color: #bbf7d0;
-  }
-  #modal-order-detail .status-dropdown[data-status='cancelled'] {
-    background: #fef2f2;
-    color: #ef4444;
-    border-color: #fecaca;
-  }
-  #modal-order-detail .status-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  #modal-order-detail .status-badge.status-pending {
-    background: #fff7ed;
-    color: #ea580c;
-  }
-  #modal-order-detail .status-badge.status-processing,
-  #modal-order-detail .status-badge.status-ready {
-    background: #eff6ff;
-    color: #2563eb;
-  }
-  #modal-order-detail .status-badge.status-shipping {
-    background: #ecfdf5;
-    color: #059669;
-  }
-  #modal-order-detail .status-badge.status-completed {
-    background: #f0fdf4;
-    color: #16a34a;
-  }
-  #modal-order-detail .status-badge.status-cancelled {
-    background: #fef2f2;
-    color: #ef4444;
   }
   .order-items-section {
     background: #fff;
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid rgba(0, 136, 255, 0.2);
+    border: 1px solid rgba(15, 23, 42, 0.08);
   }
   .order-items-list {
     display: flex;
@@ -904,7 +845,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: #fff;
+    background: white;
     padding: 16px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -933,7 +874,7 @@
     font-size: 16px;
     font-weight: 600;
     color: #1f2937;
-    margin: 0 0 6px;
+    margin-bottom: 6px;
   }
   .order-items-list .item-specs {
     font-size: 13px;
@@ -950,39 +891,63 @@
     flex-shrink: 0;
   }
   .order-payment-section {
-    background: #fff;
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid rgba(0, 136, 255, 0.2);
   }
-  .order-payment-section .payment-title {
+  .payment-title {
     font-size: 16px;
     font-weight: 800;
     color: #0088FF;
-    margin: 0 0 12px;
+    margin-bottom: 12px;
   }
-  .order-payment-section .payment-row {
+  .payment-row {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
     padding: 8px 0;
     border-bottom: 1px solid #f3f4f6;
-    color: #6b7280;
+    color: #64748b;
   }
-  .order-payment-section .payment-row:last-child {
+  .payment-row:last-child {
     border-bottom: none;
   }
-  .order-payment-section .payment-total {
+  .payment-row span:first-child {
+    font-weight: 600;
+  }
+  .payment-row span:last-child {
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .payment-total {
     margin-top: 6px;
     padding-top: 12px !important;
-    border-top: 2px solid #0088FF !important;
     border-bottom: none !important;
   }
-  .order-payment-section .payment-label-total,
-  .order-payment-section .payment-value-total {
+  .payment-total span:first-child {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .payment-total span:last-child {
+    color: #0088FF;
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .payment-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+  }
+  .payment-label-total,
+  .payment-value-total {
     color: #0088FF !important;
     font-size: 23px !important;
     font-weight: 800 !important;
+  }
+  .payment-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
   }
   .modal-order-detail .modal-footer {
     background: #fff;
@@ -1050,140 +1015,117 @@
     }
   }
   
-  /* ===== MODAL SUCCESS - GIỐNG ADMIN.CSS ===== */
-  .modal-success {
+  /* ===== MODAL SUCCESS ===== */
+  #modal-success {
     position: fixed;
     inset: 0;
     z-index: 10001;
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
   }
-  
-  .modal-success.show {
-    display: flex;
+  #modal-success.show {
+    display: flex !important;
   }
-  
-  .modal-success .modal-overlay {
+  #modal-success .modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
   }
-  
-  .modal-success-container {
-    position: relative;
-    z-index: 1;
-    background: #fff;
-    border-radius: 16px;
-    padding: 40px;
+  #modal-success .modal-container,
+  #modal-success .modal-confirm {
+    max-width: 440px;
     width: 90%;
-    max-width: 420px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-    animation: modalSuccessIn 0.3s ease-out;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 34px 84px rgba(15, 23, 42, 0.25);
   }
-  
-  @keyframes modalSuccessIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+  #modal-success .modal-confirm-body {
+    padding: 28px 28px 26px;
   }
-  
-  .modal-success-content {
+  #modal-success .modal-confirm-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 20px;
   }
-  
-  /* SUCCESS ICON - VUÔNG XANH NHẠT */
-  .success-icon {
-    width: 100px;
-    height: 100px;
-    background: #dcfce7;
+  #modal-success .confirm-icon {
+    width: 60px;
+    height: 60px;
+    background: #fff7ed;
+    border: 2px solid #fed7aa;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: successIconPop 0.5s ease-out;
+    flex-shrink: 0;
   }
-  
-  @keyframes successIconPop {
-    0% {
-      transform: scale(0);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-  
-  /* CHECKMARK - DẤU TICK XANH LÁ */
-  .success-icon img {
-    width: 48px;
-    height: 48px;
-    animation: checkmarkDraw 0.4s ease-out 0.2s both;
-  }
-  
-  @keyframes checkmarkDraw {
-    from {
-      opacity: 0;
-      transform: scale(0);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  
-  /* TITLE - TEXT XANH DƯƠNG */
-  .success-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #0b76f0;
+  #modal-success .confirm-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 5px;
     text-align: center;
+  }
+  #modal-success .confirm-message {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
     margin: 0;
-    animation: titleSlideIn 0.4s ease-out 0.3s both;
+    text-align: center;
   }
-  
-  @keyframes titleSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* CLOSE BUTTON - NÚT X */
-  .btn-close-success {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: transparent;
-    border: none;
-    font-size: 28px;
-    color: #6b7785;
-    cursor: pointer;
-    line-height: 1;
-    width: 36px;
-    height: 36px;
+  #modal-success .confirm-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 4px;
   }
-  
-  .btn-close-success:hover {
-    background: #f3f4f6;
-    color: #0b76f0;
+  #modal-success .modal-confirm .btn-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: #0088FF;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  #modal-success .modal-confirm .btn-confirm:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+  #modal-success .modal-confirm .btn-confirm img {
+    width: 15px;
+    height: 15px;
+  }
+  /* Success container - icon xanh, title xanh dương */
+  #modal-success .modal-success-container .confirm-icon.success-icon {
+    background: #d1fae5;
+    border-color: #6ee7b7;
+    color: #059669;
+  }
+  #modal-success .modal-success-container .success-icon img {
+    filter: brightness(0) saturate(100%) invert(47%) sepia(80%) saturate(500%) hue-rotate(120deg)
+      brightness(95%) contrast(90%);
+  }
+  #modal-success .modal-success-container .confirm-title {
+    color: #0088FF;
+  }
+
+  :host ::ng-deep #orders table thead th:nth-child(2),
+  :host ::ng-deep #orders table td:nth-child(2),
+  :host ::ng-deep #orders table tbody td:nth-child(2) {
+    text-align: center !important;
+  }
+  :host ::ng-deep #orders table thead th:nth-child(3),
+  :host ::ng-deep #orders table td:nth-child(3),
+  :host ::ng-deep #orders table tbody td:nth-child(3) {
+    text-align: left !important;
   }

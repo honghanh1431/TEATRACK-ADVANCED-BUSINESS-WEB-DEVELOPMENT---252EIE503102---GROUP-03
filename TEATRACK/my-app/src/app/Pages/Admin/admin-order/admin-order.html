@@ -94,7 +94,6 @@
               </tr>
             </thead>
             <tbody id="ordersTableBody">
-              <!-- Orders will be rendered here -->
             </tbody>
           </table>
         </div>
@@ -103,16 +102,19 @@
   </div>
 </div>
 
-<!-- Modal chi tiết đơn hàng-->
+<!-- Modal chi tiết đơn hàng -->
 <div id="modal-order-detail" class="modal" style="display: none" role="dialog" aria-modal="true">
+  <!--  data-close-order -->
   <div class="modal-overlay" data-close-order></div>
   <div class="modal-container modal-order-detail">
     <div class="modal-header-order">
       <h2 class="modal-title-order">CHI TIẾT ĐƠN HÀNG</h2>
+      <!-- data-close-order -->
       <button type="button" class="modal-close" data-close-order aria-label="Đóng">&times;</button>
     </div>
 
     <div class="modal-body-order">
+      <!-- Thông tin đơn hàng - Bao gồm cả địa chỉ -->
       <div class="order-info-section">
         <div class="order-info-header">
           <img src="assets/icons/Cart.png" alt="Cart" class="section-icon" />
@@ -133,7 +135,7 @@
           </div>
           <div class="info-row">
             <span class="info-label">Tình trạng đơn hàng:</span>
-            <div class="order-status-row">
+            <div style="display: flex; gap: 12px; align-items: center">
               <select id="order-status-dropdown" class="status-dropdown">
                 <option value="pending">Xác nhận đơn hàng</option>
                 <option value="processing">Chuẩn bị đơn hàng</option>
@@ -142,11 +144,11 @@
                 <option value="completed">Giao thành công</option>
                 <option value="cancelled">Đã hủy</option>
               </select>
-              <span class="info-value status-badge" id="order-status-text">Giao thành công</span>
             </div>
           </div>
         </div>
         <div class="order-info-divider-address"></div>
+        <!-- Địa chỉ người nhận - Nằm trong cùng section -->
         <div class="order-info-subsection">
           <div class="subsection-header">
             <h4 class="subsection-title">Địa chỉ người nhận:</h4>
@@ -162,22 +164,53 @@
             </div>
             <div class="info-row full-width">
               <span class="info-label">Địa chỉ:</span>
-              <span class="info-value" id="customer-address">Bcons plaza, Thống Nhất, Dĩ An Bình Dương</span>
+              <span class="info-value" id="customer-address"
+                >Bcons plaza, Thống Nhất, Dĩ An Bình Dương</span
+              >
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Danh sách đơn hàng -->
       <div class="order-items-section">
         <div class="order-info-header">
           <img src="assets/icons/cart3.png" alt="List" class="section-icon" />
           <h3 class="section-title">Danh sách đơn hàng</h3>
         </div>
         <div class="order-items-list" id="order-items">
-          <!-- Items will be rendered here -->
+          <!-- Item 1 -->
+          <div class="order-item">
+            <img
+              src="/assets/images/products/hong-tra-dai-loan.jpg"
+              alt="Product"
+              class="item-image"
+            />
+            <div class="item-details">
+              <h4 class="item-name">Hồng trà đài loan</h4>
+              <p class="item-specs">Kích cỡ: L, Độ ngọt: Vừa, 2x Thạch dừa nguyên vị</p>
+            </div>
+            <div class="item-price">25.000đ</div>
+          </div>
+          
+          <!-- Item 2 -->
+          <div class="order-item">
+            <img
+              src="/assets/images/products/tra-sua-dai-loan.jpg"
+              alt="Product"
+              class="item-image"
+            />
+            <div class="item-details">
+              <h4 class="item-name">Trà sữa Đài Loan</h4>
+              <p class="item-specs">
+                Kích cỡ: M, Độ ngọt: Ít, Trân châu hoàng kim, 2x pudding Trung
+              </p>
+            </div>
+            <div class="item-price">40.000đ</div>
+          </div>
         </div>
       </div>
-
+      <!-- Thông tin thanh toán -->
       <div class="order-payment-section">
         <div class="order-info-divider"></div>
         <h3 class="payment-title">Thông tin thanh toán</h3>
@@ -200,10 +233,11 @@
       </div>
     </div>
 
+    <!-- Nút Lưu -->
     <div class="modal-footer">
       <button type="button" class="btn-primary" id="btn-save-order">
         <span class="btn-icon">
-          <img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px; margin-right: 8px" />
+          <img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px; margin-right: 8px"/>
         </span>
         <span>Lưu</span>
       </button>
@@ -211,18 +245,26 @@
   </div>
 </div>
 
-<!-- Modal Success -->
-<div id="modal-success" class="modal modal-success" style="display:none;" role="dialog" aria-modal="true">
-  <div class="modal-overlay"></div>
-  <div class="modal-container modal-success-container">
-    <div class="modal-success-content">
-      <div class="success-icon">
-        <img src="assets/icons/tick2.png" alt="Success" style="width:48px;height:48px;">
+<!-- Modal Success-->
+<div id="modal-success" class="modal" style="display: none" role="dialog" aria-labelledby="success-message" aria-modal="true">
+  <div class="modal-overlay" data-close-success></div>
+  <div class="modal-container modal-confirm modal-success-container">
+    <div class="modal-body modal-confirm-body">
+      <div class="modal-confirm-header">
+        <div class="confirm-icon success-icon">
+          <img src="assets/icons/tick2.png" alt="Success" style="width: 24px; height: 24px" />
+        </div>
+        <div class="confirm-text">
+          <h2 id="success-message" class="confirm-title">CHỈNH SỬA THÀNH CÔNG</h2>
+          <p class="confirm-message">Thao tác đã được thực hiện thành công.</p>
+        </div>
       </div>
-      <h2 class="success-title" id="success-message">CẬP NHẬT THÀNH CÔNG</h2>
-      <button type="button" class="btn-close-success" id="btn-close-success">
-        &times;
-      </button>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-confirm" id="btn-close-success">
+          <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
+          Đóng
+        </button>
+      </div>
     </div>
   </div>
 </div>
