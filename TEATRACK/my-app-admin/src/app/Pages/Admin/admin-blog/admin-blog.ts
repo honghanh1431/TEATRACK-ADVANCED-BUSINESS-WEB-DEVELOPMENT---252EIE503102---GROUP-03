@@ -16,9 +16,12 @@ interface BlogRow {
   title: string;
   excerpt: string;
   content: string;
-  date: Date;
+  date: any;
   image: string;
   images: string[];
+  thumbnailImage?: string;
+  heading?: string;
+  headingColor?: string;
   layoutType: string;
   status: PostStatus;
   views: number;
@@ -56,8 +59,10 @@ export class AdminBlog implements OnInit {
 
   form!: FormGroup;
   formImages: string[] = [];
+  formThumbnail: string | null = null;
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('thumbInput') thumbInput?: ElementRef<HTMLInputElement>;
 
   deleteOpen = false;
   deleteTarget: BlogRow | null = null;
@@ -73,8 +78,11 @@ export class AdminBlog implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       title: ['', [Validators.required]],
+      heading: ['', [Validators.required]],
+      headingColor: ['#305C33', []],
       excerpt: ['', [Validators.required]],
       content: ['', [Validators.required]],
+      layoutType: ['single', []],
     });
 
     this.load();
@@ -133,16 +141,25 @@ export class AdminBlog implements OnInit {
   openAdd(): void {
     this.editing = false;
     this.editingId = null;
-    this.form.reset({ title: '', excerpt: '', content: '' });
+    this.form.reset({ title: '', heading: '', headingColor: '#305C33', excerpt: '', content: '', layoutType: 'single' });
     this.formImages = [];
+    this.formThumbnail = null;
     this.modalOpen = true;
   }
 
   openEdit(p: BlogRow): void {
     this.editing = true;
     this.editingId = p.id;
-    this.form.reset({ title: p.title, excerpt: p.excerpt, content: p.content });
+    this.form.reset({
+      title: p.title,
+      heading: p.heading || '',
+      headingColor: p.headingColor || '#305C33',
+      excerpt: p.excerpt,
+      content: p.content,
+      layoutType: p.layoutType || 'single'
+    });
     this.formImages = [...(p.images || [])];
+    this.formThumbnail = p.thumbnailImage || null;
     this.modalOpen = true;
   }
 
@@ -151,6 +168,7 @@ export class AdminBlog implements OnInit {
     this.editing = false;
     this.editingId = null;
     this.clearFileInput();
+    this.clearThumbInput();
   }
 
   backdropClose(ev: MouseEvent): void {
@@ -171,6 +189,18 @@ export class AdminBlog implements OnInit {
     this.clearFileInput();
   }
 
+  async onThumbFile(ev: Event): Promise<void> {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.formThumbnail = await this.fileToBase64(file);
+    this.clearThumbInput();
+  }
+
+  removeThumb(): void {
+    this.formThumbnail = null;
+  }
+
   removeImg(i: number): void {
     this.formImages.splice(i, 1);
   }
@@ -186,7 +216,7 @@ export class AdminBlog implements OnInit {
       return;
     }
 
-    const v = this.form.value as { title: string; excerpt: string; content: string };
+    const v = this.form.value;
 
     if (this.editing && this.editingId) {
       const idx = this.postsAll.findIndex(x => x.id === this.editingId);
@@ -197,11 +227,14 @@ export class AdminBlog implements OnInit {
 
       const body = {
         title: String(v.title || '').trim(),
+        heading: String(v.heading || '').trim(),
+        headingColor: String(v.headingColor || '').trim(),
         excerpt: String(v.excerpt || '').trim(),
         content: String(v.content || '').trim(),
         images: [...this.formImages],
+        thumbnailImage: this.formThumbnail || this.formImages[0],
         image: this.formImages[0],
-        layoutType: this.formImages.length > 1 ? 'gallery' : 'single',
+        layoutType: String(v.layoutType || 'single'),
       };
 
       this.http.put<BlogRow[]>(`${this.BLOG_API}/${this.editingId}`, body).subscribe({
@@ -211,24 +244,29 @@ export class AdminBlog implements OnInit {
           this.applyFilters();
           this.closeModal();
           this.toast('ok', 'CẬP NHẬT THÀNH CÔNG');
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error(err);
           this.toast('err', 'LỖI CẬP NHẬT');
+          this.cdr.detectChanges();
         }
       });
       return;
     }
 
-    const newPost: Partial<BlogRow & { layoutType: string }> = {
+    const newPost: Partial<BlogRow> = {
       code: this.nextCode(),
       title: String(v.title || '').trim(),
+      heading: String(v.heading || '').trim(),
+      headingColor: String(v.headingColor || '').trim(),
       excerpt: String(v.excerpt || '').trim(),
       content: String(v.content || '').trim(),
-      date: new Date(),
+      date: new Date().toLocaleDateString('en-GB'),
       images: [...this.formImages],
+      thumbnailImage: this.formThumbnail || this.formImages[0],
       image: this.formImages[0],
-      layoutType: this.formImages.length > 1 ? 'gallery' : 'single',
+      layoutType: String(v.layoutType || 'single'),
       status: 'published',
       views: 0,
       visible: true,
@@ -241,10 +279,12 @@ export class AdminBlog implements OnInit {
         this.applyFilters();
         this.closeModal();
         this.toast('ok', 'THÊM BÀI VIẾT THÀNH CÔNG');
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
         this.toast('err', 'LỖI THÊM BÀI VIẾT');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -257,8 +297,12 @@ export class AdminBlog implements OnInit {
         this.persist();
         this.applyFilters();
         this.toast('ok', newVal ? 'Đã bật hiển thị' : 'Đã tắt hiển thị');
+        this.cdr.detectChanges();
       },
-      error: () => this.toast('err', 'LỖI THAY ĐỔI HIỂN THỊ')
+      error: () => {
+        this.toast('err', 'LỖI THAY ĐỔI HIỂN THỊ');
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -288,8 +332,12 @@ export class AdminBlog implements OnInit {
         this.applyFilters();
         this.closeDelete();
         this.toast('ok', 'XÓA BÀI VIẾT THÀNH CÔNG');
+        this.cdr.detectChanges();
       },
-      error: () => this.toast('err', 'LỖI XÓA BÀI VIẾT')
+      error: () => {
+        this.toast('err', 'LỖI XÓA BÀI VIẾT');
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -324,6 +372,7 @@ export class AdminBlog implements OnInit {
           this.computeStats();
           this.persist();
           this.applyFilters();
+          this.cdr.detectChanges();
         } else {
           this.loadLocal();
         }
@@ -359,13 +408,16 @@ export class AdminBlog implements OnInit {
 
   private hydrate(x: any): BlogRow {
     return {
-      id: String(x.id || `blog_${Date.now()}`),
-      code: String(x.code || 'NG00000'),
-      title: String(x.title || ''),
+      id: String(x.id || x._id || `blog_${Date.now()}`),
+      code: String(x.code || (x.id || x._id)?.toString().slice(-6).toUpperCase() || 'NG00000'),
+      title: String(x.title || x.heading || ''),
+      heading: String(x.heading || x.title || ''),
+      headingColor: String(x.headingColor || '#305C33'),
       excerpt: String(x.excerpt || ''),
       content: String(x.content || ''),
-      date: x.date ? new Date(x.date) : new Date(),
+      date: x.date || new Date().toLocaleDateString('en-GB'),
       image: String(x.image || AdminBlog.PLACEHOLDER_IMG),
+      thumbnailImage: String(x.thumbnailImage || x.image || AdminBlog.PLACEHOLDER_IMG),
       images: Array.isArray(x.images) ? x.images.map((s: any) => String(s)) : [String(x.image || '')].filter(Boolean),
       layoutType: String(x.layoutType || (Array.isArray(x.images) && x.images.length > 1 ? 'gallery' : 'single')),
       status: (x.status === 'draft' ? 'draft' : 'published') as PostStatus,
@@ -483,6 +535,10 @@ export class AdminBlog implements OnInit {
 
   private clearFileInput(): void {
     if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = '';
+  }
+
+  private clearThumbInput(): void {
+    if (this.thumbInput?.nativeElement) this.thumbInput.nativeElement.value = '';
   }
 
   private async fileToBase64(file: File): Promise<string> {
