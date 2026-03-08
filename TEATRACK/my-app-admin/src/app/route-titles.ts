@@ -5,6 +5,7 @@ export const ROUTE_TITLES: Record<string, string> = {
     '/admin-blog': 'Quản lý diễn đàn',
     '/admin-account': 'Quản lý tài khoản',
     '/admin-order': 'Quản lý đơn hàng',
+    '/admin-profile': 'Tài khoản quản lý',
 
     '/404': 'Không tìm thấy trang',
 };

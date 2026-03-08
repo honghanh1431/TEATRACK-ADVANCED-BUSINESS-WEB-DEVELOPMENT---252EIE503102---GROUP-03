@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PageHeaderAdmin } from './Components/page-header/page-header-admin';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { AdminAccount } from './Pages/Admin/admin-account/admin-account';
@@ -22,6 +23,7 @@ import { AdminProfile } from './Pages/Admin/admin-profile/admin-profile';
     AppRoutingModule,
     HttpClientModule,
     CommonModule,
+    FormsModule,
     PageHeaderAdmin
   ],
   providers: [
