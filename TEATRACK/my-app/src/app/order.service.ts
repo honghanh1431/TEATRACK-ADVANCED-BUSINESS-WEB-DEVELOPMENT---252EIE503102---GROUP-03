@@ -23,6 +23,10 @@ export class OrderService {
         return this.http.get<{ orders: any[] }>(this.apiUrl, { headers: this.getHeaders() });
     }
 
+    getOrderById(orderId: string): Observable<{ order: any }> {
+        return this.http.get<{ order: any }>(`${this.apiUrl}/${encodeURIComponent(orderId)}`, { headers: this.getHeaders() });
+    }
+
     cancelOrder(orderId: string): Observable<any> {
         return this.http.patch(`${this.apiUrl}/${encodeURIComponent(orderId)}/cancel`, {}, { headers: this.getHeaders() });
     }

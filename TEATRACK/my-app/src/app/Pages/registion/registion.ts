@@ -1,15 +1,28 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, ElementRef, ViewChild, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-registion',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './registion.html',
   styleUrls: ['./registion.css'],
 })
-export class Registion {
-  constructor(private router: Router, private http: HttpClient) {}
+export class Registion implements OnInit {
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private titleService: Title
+  ) { }
+
+  ngOnInit() {
+    this.titleService.setTitle('Đăng ký tài khoản | Hồng Trà Ngô Gia');
+  }
 
   // Dữ liệu form
   username = '';
@@ -179,6 +192,7 @@ export class Registion {
           this.alertTitle = 'Thành công';
           this.alertMessage = 'Đăng ký thành công! Vui lòng đăng nhập.';
           this.showAlertModal = true;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.isLoading = false;
@@ -186,6 +200,7 @@ export class Registion {
           this.alertTitle = 'Đăng ký thất bại';
           this.alertMessage = err.error?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
           this.showAlertModal = true;
+          this.cdr.detectChanges();
         }
       });
   }

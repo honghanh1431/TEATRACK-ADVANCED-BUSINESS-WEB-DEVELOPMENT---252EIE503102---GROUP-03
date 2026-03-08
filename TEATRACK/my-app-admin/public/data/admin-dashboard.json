@@ -1,0 +1,265 @@
+{
+  "branches": ["all", "1", "2", "3"],
+  "data": {
+    "all": {
+      "2025-12": {
+        "revenue": 2471000,
+        "ordersCount": 38,
+        "productsSold": 103,
+        "revenueDelta": 100,
+        "ordersDelta": 100,
+        "productsSoldDelta": 100,
+        "revenueDiff": 1235000,
+        "ordersDiff": 19,
+        "productsSoldDiff": 52,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [28, 32, 35, 38, 42, 45, 48, 55, 62, 68, 72, 80],
+          "cost": [22, 26, 28, 32, 35, 38, 40, 45, 50, 54, 58, 62]
+        },
+        "doughnut": {
+          "data": [25, 18, 20, 12, 10, 15],
+          "centerValue": "1.9",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-11": {
+        "revenue": 1850000,
+        "ordersCount": 24,
+        "productsSold": 68,
+        "revenueDelta": 22,
+        "ordersDelta": 15,
+        "productsSoldDelta": 18,
+        "revenueDiff": 334000,
+        "ordersDiff": 3,
+        "productsSoldDiff": 10,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [35, 25, 32, 38, 28, 42, 20, 48, 52, 55, 58, 62],
+          "cost": [32, 22, 28, 35, 25, 38, 18, 42, 45, 48, 50, 52]
+        },
+        "doughnut": {
+          "data": [22, 15, 18, 14, 12, 9],
+          "centerValue": "1.5",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-10": {
+        "revenue": 1520000,
+        "ordersCount": 21,
+        "productsSold": 58,
+        "revenueDelta": -5,
+        "ordersDelta": 0,
+        "productsSoldDelta": -3,
+        "revenueDiff": -80000,
+        "ordersDiff": 0,
+        "productsSoldDiff": -2,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [30, 28, 35, 32, 38, 40, 42, 45, 48, 50, 52, 55],
+          "cost": [28, 26, 30, 30, 35, 36, 38, 40, 42, 45, 46, 48]
+        },
+        "doughnut": {
+          "data": [20, 12, 22, 10, 8, 8],
+          "centerValue": "1.2",
+          "centerUnit": "K VND"
+        }
+      }
+    },
+    "1": {
+      "2025-12": {
+        "revenue": 980000,
+        "ordersCount": 15,
+        "productsSold": 42,
+        "revenueDelta": 85,
+        "ordersDelta": 70,
+        "productsSoldDelta": 75,
+        "revenueDiff": 450000,
+        "ordersDiff": 6,
+        "productsSoldDiff": 18,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [15, 18, 22, 25, 28, 30, 32, 38, 42, 45, 48, 52],
+          "cost": [12, 14, 18, 20, 22, 24, 26, 30, 33, 35, 38, 40]
+        },
+        "doughnut": {
+          "data": [12, 8, 10, 5, 4, 3],
+          "centerValue": "0.8",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-11": {
+        "revenue": 720000,
+        "ordersCount": 11,
+        "productsSold": 30,
+        "revenueDelta": 20,
+        "ordersDelta": 10,
+        "productsSoldDelta": 15,
+        "revenueDiff": 120000,
+        "ordersDiff": 1,
+        "productsSoldDiff": 4,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [18, 20, 22, 24, 26, 28, 30, 32, 35, 38, 40, 42],
+          "cost": [14, 16, 18, 20, 22, 24, 25, 27, 29, 31, 33, 35]
+        },
+        "doughnut": {
+          "data": [10, 6, 8, 4, 3, 2],
+          "centerValue": "0.6",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-10": {
+        "revenue": 600000,
+        "ordersCount": 10,
+        "productsSold": 26,
+        "revenueDelta": -8,
+        "ordersDelta": -5,
+        "productsSoldDelta": -4,
+        "revenueDiff": -52000,
+        "ordersDiff": -1,
+        "productsSoldDiff": -1,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38],
+          "cost": [14, 16, 18, 19, 21, 23, 25, 27, 28, 30, 32, 33]
+        },
+        "doughnut": {
+          "data": [8, 5, 7, 3, 2, 1],
+          "centerValue": "0.5",
+          "centerUnit": "K VND"
+        }
+      }
+    },
+    "2": {
+      "2025-12": {
+        "revenue": 820000,
+        "ordersCount": 12,
+        "productsSold": 35,
+        "revenueDelta": 95,
+        "ordersDelta": 80,
+        "productsSoldDelta": 90,
+        "revenueDiff": 400000,
+        "ordersDiff": 5,
+        "productsSoldDiff": 17,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [22, 25, 28, 30, 32, 35, 38, 42, 45, 48, 50, 55],
+          "cost": [18, 20, 24, 26, 28, 30, 32, 36, 38, 40, 42, 45]
+        },
+        "doughnut": {
+          "data": [14, 10, 12, 6, 5, 4],
+          "centerValue": "0.7",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-11": {
+        "revenue": 520000,
+        "ordersCount": 8,
+        "productsSold": 22,
+        "revenueDelta": 18,
+        "ordersDelta": 12,
+        "productsSoldDelta": 20,
+        "revenueDiff": 80000,
+        "ordersDiff": 1,
+        "productsSoldDiff": 4,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42],
+          "cost": [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 35, 37]
+        },
+        "doughnut": {
+          "data": [11, 7, 9, 5, 4, 3],
+          "centerValue": "0.5",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-10": {
+        "revenue": 440000,
+        "ordersCount": 7,
+        "productsSold": 18,
+        "revenueDelta": -3,
+        "ordersDelta": 0,
+        "productsSoldDelta": -2,
+        "revenueDiff": -14000,
+        "ordersDiff": 0,
+        "productsSoldDiff": -1,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40],
+          "cost": [15, 17, 19, 21, 23, 25, 26, 28, 30, 32, 33, 35]
+        },
+        "doughnut": {
+          "data": [9, 6, 8, 4, 3, 2],
+          "centerValue": "0.4",
+          "centerUnit": "K VND"
+        }
+      }
+    },
+    "3": {
+      "2025-12": {
+        "revenue": 671000,
+        "ordersCount": 11,
+        "productsSold": 26,
+        "revenueDelta": 110,
+        "ordersDelta": 100,
+        "productsSoldDelta": 100,
+        "revenueDiff": 385000,
+        "ordersDiff": 8,
+        "productsSoldDiff": 17,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [18, 20, 24, 26, 28, 32, 35, 38, 42, 45, 48, 52],
+          "cost": [14, 16, 20, 22, 24, 28, 30, 32, 36, 38, 40, 43]
+        },
+        "doughnut": {
+          "data": [10, 7, 9, 5, 4, 3],
+          "centerValue": "0.6",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-11": {
+        "revenue": 358000,
+        "ordersCount": 5,
+        "productsSold": 14,
+        "revenueDelta": 25,
+        "ordersDelta": 25,
+        "productsSoldDelta": 28,
+        "revenueDiff": 72000,
+        "ordersDiff": 1,
+        "productsSoldDiff": 3,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 38],
+          "cost": [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 31, 33]
+        },
+        "doughnut": {
+          "data": [8, 5, 6, 4, 3, 2],
+          "centerValue": "0.35",
+          "centerUnit": "K VND"
+        }
+      },
+      "2025-10": {
+        "revenue": 286000,
+        "ordersCount": 4,
+        "productsSold": 11,
+        "revenueDelta": -10,
+        "ordersDelta": -8,
+        "productsSoldDelta": -5,
+        "revenueDiff": -32000,
+        "ordersDiff": 0,
+        "productsSoldDiff": -1,
+        "lineChart": {
+          "labels": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+          "revenue": [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34],
+          "cost": [10, 12, 14, 16, 18, 20, 21, 23, 25, 27, 28, 30]
+        },
+        "doughnut": {
+          "data": [6, 4, 5, 3, 2, 1],
+          "centerValue": "0.28",
+          "centerUnit": "K VND"
+        }
+      }
+    }
+  }
+}

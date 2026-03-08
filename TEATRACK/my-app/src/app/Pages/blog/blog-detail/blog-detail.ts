@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { BLOG_DATA, RELATED_BLOGS } from '../blog-data';
 import { APP_TITLE_SUFFIX } from '../../../route-titles';
 
@@ -28,7 +29,9 @@ export class BlogDetail implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private titleService: Title,
-  ) {}
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     // Lắng nghe thay đổi ID trên URL (khi click bài liên quan vẫn dùng cùng component)
@@ -47,6 +50,7 @@ export class BlogDetail implements OnInit {
   openBlog(id: string) {
     this.router.navigate(['/blog', id]).then(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.cdr.detectChanges();
     });
   }
   /** Cuộn trái: chỉ khi còn chỗ (không wrap) */
@@ -91,30 +95,64 @@ export class BlogDetail implements OnInit {
     return null;
   }
 
+  normSrc(path?: string): string {
+    if (!path) return 'assets/icons/menu.png';
+    const s = String(path);
+    if (s.startsWith('http') || s.startsWith('data:')) return s;
+    if (s.startsWith('assets/')) return s;
+    if (s.startsWith('/assets/')) return s.slice(1);
+    return 'assets/images/products/' + s.replace(/^\/+/, '').replace(/^assets\/+/, '');
+  }
+
   private loadBlog() {
-    // Lấy blog data tương ứng
-    this.blog = BLOG_DATA[this.blogId as keyof typeof BLOG_DATA];
+    this.http.get<any>(`http://localhost:3002/blog/${this.blogId}`).subscribe({
+      next: (data) => {
+        this.blog = data;
+        if (this.blog && this.blog.title) {
+          this.titleService.setTitle(`${this.blog.title} | ${APP_TITLE_SUFFIX}`);
+        }
+        this.loadRelated();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Load blog error:', err);
+        // Fallback
+        this.blog = (BLOG_DATA as any)[this.blogId];
+        if (!this.blog) {
+          this.blog = {
+            heading: 'Blog không tồn tại',
+            content: '<p>Xin lỗi, blog này không tồn tại hoặc đã bị xóa.</p>',
+            headingColor: '#D33'
+          };
+          this.relatedBlogs = [];
+          this.titleService.setTitle(`Blog không tồn tại | ${APP_TITLE_SUFFIX}`);
+        } else {
+          if (this.blog.title) {
+            this.titleService.setTitle(`${this.blog.title} | ${APP_TITLE_SUFFIX}`);
+          }
+          this.loadRelated();
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
-    // Nếu không tìm thấy, báo lỗi
-    if (!this.blog) {
-      this.blog = {
-        heading: 'Blog không tồn tại',
-        content: '<p>Xin lỗi, blog này không tồn tại hoặc đã bị xóa.</p>',
-        headingColor: '#D33'
-      };
-      this.relatedBlogs = [];
-      this.titleService.setTitle(`Blog không tồn tại | ${APP_TITLE_SUFFIX}`);
-      return;
-    }
-
-    // Đề xuất 6 bài, hiển thị 3 bài/lần; mũi tên bấm qua hết
-    this.relatedBlogs = RELATED_BLOGS
-      .filter(b => b.id !== this.blogId)
-      .slice(0, 6);
-    this.relatedIndex = 0;
-
-    if (this.blog.title) {
-      this.titleService.setTitle(`${this.blog.title} | ${APP_TITLE_SUFFIX}`);
-    }
+  private loadRelated() {
+    this.http.get<any[]>('http://localhost:3002/blog').subscribe({
+      next: (data) => {
+        this.relatedBlogs = (data || [])
+          .filter(b => b.id !== this.blogId && b.visible !== false)
+          .slice(0, 6);
+        this.relatedIndex = 0;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.relatedBlogs = RELATED_BLOGS
+          .filter(b => b.id !== this.blogId)
+          .slice(0, 6);
+        this.relatedIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

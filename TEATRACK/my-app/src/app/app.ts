@@ -17,8 +17,8 @@ export class App implements OnInit, OnDestroy {
   private toastSub?: Subscription;
 
   showLayout = true;
-  /** 'guest' = page-header, 'customer' = page-header-2, 'admin' = page-header-admin */
-  headerMode: 'guest' | 'customer' | 'admin' = 'guest';
+  /** 'guest' = page-header, 'customer' = page-header-2 */
+  headerMode: 'guest' | 'customer' = 'guest';
   /** Toast: pre + name (in đậm) + post */
   toastPre = '';
   toastName = '';
@@ -31,24 +31,16 @@ export class App implements OnInit, OnDestroy {
       const userRaw = localStorage.getItem('ngogia_user');
       if (userRaw) {
         const user = JSON.parse(userRaw) as { role?: string };
-        // Ưu tiên role trong ngogia_user: customer → header-2, admin → header-admin
+        // Ưu tiên role trong ngogia_user: customer → header-2
         if (user?.role === 'customer') {
           this.headerMode = 'customer';
-          return;
-        }
-        if (user?.role === 'admin' && localStorage.getItem('authAdmin')) {
-          this.headerMode = 'admin';
           return;
         }
         // Có user nhưng không rõ role (cũ) → coi là customer
         this.headerMode = 'customer';
         return;
       }
-      if (localStorage.getItem('authAdmin')) {
-        this.headerMode = 'admin';
-        return;
-      }
-    } catch (_) {}
+    } catch (_) { }
     this.headerMode = 'guest';
   }
 
@@ -69,16 +61,16 @@ export class App implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
   ) {
     this.router.events.subscribe(event => {
-    if (event instanceof NavigationEnd) {
-      const path = event.urlAfterRedirects?.split('?')[0] || '';
-      this.showLayout = !this.hideLayoutPaths.includes(path);
-      this.updateHeaderMode();
-      this.cdr.detectChanges();
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('routeChange', { detail: { path: path } }));
+      if (event instanceof NavigationEnd) {
+        const path = event.urlAfterRedirects?.split('?')[0] || '';
+        this.showLayout = !this.hideLayoutPaths.includes(path);
+        this.updateHeaderMode();
+        this.cdr.detectChanges();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('routeChange', { detail: { path: path } }));
+        }
       }
-    }
-  });
+    });
   }
 
   private updateTitle(path: string): void {
@@ -89,8 +81,8 @@ export class App implements OnInit, OnDestroy {
     this.titleService.setTitle(full);
   }
 
-  private readonly hideLayoutPaths = ['/login', '/login-admin', '/register', '/404', '/payment','/forgot-password'];
-  
+  private readonly hideLayoutPaths = ['/login', '/register', '/404', '/payment', '/forgot-password'];
+
 
   ngOnInit(): void {
     const path = (this.router.url || '').split('?')[0];

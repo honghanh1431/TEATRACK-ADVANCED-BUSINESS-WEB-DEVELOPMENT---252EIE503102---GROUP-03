@@ -5,9 +5,10 @@
 
   <!-- Breadcrumb -->
   <section class="breadcrumb-banner">
-    <h1 class="breadcrumb-title">Tất cả bài viết</h1>
+    <h1 class="breadcrumb-title">Tin tức & Khuyến mãi</h1>
     <p class="breadcrumb-path">
-      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/blog/" (click)="scrollToTop()">Diễn đàn</a>
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/blog/" (click)="scrollToTop()">Diễn
+        đàn</a>
     </p>
   </section>
 
@@ -15,61 +16,32 @@
   <section class="blog-list-section">
     <div class="container">
       <div class="promo-container">
-        <a
-          *ngFor="let blog of displayedBlogs"
-          [routerLink]="['/blog', blog.id]"
-          class="promo-card"
-        >
-          <img
-            [src]="blog.thumbnailImage || blog.image || blog.images?.[0]"
-            [alt]="blog.title"
-            class="promo-img"
-          />
+        <a *ngFor="let blog of displayedBlogs" [routerLink]="['/blog', blog.id]" class="promo-card">
+          <img [src]="normSrc(blog.thumbnailImage || blog.image || blog.images?.[0])" [alt]="blog.title"
+            class="promo-img" />
           <div class="promo-content">
             <p class="promo-date">
-              <img
-                src="assets/icons/Vector (1).png"
-                alt="icon"
-                width="12"
-                height="12"
-              />
+              <img src="assets/icons/Vector (1).png" alt="icon" width="12" height="12" />
               {{ formatDate(blog.date) }}
             </p>
             <hr class="divider" />
-            <h3 class="promo-title">{{ headingOneLine(blog.heading) }}</h3>
+            <h3 class="promo-title">{{ headingOneLine(blog.heading || blog.title) }}</h3>
           </div>
         </a>
       </div>
 
       <nav class="pagination-wrap">
-        <button
-          type="button"
-          class="pagination-btn"
-          (click)="prevPage()"
-          [disabled]="currentPage <= 1"
-          [attr.aria-disabled]="currentPage <= 1"
-          aria-label="Trang trước"
-        >
+        <button type="button" class="pagination-btn" (click)="prevPage()" [disabled]="currentPage <= 1"
+          [attr.aria-disabled]="currentPage <= 1" aria-label="Trang trước">
           ‹
         </button>
-        <button
-          *ngFor="let p of visiblePageNumbers"
-          type="button"
-          class="pagination-num"
-          [class.active]="p === currentPage"
-          (click)="goToPage(p)"
-        >
+        <button *ngFor="let p of visiblePageNumbers" type="button" class="pagination-num"
+          [class.active]="p === currentPage" (click)="goToPage(p)">
           {{ p }}
         </button>
         <span class="pagination-ellipsis" *ngIf="showEllipsisAfter">...</span>
-        <button
-          type="button"
-          class="pagination-btn"
-          (click)="nextPage()"
-          [disabled]="currentPage >= totalPages"
-          [attr.aria-disabled]="currentPage >= totalPages"
-          aria-label="Trang sau"
-        >
+        <button type="button" class="pagination-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages"
+          [attr.aria-disabled]="currentPage >= totalPages" aria-label="Trang sau">
           ›
         </button>
       </nav>

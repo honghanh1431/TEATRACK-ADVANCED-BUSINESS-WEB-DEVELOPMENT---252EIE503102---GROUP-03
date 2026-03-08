@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { OrderService } from '../../order.service';
 
 @Component({
   selector: 'app-order-tracking',
@@ -43,10 +44,6 @@ export class OrderTracking implements OnInit, OnDestroy {
     completed: 'Giao thành công',
   };
 
-  // Demo control
-  demoMode = true;
-  btnNextDisabled = false;
-  btnNextTitle = '';
 
   // Auto refresh interval
   private refreshInterval: any;
@@ -54,7 +51,8 @@ export class OrderTracking implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-  ) {}
+    private orderService: OrderService,
+  ) { }
 
   ngOnInit(): void {
     this.orderId = this.route.snapshot.queryParamMap.get('orderId');
@@ -99,13 +97,43 @@ export class OrderTracking implements OnInit, OnDestroy {
 
   // ==================== LOAD ORDER ====================
   private loadOrderData(): void {
+    const token = localStorage.getItem('token');
+    if (token && this.orderId) {
+      this.orderService.getOrderById(this.orderId).subscribe({
+        next: (res) => {
+          if (res.order) {
+            this.order = res.order;
+            this.updateTimeline(this.order.status || 'pending', false);
+            // Cập nhật lại localStorage để đồng bộ status
+            try {
+              const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+              const idx = orders.findIndex((o: any) => (o.id || o.orderId) === this.orderId);
+              if (idx !== -1) {
+                orders[idx].status = res.order.status;
+                localStorage.setItem('orders', JSON.stringify(orders));
+              }
+            } catch (e) { }
+            this.cdr.detectChanges();
+          } else {
+            this.loadFromFallback();
+          }
+        },
+        error: (err) => {
+          console.error('Failed to fetch order from API', err);
+          this.loadFromFallback();
+        }
+      });
+    } else {
+      this.loadFromFallback();
+    }
+  }
+
+  private loadFromFallback(): void {
     const order = this.getOrderFromStorage();
     if (order) {
       this.order = order;
       this.updateTimeline(order.status || 'pending', false);
-      this.updateDemoButtonState();
     } else {
-      // Thử fetch từ file JSON (nếu cần)
       this.fetchOrderFromJson();
     }
   }
@@ -129,7 +157,6 @@ export class OrderTracking implements OnInit, OnDestroy {
       if (order) {
         this.order = order;
         this.updateTimeline(order.status || 'pending', false);
-        this.updateDemoButtonState();
         this.applyFragmentAndOpenReview();
       } else {
         this.showError('Không tìm thấy đơn hàng');
@@ -142,12 +169,37 @@ export class OrderTracking implements OnInit, OnDestroy {
 
   private startAutoRefresh(): void {
     this.refreshInterval = setInterval(() => {
-      const updated = this.getOrderFromStorage();
-      if (updated && updated.status !== this.order?.status) {
-        this.order = updated;
-        this.updateTimeline(updated.status, false);
+      const token = localStorage.getItem('token');
+      if (token && this.orderId) {
+        this.orderService.getOrderById(this.orderId).subscribe({
+          next: (res) => {
+            if (res.order && res.order.status !== this.order?.status) {
+              this.order = res.order;
+              this.updateTimeline(res.order.status, true);
+
+              // Cập nhật lại localStorage để các trang khác (OrderHistory) cũng thấy status mới
+              try {
+                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                const idx = orders.findIndex((o: any) => (o.id || o.orderId) === this.orderId);
+                if (idx !== -1) {
+                  orders[idx].status = res.order.status;
+                  localStorage.setItem('orders', JSON.stringify(orders));
+                }
+              } catch (e) { }
+
+              this.cdr.detectChanges();
+            }
+          }
+        });
+      } else {
+        const updated = this.getOrderFromStorage();
+        if (updated && updated.status !== this.order?.status) {
+          this.order = updated;
+          this.updateTimeline(updated.status, false);
+          this.cdr.detectChanges();
+        }
       }
-    }, 30000); // 30 giây
+    }, 15000); // 15 giây
   }
 
   // ==================== UI HELPERS ====================
@@ -281,66 +333,8 @@ export class OrderTracking implements OnInit, OnDestroy {
         }, i * 200); // delay 200ms mỗi bước
       }
     }
-    this.updateDemoButtonState();
   }
 
-  // ==================== DEMO BUTTON ====================
-  private updateDemoButtonState(): void {
-    if (!this.order) return;
-    const currentIndex = this.statusFlow.indexOf(this.order.status);
-    this.btnNextDisabled = currentIndex >= this.statusFlow.length - 1;
-    if (this.btnNextDisabled) {
-      this.btnNextTitle = 'Đơn hàng đã hoàn thành';
-    } else {
-      const nextStatus = this.statusFlow[currentIndex + 1];
-      this.btnNextTitle = `Chuyển sang: ${this.statusNames[nextStatus]}`;
-    }
-  }
-
-  nextStatus(): void {
-    if (!this.order || this.btnNextDisabled) return;
-    const currentIndex = this.statusFlow.indexOf(this.order.status);
-    const nextStatus = this.statusFlow[currentIndex + 1];
-
-    // Cập nhật trong localStorage
-    try {
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      const idx = orders.findIndex((o: any) => (o.id || o.orderId) === this.orderId);
-      if (idx !== -1) {
-        orders[idx].status = nextStatus;
-        localStorage.setItem('orders', JSON.stringify(orders));
-      }
-    } catch (err) {
-      console.error('Không thể cập nhật status', err);
-    }
-
-    this.updateTimeline(nextStatus, true);
-
-    this.showToast(this.statusNames[nextStatus]);
-  }
-
-  private showToast(statusName: string): void {
-    const toast = document.createElement('div');
-    toast.className = 'status-toast';
-    toast.setAttribute('role', 'status');
-    toast.setAttribute('aria-live', 'polite');
-    toast.innerHTML = `<span class="status-toast-icon" aria-hidden="true">✓</span><strong class="status-toast-name">${this.escapeHtml(statusName)}</strong>`;
-    document.body.appendChild(toast);
-    // Đợi 1 frame để browser áp style opacity:0 rồi mới thêm visible (transition chạy đúng)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => toast.classList.add('status-toast-visible'));
-    });
-    setTimeout(() => {
-      toast.classList.remove('status-toast-visible');
-      setTimeout(() => toast.remove(), 280);
-    }, 2000);
-  }
-
-  private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
 
   // ==================== REVIEW MODAL ====================
   openReviewModal(): void {

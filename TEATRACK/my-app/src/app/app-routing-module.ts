@@ -7,7 +7,6 @@ import { Homepage } from './Pages/homepage/homepage';
 import { Product } from './Pages/product/product';
 import { Aboutus } from './Pages/aboutus/aboutus';
 import { Agency } from './Pages/agency/agency';
-import { Admin } from './Pages/Admin/admin';
 import { Login } from './Pages/login/login';
 import { Registion } from './Pages/registion/registion';
 import { Cart } from './Pages/cart/cart';
@@ -15,8 +14,6 @@ import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { Payment } from './Pages/payment/payment';
 import { Contact } from './Pages/contact/contact';
 import { Profile } from './Pages/profile/profile';
-import { AdminBlog } from './Pages/Admin/admin-blog/admin-blog';
-import { AdminOrder } from './Pages/Admin/admin-order/admin-order';
 import { OrderTracking } from './Pages/order-tracking/order-tracking';
 import { ForgotPassword } from './Pages/forgot-password/forgot-password';
 import { OrderHistory } from './Pages/order-history/order-history';
@@ -35,20 +32,15 @@ const routes: Routes = [
   { path: 'menu/product/:id/:name', component: Product },
   { path: 'aboutus', component: Aboutus },
   { path: 'agency', component: Agency },
-  { path: 'admin-dashboard', component: Admin },
-  { path: 'login', component: Login, data: { isAdmin: false } },
-  { path: 'login-admin', component: Login, data: { isAdmin: true } },
-  { path: 'forgot-password', component: ForgotPassword},
+  { path: 'login', component: Login },
+  { path: 'forgot-password', component: ForgotPassword },
   { path: 'register', component: Registion },
   { path: 'cart', component: Cart },
-  { path: 'order-tracking', component: OrderTracking},
+  { path: 'order-tracking', component: OrderTracking },
   { path: '404', component: Pagenotfound },
   { path: 'payment', component: Payment },
   { path: 'contact', component: Contact },
   { path: 'profile', component: Profile },
-  { path: 'admin/blog', component: AdminBlog },
-  { path: 'admin/blog', loadComponent: () => import('./Pages/Admin/admin-blog/admin-blog').then(m => m.AdminBlog) },
-  { path: 'admin/order', component: AdminOrder },
   { path: 'order-history', component: OrderHistory },
 
   { path: '**', redirectTo: '404', pathMatch: 'full' },

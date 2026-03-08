@@ -70,6 +70,10 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+// Admin routes (protected)
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
+
 // Products, Blog, Reviews (chuyển từ my-server in-memory sang MongoDB)
 const { productsRouter, blogRouter, reviewsRouter } = require('./routes/productsBlogReviewsRoutes');
 app.use('/products', productsRouter);

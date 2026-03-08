@@ -1,0 +1,58 @@
+.wrapper{
+  height:100vh;
+  background: url("/assets/images/bg_pagenotfound.png") no-repeat center center;
+  background-size:cover;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation: bgMove 20s ease-in-out infinite alternate;
+}
+
+/* background drift nhẹ */
+@keyframes bgMove{
+  from{ background-position:center top; }
+  to{ background-position:center bottom; }
+}
+
+.box{
+  text-align:center;
+  padding:60px 40px;
+  border-radius:22px;
+  animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.code{
+  font-size:200px;
+  font-weight:900;
+  color:#2F2D2D;
+}
+
+.title{
+  font-size:32px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.btn{
+  background:#656E2E;
+  color:white;
+  border:1px solid #656E2E;
+  padding:14px 40px;
+  font-size:18px;
+  border-radius:20px;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(0,0,0,0.15);
+  transition:0.3s;
+  font-weight: 600;
+  margin-top:20px;
+}
+
+.btn:hover{
+  background:white;
+  color:#656E2E
+}

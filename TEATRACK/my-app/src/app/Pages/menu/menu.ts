@@ -82,7 +82,7 @@ export class Menu implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private productState: ProductStateService,
     private reviewCountService: ReviewCountService,
-  ) {}
+  ) { }
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -111,21 +111,7 @@ export class Menu implements OnInit, AfterViewInit {
 
   // ─── Fetch ────────────────────────────────────────────────────────────────
   private fetchProducts(): void {
-    const fromStorage = this.getProductsFromStorage();
-    if (fromStorage.length > 0) {
-      this.allData = fromStorage.filter((item) => item.visible !== false);
-      this.categories = Array.from(
-        new Set(
-          this.allData
-            .map((item) => (item.category || '').trim())
-            .filter(Boolean)
-        )
-      );
-      this.updateProducts();
-      this.cdr.detectChanges();
-      return;
-    }
-    const url = `${Menu.STATIC_BASE}data/products.json`;
+    const url = `http://localhost:3002/products`;
     this.http.get<Product[]>(url).subscribe({
       next: (data) => {
         this.allData = (data || []).filter((item) => item.visible !== false);
@@ -140,8 +126,23 @@ export class Menu implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error(err);
-        this.loadError = true;
+        console.error('Fetch products error:', err);
+        const fromStorage = this.getProductsFromStorage();
+        if (fromStorage.length > 0) {
+          this.allData = fromStorage.filter((item) => item.visible !== false);
+          this.categories = Array.from(
+            new Set(
+              this.allData
+                .map((item) => (item.category || '').trim())
+                .filter(Boolean)
+            )
+          );
+          this.updateProducts();
+          this.cdr.detectChanges();
+        } else {
+          this.loadError = true;
+          this.cdr.detectChanges();
+        }
       },
     });
   }
@@ -206,8 +207,11 @@ export class Menu implements OnInit, AfterViewInit {
   }
 
   getProductImg(product: Product): string {
-    const img = (product.image || '').replace(/^\//, '');
-    return img ? (img.startsWith('assets/') ? img : 'assets/images/products/' + img) : 'assets/icons/menu.png';
+    const raw = (product.image || '').trim();
+    if (!raw) return 'assets/icons/menu.png';
+    if (raw.startsWith('http') || raw.startsWith('data:')) return raw;
+    const img = raw.replace(/^\//, '');
+    return img.startsWith('assets/') ? img : 'assets/images/products/' + img;
   }
 
   getRating(product: Product): number {

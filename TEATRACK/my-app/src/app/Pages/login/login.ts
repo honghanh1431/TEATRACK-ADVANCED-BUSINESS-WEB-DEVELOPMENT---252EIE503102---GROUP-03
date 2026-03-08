@@ -15,7 +15,6 @@ import { CartService } from '../../cart.service';
 })
 export class Login implements OnInit {
 
-  isAdmin = false;
   username = '';
   password = '';
   rememberMe = false;
@@ -38,9 +37,6 @@ export class Login implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      this.isAdmin = data['isAdmin'] === true;
-    });
 
     // Load ngôn ngữ đã lưu hoặc mặc định vi
     const savedLang = localStorage.getItem('lang') || 'vi';
@@ -105,15 +101,7 @@ export class Login implements OnInit {
       next: (res) => {
         this.isLoading = false;
 
-        // Kiểm tra quyền dựa trên route hiện tại (isAdmin từ route data)
-        if (this.isAdmin && res.user.role !== 'admin') {
-          this.showError(this.currentLang === 'vi'
-            ? 'Tài khoản này không có quyền quản lý.'
-            : 'This account does not have admin access.');
-          this.cdr.detectChanges();
-          return;
-        }
-        if (!this.isAdmin && res.user.role !== 'customer') {
+        if (res.user.role !== 'customer') {
           this.showError(this.currentLang === 'vi'
             ? 'Vui lòng đăng nhập tại trang quản lý.'
             : 'Please login at the admin page.');
@@ -142,16 +130,8 @@ export class Login implements OnInit {
             const syncAndNotify = () => {
               window.dispatchEvent(new Event('user-login'));
               // Điều hướng SAU KHI sync xong để không bị gián đoạn request
-              if (res.user.role === 'admin') {
-                localStorage.setItem('authAdmin', JSON.stringify({
-                  name: res.user.username,
-                  role: 'admin'
-                }));
-                window.location.href = '/admin-dashboard';
-              } else {
-                localStorage.removeItem('authAdmin');
-                this.router.navigate(['/']).then(() => this.cdr.detectChanges());
-              }
+              localStorage.removeItem('authAdmin');
+              this.router.navigate(['/']).then(() => this.cdr.detectChanges());
               this.cdr.detectChanges();
             };
 
@@ -170,14 +150,8 @@ export class Login implements OnInit {
           error: (err) => {
             console.error('Failed to fetch cart after login', err);
             window.dispatchEvent(new Event('user-login'));
-            // Điều hướng ngay cả khi fetch cart lỗi
-            if (res.user.role === 'admin') {
-              localStorage.setItem('authAdmin', JSON.stringify({ name: res.user.username, role: 'admin' }));
-              window.location.href = '/admin-dashboard';
-            } else {
-              localStorage.removeItem('authAdmin');
-              this.router.navigate(['/']).then(() => this.cdr.detectChanges());
-            }
+            localStorage.removeItem('authAdmin');
+            this.router.navigate(['/']).then(() => this.cdr.detectChanges());
           }
         });
       },

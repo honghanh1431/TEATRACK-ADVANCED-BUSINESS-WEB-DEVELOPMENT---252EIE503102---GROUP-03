@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, updateProfile, updateUsername, changePassword } = require('../controllers/authController');const { forgotPassword, verifyOtp, resetPassword } = require('../controllers/forgotPasswordController'); 
+const { register, login, adminLogin, updateProfile, updateUsername, changePassword } = require('../controllers/authController');const { forgotPassword, verifyOtp, resetPassword } = require('../controllers/forgotPasswordController'); 
 const { verifyToken, checkAdmin } = require('../middleware/authMiddleware');
 const User = require('../models/User');
 const upload = require('../middleware/upload');
@@ -8,6 +8,7 @@ const upload = require('../middleware/upload');
 // Public routes
 router.post('/register', register);
 router.post('/login', login);
+router.post('/admin-login', adminLogin);
 // Forgot password routes
 router.post('/forgot-password', forgotPassword);
 router.post('/verify-otp', verifyOtp);

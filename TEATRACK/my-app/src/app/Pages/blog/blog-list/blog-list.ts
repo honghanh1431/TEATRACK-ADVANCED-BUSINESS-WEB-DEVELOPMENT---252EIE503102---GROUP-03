@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { BLOG_DATA } from '../blog-data';
+import { APP_TITLE_SUFFIX } from '../../../route-titles';
 
 const PAGE_SIZE = 8;
 /** Pagination chỉ hiển thị tối đa 5 số, sau đó là dấu ... */
@@ -20,7 +23,12 @@ export class BlogList implements OnInit {
   currentPage = 1;
   totalPages = 1;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private titleService: Title
+  ) { }
 
   /** Chỉ hiển thị tối đa 5 số trang, trượt theo currentPage. */
   get visiblePageNumbers(): number[] {
@@ -47,14 +55,37 @@ export class BlogList implements OnInit {
   }
 
   ngOnInit() {
-    this.blogsArray = Object.keys(BLOG_DATA).map(
-      key => ({
-        id: key,
-        ...(BLOG_DATA as Record<string, any>)[key]
-      })
-    );
-    this.totalPages = Math.max(1, Math.ceil(this.blogsArray.length / PAGE_SIZE));
-    this.updateDisplayedBlogs();
+    this.titleService.setTitle(`Diễn đàn | ${APP_TITLE_SUFFIX}`);
+    this.http.get<any[]>('http://localhost:3002/blog').subscribe({
+      next: (data) => {
+        this.blogsArray = (data || []).filter(b => b.visible !== false);
+        this.totalPages = Math.max(1, Math.ceil(this.blogsArray.length / PAGE_SIZE));
+        this.updateDisplayedBlogs();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Fetch blogs error:', err);
+        // Fallback to local data
+        this.blogsArray = Object.keys(BLOG_DATA).map(
+          key => ({
+            id: key,
+            ...(BLOG_DATA as Record<string, any>)[key]
+          })
+        );
+        this.totalPages = Math.max(1, Math.ceil(this.blogsArray.length / PAGE_SIZE));
+        this.updateDisplayedBlogs();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  normSrc(path?: string): string {
+    if (!path) return 'assets/icons/menu.png';
+    const s = String(path);
+    if (s.startsWith('http') || s.startsWith('data:')) return s;
+    if (s.startsWith('assets/')) return s;
+    if (s.startsWith('/assets/')) return s.slice(1);
+    return 'assets/images/products/' + s.replace(/^\/+/, '').replace(/^assets\/+/, '');
   }
 
   private updateDisplayedBlogs() {

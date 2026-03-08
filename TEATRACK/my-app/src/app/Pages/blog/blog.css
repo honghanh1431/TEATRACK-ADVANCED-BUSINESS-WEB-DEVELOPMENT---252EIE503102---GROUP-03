@@ -1,10 +1,10 @@
 body {
   position: relative;
   min-height: 100vh;
-  background: linear-gradient(to bottom, 
-              rgba(255,255,255,0.9) 0%, 
-              rgba(0,136,255,0.3) 50%, 
-              rgba(255,255,255,0.9) 100%) !important;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(0, 136, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.9) 100%) !important;
 }
 
 .background-overlay {
@@ -50,7 +50,7 @@ body {
 
 .breadcrumb-path a {
   text-decoration: none;
-  color:#808080 !important
+  color: #808080 !important
 }
 
 .breadcrumb-path a:hover {
@@ -66,7 +66,7 @@ body {
 .container {
   position: relative;
   z-index: 2;
-  padding: 40px 20px; 
+  padding: 40px 20px;
   text-align: center;
 }
 
@@ -164,6 +164,7 @@ body {
   gap: 8px;
   margin-top: 32px;
 }
+
 .pagination-btn,
 .pagination-num {
   min-width: 36px;
@@ -178,20 +179,24 @@ body {
   border-radius: 6px;
   transition: all 0.2s ease;
 }
+
 .pagination-btn:hover:not(:disabled),
 .pagination-num:hover {
   border-color: #0088ff;
   color: #0088ff;
 }
+
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .pagination-num.active {
   border-color: #0088ff;
   background: #0088ff;
   color: #fff;
 }
+
 .pagination-ellipsis {
   padding: 0 4px;
   color: #808080;
@@ -207,12 +212,15 @@ body {
 }
 
 #blog-heading {
-  margin-bottom: 10px; /* Giảm khoảng cách sau heading */
+  margin-bottom: 10px;
+  /* Giảm khoảng cách sau heading */
 }
 
 #blog-subheading {
-  margin-top: 5px; /* Giảm khoảng cách trước subheading */
-  margin-bottom: 15px; /* Giảm khoảng cách sau subheading */
+  margin-top: 5px;
+  /* Giảm khoảng cách trước subheading */
+  margin-bottom: 15px;
+  /* Giảm khoảng cách sau subheading */
 }
 
 .title-divider {
@@ -220,37 +228,51 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: 15px 0; /* Giảm từ 10px xuống 15px */
+  margin: 15px 0;
+  /* Giảm từ 10px xuống 15px */
   gap: 5px;
 }
 
 .title-divider hr {
-  width: 80px; /* Giảm từ 100px */
+  width: 80px;
+  /* Giảm từ 100px */
   border: none;
   border-top: 2px solid #808080;
   margin: 0;
 }
 
 .title-divider img {
-  width: 40px; /* Giảm từ 50px */
-  height: 40px; /* Giảm từ 50px */
+  width: 40px;
+  /* Giảm từ 50px */
+  height: 40px;
+  /* Giảm từ 50px */
   object-fit: cover;
 }
 
 .img {
   text-align: center;
   margin: 30px auto;
-  max-width: 800px; /* Giới hạn chiều rộng ảnh */
+  max-width: 1000px;
+  /* Khớp với chiều rộng content */
+  width: 100%;
 }
 
 .blog-img {
   width: 100%;
-  max-width: 1000px; /* Ảnh không quá 800px */
-  height: auto; /* Tự động tính chiều cao theo tỷ lệ */
+  max-width: 100%;
+  max-height: 600px;
+  /* Giới hạn chiều cao để không bị quá dài */
+  height: auto;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  object-fit: contain; /* Hiển thị full ảnh, không crop */
-  background: #f8f9fa; /* Background khi ảnh không fill hết */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+  /* Fill khung đẹp hơn */
+  background: #f8f9fa;
+  transition: transform 0.3s ease;
+}
+
+.blog-img:hover {
+  transform: scale(1.01);
 }
 
 /* Blog Content - line-height đều, màu chữ đồng nhất cho p và ul li */
@@ -299,10 +321,10 @@ body {
   margin-left: -50vw;
   margin-right: -50vw;
   width: 100vw;
-  height: 100px;                  
-  background-color: #ffffff;     
+  height: 100px;
+  background-color: #ffffff;
   padding: 5px 5px;
-  margin-top:40px;
+  margin-top: 40px;
 }
 
 .related-title {
@@ -311,7 +333,7 @@ body {
   font-weight: 700;
   text-align: left;
   padding-left: 40px;
-  margin:25px;
+  margin: 25px;
 }
 
 .related-carousel {
@@ -339,6 +361,7 @@ body {
   padding: 0;
   transition: opacity 0.2s, transform 0.2s;
 }
+
 .related-arrow-icon {
   display: block;
   font-size: 22px;
@@ -347,6 +370,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .related-arrow:hover:not(:disabled) {
   opacity: 0.9;
   transform: scale(1.05);
@@ -374,7 +398,8 @@ body {
   gap: 24px;
   transition: transform 0.4s ease-out;
   will-change: transform;
-  width: calc(200% + 120px); /* 6 cột + 5 gap 24px */
+  width: calc(200% + 120px);
+  /* 6 cột + 5 gap 24px */
 }
 
 .related-container {
@@ -417,7 +442,7 @@ body {
   margin-right: -20px;
   height: 280px;
   object-fit: cover;
-  border-radius:0;
+  border-radius: 0;
   margin-bottom: 16px;
   display: block;
 }
@@ -465,7 +490,7 @@ body {
   text-decoration: none;
   transition: color 0.2s;
   margin: 0 16px 16px;
-  margin-top: auto;           
+  margin-top: auto;
   text-align: center;
 }
 
@@ -473,11 +498,14 @@ body {
   color: #004aad;
 }
 
-/* Image Layout - Gallery (Blog 2) */
+/* Image Layout - Gallery */
 .image-layout {
   display: flex;
   gap: 16px;
-  margin: 30px 0;
+  margin: 30px auto;
+  max-width: 1000px;
+  height: 500px;
+  /* Cố định chiều cao gallery để cân đối */
 }
 
 .left-image {
@@ -508,8 +536,8 @@ body {
 }
 
 .flip-opc {
-  opacity: 0.7;
-  transform: rotate(180deg); /* Xoay 180 độ */
+  opacity: 0.85;
+  filter: brightness(0.95);
 }
 
 /* Responsive */
@@ -517,27 +545,27 @@ body {
   .breadcrumb-banner {
     padding: 20px 20px;
   }
-  
+
   .breadcrumb-title {
     font-size: 24px;
   }
-  
+
   .promo-container {
     grid-template-columns: 1fr !important;
   }
-  
+
   .breadcrumb-path {
     font-size: 13px;
   }
-  
+
   .image-layout {
     flex-direction: column;
   }
-  
+
   .right-images {
     flex-direction: row;
   }
-  
+
   .right-images img {
     width: calc(50% - 8px);
     height: 200px;
@@ -558,15 +586,15 @@ body {
     gap: 16px;
     padding: 16px;
   }
-  
+
   .promo-card {
     max-width: 100%;
   }
-  
+
   .promo-img {
     height: 140px;
   }
-  
+
   .promo-title {
     font-size: 13px;
   }
@@ -577,7 +605,7 @@ body {
   .promo-container {
     grid-template-columns: 1fr;
   }
-  
+
   .promo-img {
     height: 180px;
   }
@@ -589,32 +617,32 @@ body {
     max-width: 100%;
     max-height: 300px;
   }
-  
+
   .blog-content {
     font-size: 14px;
     line-height: 1.6;
     margin-top: 20px;
   }
-  
+
   .image-layout {
     flex-direction: column;
     max-width: 100%;
   }
-  
+
   .left-image img,
   .right-images img {
     max-height: 250px;
   }
-  
+
   .title-divider img {
     width: 35px;
     height: 35px;
   }
-  
+
   .title-divider hr {
     width: 60px;
   }
-  
+
   .img {
     padding-top: 15px;
   }
@@ -626,32 +654,32 @@ body {
     margin-top: 40px;
     padding: 30px 16px;
   }
-  
+
   .related-title {
     font-size: 22px;
     margin-bottom: 20px;
   }
-  
+
   .related-container {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
     padding: 0 16px 40px 16px;
   }
-  
+
   .related-img {
     height: 160px;
   }
-  
+
   .related-card h3 {
     font-size: 15px;
     padding: 0 16px;
   }
-  
+
   .related-card p {
     font-size: 13px;
     padding: 0 16px;
   }
-  
+
   .related-link {
     margin: 0 16px 16px 16px;
     font-size: 13px;

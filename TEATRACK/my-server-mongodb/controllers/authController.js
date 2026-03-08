@@ -198,5 +198,51 @@ const changePassword = async (req, res) => {
   }
 };
 
+// @desc    Admin login (separate endpoint for security)
+// @route   POST /api/auth/admin-login
+const adminLogin = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Please provide username and password' });
+    }
+
+    // Tìm user theo username
+    const user = await User.findUserByUsername(username);
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Kiểm tra role admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Admin role required.' });
+    }
+
+    // Kiểm tra password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Tạo token với role admin
+    const token = jwt.sign(
+      { userId: user._id, username: user.username, email: user.email, role: 'admin' },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const { password: _, ...userWithoutPassword } = user;
+    res.json({
+      message: 'Admin login successful',
+      token,
+      user: { ...userWithoutPassword, role: 'admin' }
+    });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // Export thêm hai hàm này
-module.exports = { register, login, updateProfile, updateUsername, changePassword };
+module.exports = { register, login, adminLogin, updateProfile, updateUsername, changePassword };

@@ -83,7 +83,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly NAME_TO_SLUG: Record<string, string>;
 
-  private readonly API_PRODUCTS = '/data/products.json';
+  private readonly API_PRODUCTS = 'http://localhost:3002/products';
 
   getSelectedCategoryName(): string {
     return this.selectedSlug ? (this.CAT_MAP[this.selectedSlug] || '') : '';
@@ -160,9 +160,11 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     try {
       const data = await firstValueFrom(this.http.get<Product[]>(this.API_PRODUCTS));
       this.ALL_PRODUCTS = Array.isArray(data) ? data : [];
+      this.cdr.detectChanges();
     } catch (err) {
       console.error('Cannot load products', err);
       this.ALL_PRODUCTS = [];
+      this.cdr.detectChanges();
     }
   }
 
@@ -203,7 +205,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
   normSrc(path?: string): string {
     if (!path) return '';
     const s = String(path);
-    if (s.startsWith('http')) return s;
+    if (s.startsWith('http') || s.startsWith('data:')) return s;
     if (s.startsWith('assets/')) return s;
     if (s.startsWith('/assets/')) return s.slice(1);
     return 'assets/' + s.replace(/^\/+/, '').replace(/^assets\/+/, '');
@@ -254,6 +256,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
 
     this.showDrinksModal = true;
     document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
 
     setTimeout(() => this.initModalSwiper(), 0);
   }

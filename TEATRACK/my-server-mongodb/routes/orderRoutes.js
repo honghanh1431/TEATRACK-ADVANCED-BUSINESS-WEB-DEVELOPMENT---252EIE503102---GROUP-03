@@ -30,6 +30,29 @@ router.get('/', verifyToken, async (req, res) => {
     }
 });
 
+// Lấy 1 đơn hàng cụ thể
+router.get('/:id', verifyToken, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const orderId = req.params.id;
+        const order = await Order.findOrderById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+        }
+
+        // Kiểm tra xem đơn hàng này có phải của user đang đăng nhập không
+        if (String(order.userId) !== String(userId)) {
+            return res.status(403).json({ message: 'Bạn không có quyền xem đơn hàng này.' });
+        }
+
+        res.json({ order });
+    } catch (err) {
+        console.error('Get single order error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Hủy đơn hàng (nếu đang pending)
 router.patch('/:id/cancel', verifyToken, async (req, res) => {
     try {

@@ -46,7 +46,7 @@ export interface ProductItem {
 
 const REVIEW_PAGE_SIZE = 4;
 /** Base URL API đánh giá (my-server port 3100); bỏ trống nếu chỉ dùng local */
-const REVIEWS_API_BASE = 'http://localhost:3100';
+const REVIEWS_API_BASE = 'http://localhost:3002';
 /** localStorage key lưu danh sách review đã thích (mảng key) */
 const REVIEW_LIKED_STORAGE_KEY = 'teatrack_review_liked';
 
@@ -151,7 +151,7 @@ export class Product implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private productState: ProductStateService,
     private reviewCountService: ReviewCountService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     document.body.style.overflow = '';
@@ -194,7 +194,7 @@ export class Product implements OnInit, OnDestroy {
       this.product = null;
       this.cdr.detectChanges();
     }
-    this.http.get<ProductItem[]>('/data/products.json').subscribe({
+    this.http.get<ProductItem[]>('http://localhost:3002/products').subscribe({
       next: (data) => {
         this.allProducts = data;
         let found: ProductItem | null = null;
@@ -257,7 +257,7 @@ export class Product implements OnInit, OnDestroy {
   getProductImg(p: ProductItem): string {
     const raw = (p?.image || '').trim();
     if (!raw) return 'assets/icons/menu.png';
-    if (raw.startsWith('http') || raw.startsWith('/')) return raw;
+    if (raw.startsWith('http') || raw.startsWith('/') || raw.startsWith('data:')) return raw;
     if (raw.startsWith('assets/')) return raw;
     return 'assets/images/products/' + raw.replace(/^assets\/images\/products\//, '');
   }
@@ -318,7 +318,7 @@ export class Product implements OnInit, OnDestroy {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '2dca64' },
       body: JSON.stringify(payload),
-    }).catch(() => {});
+    }).catch(() => { });
   }
   // #endregion
 
@@ -477,7 +477,7 @@ export class Product implements OnInit, OnDestroy {
         const arr = JSON.parse(raw);
         if (Array.isArray(arr)) this.likedReviewKeys = new Set(arr);
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   private saveLikedToStorage(): void {
@@ -485,7 +485,7 @@ export class Product implements OnInit, OnDestroy {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(REVIEW_LIKED_STORAGE_KEY, JSON.stringify(Array.from(this.likedReviewKeys)));
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /** Số lượt đánh giá hiển thị: ưu tiên từ ReviewCountService (đã cập nhật), fallback p.reviews */
@@ -546,7 +546,7 @@ export class Product implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       },
-      error: () => {},
+      error: () => { },
     });
   }
 
@@ -580,7 +580,7 @@ export class Product implements OnInit, OnDestroy {
     this.cdr.detectChanges();
     if (REVIEWS_API_BASE && this.product?.id) {
       const body = { productId: String(this.product.id), name, title, content: newReview.content, time: newReview.time, rating, createdAt };
-      this.http.post(`${REVIEWS_API_BASE}/reviews`, body).subscribe({ error: () => {} });
+      this.http.post(`${REVIEWS_API_BASE}/reviews`, body).subscribe({ error: () => { } });
     }
   }
 

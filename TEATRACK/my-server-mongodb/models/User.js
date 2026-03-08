@@ -24,7 +24,7 @@ const createUser = async (userData) => {
     name: userData.name,
     email: userData.email,
     password: userData.password,
-    role: userData.role || 'customer',
+    role: userData.role || 'customer',  // 'customer' hoặc 'admin'
     phone: userData.phone || '',
     address: userData.address || '',
     dob: userData.dob || null,
@@ -78,6 +78,12 @@ const findUserById = async (id) => {
   const users = collection();
   return await users.findOne({ _id: new ObjectId(id) });
 };
+
+const findUsersByRole = async (role) => {
+  const users = collection();
+  return await users.find({ role }).toArray();
+};
+
 const updatePassword = async (email, hashedPassword) => {
   const users = collection();
   return await users.updateOne({ email }, { $set: { password: hashedPassword } });
@@ -90,6 +96,7 @@ module.exports = {
   findUserByEmail,
   findUserByUsername,
   findUserById,
+  findUsersByRole,
   updateUserById,
   updatePassword,
   collection

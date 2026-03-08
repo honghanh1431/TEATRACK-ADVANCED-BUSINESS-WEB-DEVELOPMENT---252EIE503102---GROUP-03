@@ -1,0 +1,64 @@
+<header class="shop-header logged admin">
+  <div class="header-top">
+    <div class="brand">
+      <a routerLink="/admin-dashboard">
+        <img src="assets/images/logo%20ngo%20gia.png" alt="Hồng Trà Ngô Gia" class="logo" />
+      </a>
+    </div>
+
+    <div class="actions">
+      <div class="user" id="user-box" #userBox [class.open]="userMenuOpen">
+        <button class="user-btn" id="user-btn" type="button" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen"
+          aria-controls="user-menu" (click)="toggleUserMenu($event)">
+          <img class="avatar" id="user-avatar" src="assets/icons/user.png" alt="User">
+          <span class="name" id="user-name" data-user-chip>{{ userName }}</span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="menu" id="user-menu" role="menu">
+          <a role="menuitem" routerLink="/404" (click)="closeUserMenu()" data-i18n="header.admin.profile">Hồ
+            sơ</a>
+          <button role="menuitem" id="btn-logout" type="button" (click)="onLogout($event)"
+            data-i18n="header.admin.logout">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav-bar">
+    <a routerLink="/admin-dashboard" class="nav-item" [class.active]="isOverviewNavActive">
+      <img src="assets/icons/Home.png" alt="">
+      <span data-i18n="header.admin.overview">Tổng quan</span>
+    </a>
+    <a routerLink="/admin-dashboard" fragment="products" class="nav-item" [class.active]="isProductsNavActive">
+      <img src="assets/icons/sanpham.png" alt="">
+      <span data-i18n="header.admin.products">Sản phẩm</span>
+    </a>
+    <a routerLink="/admin/order" routerLinkActive="active" class="nav-item">
+      <img src="assets/icons/Cart.png" alt="">
+      <span data-i18n="header.admin.orders">Đơn hàng</span>
+    </a>
+    <a routerLink="/404" routerLinkActive="active" class="nav-item">
+      <img src="assets/icons/account.png" alt="">
+      <span data-i18n="header.admin.account">Tài khoản</span>
+    </a>
+    <a routerLink="/admin/blog" routerLinkActive="active" class="nav-item">
+      <img src="assets/icons/dien_dan.png" alt="">
+      <span data-i18n="header.admin.forums">Diễn đàn</span>
+    </a>
+  </nav>
+</header>
+
+<!-- Modal xác nhận đăng xuất -->
+<div class="header-alert-modal" *ngIf="showLogoutModal" (click)="closeLogoutModal()" role="dialog" aria-modal="true"
+  aria-labelledby="header-admin-logout-title">
+  <div class="header-alert-modal__dialog" (click)="$event.stopPropagation()">
+    <h3 class="header-alert-modal__title" id="header-admin-logout-title">Xác nhận đăng xuất</h3>
+    <p class="header-alert-modal__message">Bạn có chắc muốn đăng xuất?</p>
+    <div class="header-alert-modal__actions">
+      <button type="button" class="header-alert-modal__btn header-alert-modal__btn--ghost"
+        (click)="closeLogoutModal()">Đóng</button>
+      <button type="button" class="header-alert-modal__btn header-alert-modal__btn--primary"
+        (click)="confirmLogout()">Xác nhận</button>
+    </div>
+  </div>
+</div>

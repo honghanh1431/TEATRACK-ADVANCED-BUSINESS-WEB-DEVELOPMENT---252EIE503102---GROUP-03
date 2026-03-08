@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <div class="order-tracking-container">
-    <!-- Breadcrumb -->
+  <!-- Breadcrumb -->
   <section class="breadcrumb-banner">
     <h1 class="breadcrumb-title">Đơn hàng</h1>
     <p class="breadcrumb-path">
-      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/order-history" (click)="scrollToTop()">Lịch sử đơn hàng</a> / <a routerLink="/order-tracking" [queryParams]="{ orderId: orderId }" (click)="scrollToTop()"> Đơn hàng - {{ orderId || order?.id || order?.orderId || 'Đơn hàng' }}</a>
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/order-history"
+        (click)="scrollToTop()">Lịch sử đơn hàng</a> / <a routerLink="/order-tracking"
+        [queryParams]="{ orderId: orderId }" (click)="scrollToTop()"> Đơn hàng - {{ orderId || order?.id ||
+        order?.orderId || 'Đơn hàng' }}</a>
     </p>
   </section>
   <!-- Hero Section -->
@@ -81,8 +84,7 @@
           <div class="timeline-fill" [style.width.%]="timelineProgressPercent"></div>
         </div>
         <!-- Pending -->
-        <div class="timeline-item" id="timeline-pending"
-             [ngClass]="getStatusClass('pending')">
+        <div class="timeline-item" id="timeline-pending" [ngClass]="getStatusClass('pending')">
           <img *ngIf="isStepReached('pending')" src="/assets/icons/1.png" alt="1" class="timeline-number" />
           <div class="timeline-placeholder" *ngIf="!isStepReached('pending')"></div>
           <div class="timeline-content" *ngIf="isStepReached('pending')">
@@ -99,8 +101,7 @@
         </div>
 
         <!-- Processing -->
-        <div class="timeline-item" id="timeline-processing"
-             [ngClass]="getStatusClass('processing')">
+        <div class="timeline-item" id="timeline-processing" [ngClass]="getStatusClass('processing')">
           <img *ngIf="isStepReached('processing')" src="/assets/icons/2.png" alt="2" class="timeline-number" />
           <div class="timeline-placeholder" *ngIf="!isStepReached('processing')"></div>
           <div class="timeline-content" *ngIf="isStepReached('processing')">
@@ -117,8 +118,7 @@
         </div>
 
         <!-- Ready -->
-        <div class="timeline-item" id="timeline-ready"
-             [ngClass]="getStatusClass('ready')">
+        <div class="timeline-item" id="timeline-ready" [ngClass]="getStatusClass('ready')">
           <img *ngIf="isStepReached('ready')" src="/assets/icons/3.png" alt="3" class="timeline-number" />
           <div class="timeline-placeholder" *ngIf="!isStepReached('ready')"></div>
           <div class="timeline-content" *ngIf="isStepReached('ready')">
@@ -135,8 +135,7 @@
         </div>
 
         <!-- Shipping -->
-        <div class="timeline-item" id="timeline-shipping"
-             [ngClass]="getStatusClass('shipping')">
+        <div class="timeline-item" id="timeline-shipping" [ngClass]="getStatusClass('shipping')">
           <img *ngIf="isStepReached('shipping')" src="/assets/icons/4.png" alt="4" class="timeline-number" />
           <div class="timeline-placeholder" *ngIf="!isStepReached('shipping')"></div>
           <div class="timeline-content" *ngIf="isStepReached('shipping')">
@@ -153,8 +152,7 @@
         </div>
 
         <!-- Completed -->
-        <div class="timeline-item" id="timeline-completed"
-             [ngClass]="getStatusClass('completed')">
+        <div class="timeline-item" id="timeline-completed" [ngClass]="getStatusClass('completed')">
           <img *ngIf="isStepReached('completed')" src="/assets/icons/5.png" alt="5" class="timeline-number" />
           <div class="timeline-placeholder" *ngIf="!isStepReached('completed')"></div>
           <div class="timeline-content" *ngIf="isStepReached('completed')">
@@ -171,13 +169,6 @@
         </div>
       </div>
     </div>
-    <div class="demo-btn-wrap" *ngIf="demoMode">
-      <button id="btnNextStatus" class="btn-demo-float"
-              [disabled]="btnNextDisabled" [title]="btnNextTitle"
-              (click)="nextStatus()">
-        ⏭️
-      </button>
-    </div>
   </section>
 
   <!-- Order Items -->
@@ -186,18 +177,12 @@
       <h2 class="section-title">Sản Phẩm Đã Đặt</h2>
       <div class="items-list">
         <div class="order-item" *ngFor="let item of order.items">
-          <a *ngIf="item.id"
-             [routerLink]="['/menu/product', item.id, item.name || item.id]"
-             class="item-image-link"
-             [attr.aria-label]="'Xem chi tiết ' + (item.name || 'sản phẩm')">
-            <img [src]="item.image || '/assets/images/products/default.jpg'"
-                 [alt]="item.name"
-                 class="item-image" />
+          <a *ngIf="item.id" [routerLink]="['/menu/product', item.id, item.name || item.id]" class="item-image-link"
+            [attr.aria-label]="'Xem chi tiết ' + (item.name || 'sản phẩm')">
+            <img [src]="item.image || '/assets/images/products/default.jpg'" [alt]="item.name" class="item-image" />
           </a>
-          <img *ngIf="!item.id"
-               [src]="item.image || '/assets/images/products/default.jpg'"
-               [alt]="item.name"
-               class="item-image" />
+          <img *ngIf="!item.id" [src]="item.image || '/assets/images/products/default.jpg'" [alt]="item.name"
+            class="item-image" />
           <div class="item-info">
             <div class="item-name">{{ item.name }}</div>
             <div class="item-details" *ngIf="getItemDetailLines(item).length">
@@ -251,36 +236,21 @@
           <div class="rating-field">
             <span class="label">Chất lượng sản phẩm:</span>
             <div class="rating-stars" role="group" aria-label="Chọn 1 đến 5 sao">
-              <button
-                *ngFor="let star of [1,2,3,4,5]; let i = index"
-                type="button"
-                class="star"
-                [class.filled]="(i + 1) <= review.rating"
-                (click)="setReviewRating(i + 1)"
-                [attr.aria-label]="(i + 1) + ' sao'"
-                [attr.aria-pressed]="(i + 1) <= review.rating"
-              >★</button>
+              <button *ngFor="let star of [1,2,3,4,5]; let i = index" type="button" class="star"
+                [class.filled]="(i + 1) <= review.rating" (click)="setReviewRating(i + 1)"
+                [attr.aria-label]="(i + 1) + ' sao'" [attr.aria-pressed]="(i + 1) <= review.rating">★</button>
             </div>
           </div>
           <span class="rating-text" [style.color]="review.rating ? '#0088ff' : '#6b7280'">{{ ratingText }}</span>
-          <input
-            type="text"
-            class="review-form-title-input"
-            [(ngModel)]="review.title"
-            name="reviewTitle"
-            placeholder="Để lại đánh giá chi tiết tại đây"
-            aria-label="Tiêu đề đánh giá"
-          />
-          <textarea
-            name="reviewComment"
-            rows="4"
-            [(ngModel)]="review.comment"
+          <input type="text" class="review-form-title-input" [(ngModel)]="review.title" name="reviewTitle"
+            placeholder="Để lại đánh giá chi tiết tại đây" aria-label="Tiêu đề đánh giá" />
+          <textarea name="reviewComment" rows="4" [(ngModel)]="review.comment"
             placeholder="Hãy để lại nhận xét cho đơn hàng này bạn nhé! Ngô Gia xin chân thành cảm ơn."
-            required
-          ></textarea>
+            required></textarea>
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" (click)="closeReviewModal()">Hủy</button>
-            <button type="submit" class="btn btn-primary submit-review" [disabled]="review.rating === 0 || !review.comment.trim()">
+            <button type="submit" class="btn btn-primary submit-review"
+              [disabled]="review.rating === 0 || !review.comment.trim()">
               Gửi Đánh Giá
             </button>
           </div>
@@ -289,20 +259,16 @@
     </div>
   </div>
 
-  <div
-    class="order-tracking-alert-modal"
-    *ngIf="showReviewSuccessModal"
-    (click)="closeReviewSuccessModal()"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="review-success-title"
-  >
+  <div class="order-tracking-alert-modal" *ngIf="showReviewSuccessModal" (click)="closeReviewSuccessModal()"
+    role="dialog" aria-modal="true" aria-labelledby="review-success-title">
     <div class="order-tracking-alert-modal__dialog" (click)="$event.stopPropagation()">
       <h3 class="order-tracking-alert-modal__title" id="review-success-title">Thông báo</h3>
-      <p class="order-tracking-alert-modal__message">Cảm ơn bạn đã đánh giá! 
-        <br/>Đánh giá của bạn rất quan trọng với chúng tôi!</p>
+      <p class="order-tracking-alert-modal__message">Cảm ơn bạn đã đánh giá!
+        <br />Đánh giá của bạn rất quan trọng với chúng tôi!
+      </p>
       <div class="order-tracking-alert-modal__actions">
-        <button type="button" class="order-tracking-alert-modal__btn order-tracking-alert-modal__btn--primary" (click)="closeReviewSuccessModal()">OK</button>
+        <button type="button" class="order-tracking-alert-modal__btn order-tracking-alert-modal__btn--primary"
+          (click)="closeReviewSuccessModal()">OK</button>
       </div>
     </div>
   </div>
