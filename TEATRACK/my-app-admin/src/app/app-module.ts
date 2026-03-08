@@ -7,11 +7,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { PageHeaderAdmin } from './Components/page-header/page-header-admin';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
+import { AdminAccount } from './admin-account/admin-account';
 
 @NgModule({
   declarations: [
     App,
-    Pagenotfound
+    Pagenotfound,
+    AdminAccount
   ],
   imports: [
     BrowserModule,
