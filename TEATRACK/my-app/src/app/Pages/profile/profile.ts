@@ -77,6 +77,11 @@ export class Profile implements OnInit, OnDestroy {
   securitySuccess = '';
   isChangingPassword = false; // tránh double click
 
+  // Password visibility toggles
+  showCurrentPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+
   private errorTimeout: any;
   private successTimeout: any;
 
@@ -291,10 +296,11 @@ export class Profile implements OnInit, OnDestroy {
       return;
     }
 
-    // Nếu có thay đổi mật khẩu thì phải nhập đủ
-    if (this.securityEditData.newPassword || this.securityEditData.confirmPassword || this.securityEditData.currentPassword) {
+    // Kiểm tra nếu có ý định đổi mật khẩu
+    const hasPasswordChangeIntent = this.securityEditData.newPassword || this.securityEditData.confirmPassword;
+    if (hasPasswordChangeIntent) {
       if (!this.securityEditData.currentPassword) {
-        this.showError('Vui lòng nhập mật khẩu hiện tại');
+        this.showError('Vui lòng nhập mật khẩu hiện tại để đổi mật khẩu');
         return;
       }
       if (!this.securityEditData.newPassword) {
@@ -311,13 +317,20 @@ export class Profile implements OnInit, OnDestroy {
       }
     }
 
-    // Thực hiện cập nhật username trước (nếu thay đổi)
+    // Kiểm tra nếu có ý định đổi username (nhưng không đổi password)
     const usernameChanged = this.securityEditData.username !== this.username;
-    const passwordChanged = !!this.securityEditData.newPassword;
-    // Thêm kiểm tra không có thay đổi (tùy chọn, có thể thêm)
+    const passwordChanged = hasPasswordChangeIntent;
+
     if (!usernameChanged && !passwordChanged) {
-      this.showError('Không có thông tin nào thay đổi'); // 👈 thêm mới (có thể bỏ qua nếu không muốn)
+      this.showError('Không có thông tin nào thay đổi');
       return;
+    }
+
+    // Nếu chỉ đổi username mà không đổi password, không cần xác thực password
+    if (usernameChanged && !passwordChanged) {
+      // Có thể thêm xác thực khác nếu cần, nhưng hiện tại cho phép
+    } else if (passwordChanged) {
+      // Đã kiểm tra ở trên
     }
 
     const token = localStorage.getItem('token');
@@ -477,6 +490,19 @@ export class Profile implements OnInit, OnDestroy {
 
   closeSavedModal(): void {
     this.showSavedModal = false;
+  }
+
+  // Password visibility toggle methods
+  toggleCurrentPasswordVisibility(): void {
+    this.showCurrentPassword = !this.showCurrentPassword;
+  }
+
+  toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   private getUser(): UserProfile {
