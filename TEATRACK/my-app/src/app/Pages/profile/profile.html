@@ -160,18 +160,153 @@
           <h4 class="block-title mt-4">Đổi mật khẩu</h4>
           <div class="form-group">
             <label>Mật khẩu hiện tại:</label>
-            <input type="password" class="form-control" [(ngModel)]="securityEditData.currentPassword"
-              placeholder="Nhập mật khẩu hiện tại" />
+            <div class="control">
+              <input [type]="showCurrentPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="securityEditData.currentPassword"
+                placeholder="Nhập mật khẩu hiện tại" />
+              <button
+                class="toggle-eye"
+                type="button"
+                (click)="toggleCurrentPasswordVisibility()"
+                aria-label="Hiện/ẩn mật khẩu"
+              >
+                <!-- Eye Off -->
+                <svg
+                  *ngIf="!showCurrentPassword"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
+                  />
+                  <path d="M1 1l22 22" />
+                  <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
+                  <path
+                    d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
+                  />
+                </svg>
+                <!-- Eye On -->
+                <svg
+                  *ngIf="showCurrentPassword"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label>Mật khẩu mới:</label>
-            <input type="password" class="form-control" [(ngModel)]="securityEditData.newPassword"
-              placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)" />
+            <div class="control">
+              <input [type]="showNewPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="securityEditData.newPassword"
+                placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)" />
+              <button
+                class="toggle-eye"
+                type="button"
+                (click)="toggleNewPasswordVisibility()"
+                aria-label="Hiện/ẩn mật khẩu"
+              >
+                <!-- Eye Off -->
+                <svg
+                  *ngIf="!showNewPassword"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
+                  />
+                  <path d="M1 1l22 22" />
+                  <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
+                  <path
+                    d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
+                  />
+                </svg>
+                <!-- Eye On -->
+                <svg
+                  *ngIf="showNewPassword"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label>Xác nhận mật khẩu mới:</label>
-            <input type="password" class="form-control" [(ngModel)]="securityEditData.confirmPassword"
-              placeholder="Xác nhận mật khẩu mới" />
+            <div class="control">
+              <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="securityEditData.confirmPassword"
+                placeholder="Xác nhận mật khẩu mới" />
+              <button
+                class="toggle-eye"
+                type="button"
+                (click)="toggleConfirmPasswordVisibility()"
+                aria-label="Hiện/ẩn mật khẩu"
+              >
+                <!-- Eye Off -->
+                <svg
+                  *ngIf="!showConfirmPassword"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.08-6.23"
+                  />
+                  <path d="M1 1l22 22" />
+                  <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
+                  <path
+                    d="M10.73 5.08A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-4.18 5.17"
+                  />
+                </svg>
+                <!-- Eye On -->
+                <svg
+                  *ngIf="showConfirmPassword"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <!-- Thông báo lỗi / thành công -->

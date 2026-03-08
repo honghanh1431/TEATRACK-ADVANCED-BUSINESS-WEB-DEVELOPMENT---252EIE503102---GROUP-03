@@ -10,6 +10,7 @@ export interface Product {
   price: string;
   emoji: string;
   colorClass: string;
+  image?: string;
 }
 
 export interface Order {
@@ -98,6 +99,7 @@ export class OrderHistory implements OnInit {
           price: '1.850.000₫',
           emoji: '👟',
           colorClass: 'c1',
+          image: '/assets/images/products/tra-o-long-moc-huong.png',
         },
         {
           name: 'Áo Thun Polo Cotton Premium',
@@ -105,6 +107,7 @@ export class OrderHistory implements OnInit {
           price: '480.000₫',
           emoji: '👕',
           colorClass: 'c2',
+          image: '/assets/images/products/hong-tra-bi-dao.jpg',
         },
       ],
     },
@@ -124,6 +127,7 @@ export class OrderHistory implements OnInit {
           price: '2.290.000₫',
           emoji: '💻',
           colorClass: 'c3',
+          image: '/assets/images/products/tra-xanh-bi-dao.jpg',
         },
       ],
     },
@@ -142,6 +146,7 @@ export class OrderHistory implements OnInit {
           price: '650.000₫',
           emoji: '🎒',
           colorClass: 'c4',
+          image: '/assets/images/products/tra-xanh-hoa-nhai.jpg',
         },
         {
           name: 'Kem Chống Nắng SPF50 Anessa',
@@ -149,6 +154,7 @@ export class OrderHistory implements OnInit {
           price: '360.000₫',
           emoji: '🧴',
           colorClass: 'c2',
+          image: '/assets/images/products/hong-tra-bi-dao.jpg',
         },
       ],
     },
@@ -167,6 +173,7 @@ export class OrderHistory implements OnInit {
           price: '290.000₫',
           emoji: '📱',
           colorClass: 'c1',
+          image: '/assets/images/products/tra-o-long-moc-huong.png',
         },
       ],
     },
@@ -185,6 +192,7 @@ export class OrderHistory implements OnInit {
           price: '4.500.000₫',
           emoji: '🪑',
           colorClass: 'c3',
+          image: '/assets/images/products/tra-xanh-bi-dao.jpg',
         },
       ],
     },
@@ -284,6 +292,7 @@ export class OrderHistory implements OnInit {
         price: this.formatMoneyForOrder(priceEach * qty),
         emoji: '🍵',
         colorClass: colorClasses[i % colorClasses.length],
+        image: item.image,
       };
     });
     const totalNum = Number(storage.total) || 0;
@@ -317,6 +326,12 @@ export class OrderHistory implements OnInit {
 
   private formatMoneyForOrder(value: number): string {
     return new Intl.NumberFormat('vi-VN').format(Math.round(value || 0)) + '₫';
+  }
+
+  getImageUrl(imagePath: string): string {
+    if (!imagePath) return '';
+    // Xử lý đường dẫn ảnh, đảm bảo bắt đầu bằng /
+    return '/' + imagePath.replace(/^\//, '');
   }
 
   private updateTabCounts(): void {

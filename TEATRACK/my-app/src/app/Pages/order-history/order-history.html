@@ -42,7 +42,8 @@
       <div class="card-products">
         <div class="product-row" *ngFor="let product of order.products">
           <div class="product-thumb" [ngClass]="product.colorClass">
-            {{ product.emoji }}
+            <img *ngIf="product.image" [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" />
+            <span *ngIf="!product.image" class="product-emoji">{{ product.emoji }}</span>
           </div>
           <div class="product-info">
             <div class="product-name">{{ product.name }}</div>
