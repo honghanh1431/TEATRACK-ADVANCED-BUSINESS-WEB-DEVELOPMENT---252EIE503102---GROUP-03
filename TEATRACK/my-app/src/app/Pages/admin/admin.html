@@ -1,6 +1,6 @@
-<div class="admin-layout" id="adminLayout">
-  <div class="main">
-    <header class="topbar">
+  <div class="admin-layout" id="adminLayout">
+    <div class="main">
+      <header class="topbar">
       <button
         class="export-btn"
         id="btnExportReport"
@@ -9,8 +9,8 @@
       >
         Xuất báo cáo tổng kết
       </button>
-      <div class="top-actions">
-        <div class="dropdown" id="ddUser">
+        <div class="top-actions">
+          <div class="dropdown" id="ddUser">
           <button
             class="dd-btn"
             id="ddUserBtn"
@@ -19,9 +19,9 @@
             aria-expanded="false"
             aria-controls="ddUserMenu"
           ></button>
-          <div class="dd-menu" id="ddUserMenu" role="menu" hidden></div>
-        </div>
-        <div class="dropdown" id="ddMore">
+            <div class="dd-menu" id="ddUserMenu" role="menu" hidden></div>
+          </div>
+          <div class="dropdown" id="ddMore">
           <button
             class="dd-btn"
             id="ddMoreBtn"
@@ -30,124 +30,124 @@
             aria-expanded="false"
             aria-controls="ddMoreMenu"
           ></button>
-          <div class="dd-menu" id="ddMoreMenu" role="menu" hidden></div>
+            <div class="dd-menu" id="ddMoreMenu" role="menu" hidden></div>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <main class="content">
-      <section class="cards" id="overview">
-        <div class="card stat revenue">
-          <div class="stat-title">
+      <main class="content">
+        <section class="cards" id="overview">
+          <div class="card stat revenue">
+            <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/doanhthu.png" alt="Revenue icon" class="stat-title-icon" />
             </span>
-            <span data-i18n="admin.dashboard.revenue">DOANH THU</span>
-          </div>
-          <div class="stat-value" id="sRevenue">679.000đ</div>
-          <div class="stat-desc">
+              <span data-i18n="admin.dashboard.revenue">DOANH THU</span>
+            </div>
+            <div class="stat-value" id="sRevenue">679.000đ</div>
+            <div class="stat-desc">
             <span class="stat-desc-left">
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sRevenueDelta">+0%</span>
             </span>
             <span class="stat-desc-right" id="sRevenueDeltaAbs">+0 tuần này</span>
           </div>
-        </div>
-
-        <div class="card stat orders">
-          <div class="stat-title">
+          </div>
+          
+          <div class="card stat orders">
+            <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/order.png" alt="Order icon" class="stat-title-icon" />
             </span>
-            <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG TUẦN NÀY</span>
-          </div>
-          <div class="stat-value" id="sOrders">0</div>
-          <div class="stat-desc">
+              <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG TUẦN NÀY</span>
+            </div>
+            <div class="stat-value" id="sOrders">0</div>
+            <div class="stat-desc">
             <span class="stat-desc-left">
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sOrdersDelta">+0%</span>
             </span>
             <span class="stat-desc-right" id="sOrdersDeltaAbs">+0 tuần này</span>
           </div>
-        </div>
-
-        <div class="card stat bestseller">
-          <div class="stat-title">
+          </div>
+          
+          <div class="card stat bestseller">
+            <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/bestseller.png" alt="Best seller icon" class="stat-title-icon" />
             </span>
-            <span data-i18n="admin.dashboard.productsSold">SẢN PHẨM ĐÃ BÁN</span>
-          </div>
+              <span data-i18n="admin.dashboard.productsSold">SẢN PHẨM ĐÃ BÁN</span>
+            </div>
           <div class="stat-value" id="sCustomers">0</div>
-          <div class="stat-desc">
+            <div class="stat-desc">
             <span class="stat-desc-left">
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sCustomersDelta">+0%</span>
             </span>
             <span class="stat-desc-right" id="sCustomersDeltaAbs">+0 tuần này</span>
           </div>
-        </div>
-
-        <div class="card stat products">
-          <div class="stat-title">
+          </div>
+          
+          <div class="card stat products">
+            <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/product.png" alt="Product icon" class="stat-title-icon" />
             </span>
-            <span data-i18n="admin.dashboard.products">SẢN PHẨM</span>
-          </div>
-          <div class="stat-value" id="sProducts">0</div>
+              <span data-i18n="admin.dashboard.products">SẢN PHẨM</span>
+            </div>
+            <div class="stat-value" id="sProducts">0</div>
           <div class="stat-desc">
             <span class="stat-desc-left" data-i18n="admin.dashboard.inBusiness">Đang kinh doanh</span>
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <section class="grid2">
-        <div class="card chart" id="reports">
+        <section class="grid2">
+          <div class="card chart" id="reports">
           <div class="card-title" data-i18n="admin.dashboard.performance">
             Hiệu suất (Doanh thu & Chi phí)
           </div>
           <canvas id="revCostChart" height="260"></canvas>
-        </div>
-
-        <div class="card tasks" id="settings">
-          <div class="card-title" data-i18n="admin.dashboard.topDrinks">Top thức uống bán chạy</div>
-          <div class="chart-wrap">
-            <canvas id="catPieChart" height="220"></canvas>
           </div>
-        </div>
-      </section>
 
-      <section class="card table" id="orders">
-        <div class="card-title" data-i18n="admin.dashboard.recentOrders">Đơn hàng gần đây</div>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="admin.dashboard.orderCode">Mã</th>
-                <th data-i18n="admin.dashboard.customer">Khách</th>
-                <th data-i18n="admin.dashboard.time">Thời Gian</th>
-                <th data-i18n="admin.dashboard.status">Trạng thái</th>
-                <th data-i18n="admin.dashboard.total">Tổng</th>
-                <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
-                <th data-i18n="admin.dashboard.actions"></th>
-              </tr>
-            </thead>
+          <div class="card tasks" id="settings">
+            <div class="card-title" data-i18n="admin.dashboard.topDrinks">Top thức uống bán chạy</div>
+            <div class="chart-wrap">
+              <canvas id="catPieChart" height="220"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="card table" id="orders">
+          <div class="card-title" data-i18n="admin.dashboard.recentOrders">Đơn hàng gần đây</div>
+          <div class="table-scroll">         
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="admin.dashboard.orderCode">Mã</th>
+                  <th data-i18n="admin.dashboard.customer">Khách</th>
+                  <th data-i18n="admin.dashboard.time">Thời Gian</th>
+                  <th data-i18n="admin.dashboard.status">Trạng thái</th>
+                  <th data-i18n="admin.dashboard.total">Tổng</th>
+                  <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
+                  <th data-i18n="admin.dashboard.actions"></th>
+                </tr>
+              </thead>
             <tbody id="ordersBody"></tbody>
-          </table>
-        </div>
-      </section>
+            </table>  
+          </div>       
+        </section>
 
-      <section class="card table" id="products">
+        <section class="card table" id="products">
         <div class="card-title" data-i18n="admin.dashboard.productList">Danh sách sản phẩm</div>
-        <div class="card-header-block">
-          <div class="card-actions-row">
-            <button type="button" class="btn btn-add" id="btn-add-product">
-              <span class="btn-icon">+</span>
-              <span data-i18n="admin.dashboard.addProduct">Thêm sản phẩm</span>
-            </button>
-
-            <div class="search-box">
+          <div class="card-header-block">
+            <div class="card-actions-row">
+              <button type="button" class="btn btn-add" id="btn-add-product">
+                <span class="btn-icon">+</span>
+                <span data-i18n="admin.dashboard.addProduct">Thêm sản phẩm</span>
+              </button>
+              
+              <div class="search-box">
               <input
                 type="search"
                 id="product-search"
@@ -155,10 +155,10 @@
                 placeholder="Tìm kiếm sản phẩm..."
                 aria-label="Tìm kiếm sản phẩm"
               />
-              <button type="button" class="search-btn" aria-label="Tìm kiếm">
+                <button type="button" class="search-btn" aria-label="Tìm kiếm">
                 <img src="assets/icons/search.png" alt="Search" />
-              </button>
-            </div>
+                </button>
+              </div>
             <div style="flex: 1">
               <select id="category-filter" class="category-filter" aria-label="Lọc theo danh mục">
                 <option value="1">Tất cả danh mục</option>
@@ -170,28 +170,28 @@
                 <option value="7">Loại Trà Trái Cây</option>
               </select>
             </div>
+            </div>
           </div>
-        </div>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="admin.dashboard.id">ID</th>
-                <th data-i18n="admin.dashboard.name">Tên</th>
-                <th data-i18n="admin.dashboard.category">Danh mục</th>
-                <th data-i18n="admin.dashboard.image">Hình ảnh</th>
-                <th data-i18n="admin.dashboard.price">Giá</th>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="admin.dashboard.id">ID</th>
+                  <th data-i18n="admin.dashboard.name">Tên</th>
+                  <th data-i18n="admin.dashboard.category">Danh mục</th>
+                  <th data-i18n="admin.dashboard.image">Hình ảnh</th>
+                  <th data-i18n="admin.dashboard.price">Giá</th>
                 <th data-i18n="admin.dashboard.visible">Hiển thị</th>
                 <th data-i18n="admin.dashboard.actions"></th>
-              </tr>
-            </thead>
-            <tbody id="productsBody"></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+                </tr>
+              </thead>
+              <tbody id="productsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
   </div>
-</div>
 
 <!-- Modal chỉnh sửa sản phẩm -->
 <div
@@ -216,7 +216,7 @@
           <label for="edit-product-name">Tên sản phẩm</label>
           <input type="text" id="edit-product-name" placeholder="Nhập tên sản phẩm" required />
         </div>
-
+        
         <div class="form-group">
           <label for="edit-product-category">Loại</label>
           <select id="edit-product-category" required>
@@ -270,8 +270,8 @@
       <!-- Row 4: Thông tin sản phẩm -->
       <div class="form-group">
         <label for="edit-product-desc">Thông tin sản phẩm</label>
-        <textarea
-          id="edit-product-desc"
+        <textarea 
+          id="edit-product-desc" 
           rows="4"
           placeholder="Nhập thông tin sản phẩm..."
         ></textarea>
@@ -286,11 +286,11 @@
       <!-- Row 6: Hình ảnh (tối đa 4 ảnh) -->
       <div class="image-upload-section">
         <label>Hình ảnh sản phẩm <span class="image-limit-hint">(tối đa 4 ảnh)</span></label>
-
-        <input
-          type="file"
-          id="edit-product-image"
-          accept="image/*"
+        
+        <input 
+          type="file" 
+          id="edit-product-image" 
+          accept="image/*" 
           multiple
           style="display: none"
         />
@@ -344,7 +344,7 @@
           <div class="image-preview-slot" data-slot="3">
             <div class="upload-placeholder slot-placeholder">
               <img src="assets/icons/upload.png" alt="Upload" class="upload-icon" />
-              <span class="upload-text">Tải ảnh lên</span>
+            <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
             <button
@@ -388,7 +388,7 @@
 >
   <div class="modal-overlay" data-close-delete></div>
   <div class="modal-container modal-confirm">
-
+    
     <div class="modal-body modal-confirm-body">
       <div class="modal-confirm-header">
         <div class="confirm-icon">
@@ -399,7 +399,7 @@
           <p class="confirm-message">Sau khi xóa, bạn sẽ không thể khôi phục sản phẩm.</p>
         </div>
       </div>
-
+      
       <div class="confirm-actions">
         <button type="button" class="btn btn-cancel" data-close-delete>
           <img
@@ -464,9 +464,9 @@
                 <option value="completed">Giao thành công</option>
                 <option value="cancelled">Đã hủy</option>
               </select>
-              <span class="info-value status-badge status-delivered" id="order-status-text"
-                >Giao thành công</span
-              >
+              <span class="info-value status-badge status-delivered" id="order-status-text">
+                Giao thành công
+              </span>
             </div>
           </div>
         </div>
@@ -515,7 +515,7 @@
             </div>
             <div class="item-price">25.000đ</div>
           </div>
-
+          
           <!-- Item 2 -->
           <div class="order-item">
             <img
@@ -568,7 +568,7 @@
   </div>
 </div>
 
-<!--  Modal thêm sản phẩm - Bố cục mới -->
+<!--  Modal thêm sản phẩm -->
 <div id="modal-add-product" class="modal" style="display: none" role="dialog" aria-modal="true">
   <div class="modal-overlay" data-close-add-modal></div>
   <div class="modal-container modal-add-product">
@@ -584,7 +584,7 @@
           <label for="add-product-name">Tên sản phẩm</label>
           <input type="text" id="add-product-name" placeholder="Nhập tên sản phẩm" required />
         </div>
-
+        
         <div class="form-group">
           <label for="add-product-category">Loại</label>
           <select id="add-product-category" required>
@@ -638,8 +638,8 @@
       <!-- Row 4: Thông tin sản phẩm -->
       <div class="form-group">
         <label for="add-product-desc">Thông tin sản phẩm</label>
-        <textarea
-          id="add-product-desc"
+        <textarea 
+          id="add-product-desc" 
           rows="4"
           placeholder="Nhập thông tin sản phẩm..."
         ></textarea>
@@ -706,7 +706,7 @@
           <div class="image-preview-slot" data-slot="3">
             <div class="upload-placeholder slot-placeholder">
               <img src="assets/icons/upload.png" alt="Upload" class="upload-icon" />
-              <span class="upload-text">Tải ảnh lên</span>
+            <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
             <button
@@ -737,21 +737,33 @@
   </div>
 </div>
 
+<!-- Modal thành công -->
 <div
   id="modal-success"
-  class="modal modal-success"
+  class="modal"
   style="display: none"
   role="dialog"
+  aria-labelledby="success-message"
   aria-modal="true"
 >
-  <div class="modal-overlay"></div>
-  <div class="modal-container modal-success-container">
-    <div class="modal-success-content">
-      <div class="success-icon">
-        <img src="assets/icons/tick2.png" alt="Success" style="width: 48px; height: 48px" />
+  <div class="modal-overlay" data-close-success></div>
+  <div class="modal-container modal-confirm modal-success-container">
+    <div class="modal-body modal-confirm-body">
+      <div class="modal-confirm-header">
+        <div class="confirm-icon success-icon">
+          <img src="assets/icons/tick2.png" alt="Success" style="width: 24px; height: 24px" />
+        </div>
+        <div class="confirm-text">
+          <h2 id="success-message" class="confirm-title">CHỈNH SỬA THÀNH CÔNG</h2>
+          <p class="confirm-message">Thao tác đã được thực hiện thành công.</p>
+        </div>
       </div>
-      <h2 class="success-title" id="success-message">CHỈNH SỬA THÀNH CÔNG</h2>
-      <button type="button" class="btn-close-success" id="btn-close-success">&times;</button>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-confirm" id="btn-close-success">
+          <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
+          Đóng
+      </button>
+      </div>
     </div>
   </div>
 </div>
@@ -759,23 +771,33 @@
 <!-- Modal thông báo -->
 <div
   id="modal-alert"
-  class="alert-overlay"
+  class="modal"
+  style="display: none"
   role="alertdialog"
   aria-labelledby="alert-title"
   aria-modal="true"
 >
-  <div class="alert-overlay-backdrop" data-close-alert></div>
-  <div class="alert-dialog alert-info">
-    <div class="alert-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M9 12l2 2 4-4"></path>
-      </svg>
-    </div>
-    <h3 id="alert-title" class="alert-title">Thông báo</h3>
-    <p id="alert-message" class="alert-message"></p>
-    <div class="alert-actions">
-      <button type="button" class="alert-btn alert-btn-primary" id="btn-alert-ok">Đồng ý</button>
+  <div class="modal-overlay" data-close-alert></div>
+  <div class="modal-container modal-confirm modal-alert-container">
+    <div class="modal-body modal-confirm-body">
+      <div class="modal-confirm-header">
+        <div class="confirm-icon alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="confirm-text">
+          <h2 id="alert-title" class="confirm-title">Thông báo</h2>
+          <p id="alert-message" class="confirm-message"></p>
+        </div>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-confirm" id="btn-alert-ok">
+          <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
+          Đồng ý
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -1,52 +1,228 @@
-<div class="app">
-    <main class="main">
-    <!-- Thống kê đơn hàng -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-label">Tất cả đơn hàng</span>
-        <span class="stat-value">{{ stats.total }}</span>
+<div class="admin-layout">
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>ĐƠN HÀNG</h1>
       </div>
-      <div class="stat-card pending">
-        <span class="stat-label">Chờ xác nhận</span>
-        <span class="stat-value">{{ stats.pending }}</span>
+    </header>
+
+    <main class="content">
+      <!-- Thống kê tổng quan -->
+      <section class="order-stats">
+        <div class="stat-card active" data-status="">
+          <div class="stat-info">
+            <div class="stat-label">Tất cả đơn hàng</div>
+            <div class="stat-value"><span id="statAll">0</span> đơn hàng</div>
+          </div>
+        </div>
+        
+        <div class="stat-card" data-status="pending">
+          <div class="stat-info">
+            <div class="stat-label">Xác nhận đơn hàng</div>
+            <div class="stat-value"><span id="statPending">0</span> đơn hàng</div>
+          </div>
+        </div>
+        <div class="stat-card" data-status="processing">
+          <div class="stat-info">
+            <div class="stat-label">Chuẩn bị đơn hàng</div>
+            <div class="stat-value"><span id="statProcessing">0</span> đơn hàng</div>
+          </div>
+        </div>
+        <div class="stat-card" data-status="ready">
+          <div class="stat-info">
+            <div class="stat-label">Chờ lấy hàng</div>
+            <div class="stat-value"><span id="statReady">0</span> đơn hàng</div>
+          </div>
+        </div>
+        <div class="stat-card" data-status="shipping">
+          <div class="stat-info">
+            <div class="stat-label">Đang giao hàng</div>
+            <div class="stat-value"><span id="statShipping">0</span> đơn hàng</div>
+          </div>
+        </div>
+        <div class="stat-card" data-status="completed">
+          <div class="stat-info">
+            <div class="stat-label">Giao thành công</div>
+            <div class="stat-value"><span id="statCompleted">0</span> đơn hàng</div>
+          </div>
+        </div>
+        <div class="stat-card" data-status="cancelled">
+          <div class="stat-info">
+            <div class="stat-label">Đã hủy</div>
+            <div class="stat-value"><span id="statCancelled">0</span> đơn hàng</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bộ lọc và tìm kiếm -->
+      <section class="order-filters">
+        <div class="filter-left">
+        </div>
+        <div class="filter-right">
+          <input type="text" id="filter-order-id" class="filter-input-round" placeholder="Mã đơn">
+          <div class="search-wrapper">
+            <input type="text" id="search-order" class="filter-input-round" placeholder="Tìm kiếm">
+            <button type="button" class="btn-search-icon" id="btnSearch">
+              <img src="assets/icons/search.png" alt="Search" style="width:28px;height:28px;">
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bảng đơn hàng -->
+      <section class="card table" id="orders">
+        <div class="card-header-block">
+          <h2 class="card-title">Danh sách đơn hàng</h2>
+          <div class="table-info">
+            Tổng: <strong id="totalOrders">0</strong> đơn hàng
+            <button type="button" class="btn btn-primary" id="btnExportOrders" style="margin-left:12px;">Xuất CSV</button>
+          </div>
+        </div>
+        
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th data-i18n="admin.dashboard.orderCode">Mã</th>
+                <th data-i18n="admin.dashboard.customer">Khách</th>
+                <th data-i18n="admin.dashboard.time">Thời gian</th>
+                <th data-i18n="admin.dashboard.status">Trạng thái</th>
+                <th data-i18n="admin.dashboard.total">Tổng</th>
+                <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
+                <th data-i18n="admin.dashboard.actions"></th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Orders will be rendered here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Modal chi tiết đơn hàng-->
+<div id="modal-order-detail" class="modal" style="display: none" role="dialog" aria-modal="true">
+  <div class="modal-overlay" data-close-order></div>
+  <div class="modal-container modal-order-detail">
+    <div class="modal-header-order">
+      <h2 class="modal-title-order">CHI TIẾT ĐƠN HÀNG</h2>
+      <button type="button" class="modal-close" data-close-order aria-label="Đóng">&times;</button>
+    </div>
+
+    <div class="modal-body-order">
+      <div class="order-info-section">
+        <div class="order-info-header">
+          <img src="assets/icons/Cart.png" alt="Cart" class="section-icon" />
+          <h3 class="section-title">Thông tin đơn hàng</h3>
+        </div>
+        <div class="order-info-grid">
+          <div class="info-row">
+            <span class="info-label">Mã đơn hàng:</span>
+            <span class="info-value" id="order-id">HTNGTD273</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Ngày đặt hàng:</span>
+            <span class="info-value" id="order-date">20/10/2025</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Thời gian:</span>
+            <span class="info-value" id="order-time">07:28 am</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tình trạng đơn hàng:</span>
+            <div class="order-status-row">
+              <select id="order-status-dropdown" class="status-dropdown">
+                <option value="pending">Xác nhận đơn hàng</option>
+                <option value="processing">Chuẩn bị đơn hàng</option>
+                <option value="ready">Chờ lấy hàng</option>
+                <option value="shipping">Đang giao hàng</option>
+                <option value="completed">Giao thành công</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+              <span class="info-value status-badge" id="order-status-text">Giao thành công</span>
+            </div>
+          </div>
+        </div>
+        <div class="order-info-divider-address"></div>
+        <div class="order-info-subsection">
+          <div class="subsection-header">
+            <h4 class="subsection-title">Địa chỉ người nhận:</h4>
+          </div>
+          <div class="order-info-grid">
+            <div class="info-row">
+              <span class="info-label">Họ và tên:</span>
+              <span class="info-value" id="customer-name">Nguyễn Ba Đù</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Số điện thoại:</span>
+              <span class="info-value" id="customer-phone">0934727978</span>
+            </div>
+            <div class="info-row full-width">
+              <span class="info-label">Địa chỉ:</span>
+              <span class="info-value" id="customer-address">Bcons plaza, Thống Nhất, Dĩ An Bình Dương</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card shipping">
-        <span class="stat-label">Đang giao hàng</span>
-        <span class="stat-value">{{ stats.shipping }}</span>
+
+      <div class="order-items-section">
+        <div class="order-info-header">
+          <img src="assets/icons/cart3.png" alt="List" class="section-icon" />
+          <h3 class="section-title">Danh sách đơn hàng</h3>
+        </div>
+        <div class="order-items-list" id="order-items">
+          <!-- Items will be rendered here -->
+        </div>
       </div>
-      <div class="stat-card delivered">
-        <span class="stat-label">Đã giao hàng</span>
-        <span class="stat-value">{{ stats.delivered }}</span>
+
+      <div class="order-payment-section">
+        <div class="order-info-divider"></div>
+        <h3 class="payment-title">Thông tin thanh toán</h3>
+        <div class="payment-row">
+          <span class="payment-label">Tổng tiền tạm tính</span>
+          <span class="payment-value" id="subtotal">65.000đ</span>
+        </div>
+        <div class="payment-row">
+          <span class="payment-label">Phí vận chuyển</span>
+          <span class="payment-value" id="shipping-fee">0đ</span>
+        </div>
+        <div class="payment-row">
+          <span class="payment-label">Mã giảm giá</span>
+          <span class="payment-value" id="discount">0đ</span>
+        </div>
+        <div class="payment-row payment-total">
+          <span class="payment-label-total">Tổng tiền</span>
+          <span class="payment-value-total" id="total-amount">65.000đ</span>
+        </div>
       </div>
     </div>
 
-    <!-- Bảng sản phẩm -->
-    <div class="table-container">
-      <h2>Bảng sản phẩm</h2>
-      <table class="order-table">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Mã đơn hàng</th>
-            <th>Thời gian</th>
-            <th>Tình trạng</th>
-            <th>Thanh toán</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of orders">
-            <td>{{ order.stt }}</td>
-            <td>{{ order.maDonHang }}</td>
-            <td>{{ order.thoiGian }}</td>
-            <td>
-              <span class="status-badge" [ngClass]="getStatusClass(order.tinhTrang)">
-                {{ order.tinhTrang }}
-              </span>
-            </td>
-            <td>{{ order.thanhToan }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="modal-footer">
+      <button type="button" class="btn-primary" id="btn-save-order">
+        <span class="btn-icon">
+          <img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px; margin-right: 8px" />
+        </span>
+        <span>Lưu</span>
+      </button>
     </div>
-  </main>
+  </div>
+</div>
 
+<!-- Modal Success -->
+<div id="modal-success" class="modal modal-success" style="display:none;" role="dialog" aria-modal="true">
+  <div class="modal-overlay"></div>
+  <div class="modal-container modal-success-container">
+    <div class="modal-success-content">
+      <div class="success-icon">
+        <img src="assets/icons/tick2.png" alt="Success" style="width:48px;height:48px;">
+      </div>
+      <h2 class="success-title" id="success-message">CẬP NHẬT THÀNH CÔNG</h2>
+      <button type="button" class="btn-close-success" id="btn-close-success">
+        &times;
+      </button>
+    </div>
+  </div>
+</div>

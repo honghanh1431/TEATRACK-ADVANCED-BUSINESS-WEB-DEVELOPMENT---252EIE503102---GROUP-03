@@ -230,10 +230,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const btn = document.getElementById('btn-close-success');
     const modal = document.getElementById('modal-success');
     if (btn) btn.addEventListener('click', () => this.hideSuccess());
-    if (modal) {
-      const overlay = modal.querySelector('.modal-overlay');
-      if (overlay) overlay.addEventListener('click', () => this.hideSuccess());
-    }
+    document.querySelectorAll('[data-close-success]').forEach((el) => el.addEventListener('click', () => this.hideSuccess()));
     document.addEventListener('keydown', this.successKeydown);
   }
 
@@ -764,7 +761,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     return v;
   }
 
-  /** Trả về tên danh mục để lọc: '' = Tất cả (value '' hoặc '1'), còn lại map theo CATEGORY_ID_TO_NAME. */
   private getCategoryFilterName(): string {
     const el = document.getElementById('category-filter') as HTMLSelectElement | null;
     if (!el) return '';
@@ -1543,13 +1539,15 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     document.querySelectorAll('.modal').forEach((m) => {
       if (m.id !== 'modal-alert') (m as HTMLElement).style.display = 'none';
     });
-    modal.classList.add('show');
+    (modal as HTMLElement).style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
   }
 
   private closeAlertModal(): void {
     const modal = document.getElementById('modal-alert');
     if (!modal) return;
     modal.classList.remove('show');
+    setTimeout(() => ((modal as HTMLElement).style.display = 'none'), 300);
   }
 
   private initExportReport(): void {
