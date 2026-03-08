@@ -61,12 +61,8 @@
 
           <div class="table-actions">
             <div class="search">
-              <input
-                type="search"
-                placeholder="Tìm kiếm..."
-                [value]="q"
-                (input)="onSearch($any($event.target).value)"
-              />
+              <input type="search" placeholder="Tìm kiếm..." [value]="q"
+                (input)="onSearch($any($event.target).value)" />
               <img class="search-ico" src="/assets/icons/search.png" alt="" />
             </div>
 
@@ -93,17 +89,18 @@
 
             <tbody>
               <tr *ngFor="let p of pagedPosts; let i = index" [class.alt]="i % 2 === 0">
-                <td class="col-id">{{ p.code }}</td>
-                <td class="col-date">{{ p.date | date : 'dd/MM/yyyy' }}</td>
+                <td class="col-id">{{ p.code || p.id }}</td>
+                <td class="col-date">{{ p.date }}</td>
 
                 <td class="col-img">
                   <div class="thumb">
-                    <img [src]="p.image" [alt]="p.title" (error)="imgFallback($event)" />
+                    <img [src]="p.thumbnailImage || p.image" [alt]="p.title || p.heading"
+                      (error)="imgFallback($event)" />
                   </div>
                 </td>
 
                 <td class="col-title">
-                  <div class="title-strong">{{ p.title }}</div>
+                  <div class="title-strong">{{ p.title || p.heading || 'Chưa có tiêu đề' }}</div>
                 </td>
 
                 <td class="col-show">
@@ -134,12 +131,7 @@
         <div class="pager" *ngIf="totalPages > 1">
           <button class="page-btn" (click)="goPage(page - 1)" [disabled]="page === 1">‹</button>
 
-          <button
-            class="page-btn"
-            *ngFor="let n of pages"
-            (click)="goPage(n)"
-            [class.active]="n === page"
-          >
+          <button class="page-btn" *ngFor="let n of pages" (click)="goPage(n)" [class.active]="n === page">
             {{ n }}
           </button>
 
@@ -164,6 +156,24 @@
         </div>
 
         <div class="form-row">
+          <label>Tiêu đề nội dung chính (Heading)</label>
+          <input formControlName="heading" type="text" placeholder="Nhập tiêu đề hiển thị" />
+        </div>
+
+        <div class="form-row">
+          <label>Màu chữ tiêu đề (Heading Color)</label>
+          <input formControlName="headingColor" type="color" />
+        </div>
+
+        <div class="form-row">
+          <label>Loại giao diện (Layout Type)</label>
+          <select formControlName="layoutType">
+            <option value="single">Single (1 ảnh ngang)</option>
+            <option value="gallery">Gallery (Nhóm 3 ảnh dọc)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
           <label>Tiêu đề nội dung</label>
           <input formControlName="excerpt" type="text" placeholder="Nhập tiêu đề nội dung" />
         </div>
@@ -174,7 +184,27 @@
         </div>
 
         <div class="form-row">
-          <label>Hình ảnh bài viết</label>
+          <label>Ảnh đại diện ở danh sách (Thumbnail)</label>
+          <input #thumbInput type="file" accept="image/*" hidden (change)="onThumbFile($event)" />
+
+          <div class="gallery">
+            <div class="img-item" *ngIf="formThumbnail">
+              <img [src]="formThumbnail" alt="thumbnail" (error)="imgFallback($event)" />
+              <button type="button" class="img-remove" (click)="removeThumb()">×</button>
+              <div class="img-cap">Thumbnail</div>
+            </div>
+
+            <button type="button" class="upload-box" *ngIf="!formThumbnail" (click)="thumbInput.click()">
+              <div class="upload-circle">
+                <img src="/assets/icons/upload.png" alt="upload" />
+              </div>
+              <div class="upload-text">Tải ảnh đại diện</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Hình ảnh bài viết (Dùng cho Layout Single hoặc Gallery)</label>
 
           <input #fileInput type="file" accept="image/*" multiple hidden (change)="onFiles($event)" />
 
