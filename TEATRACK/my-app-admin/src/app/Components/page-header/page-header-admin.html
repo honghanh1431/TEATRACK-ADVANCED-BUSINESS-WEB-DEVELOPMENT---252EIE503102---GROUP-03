@@ -15,7 +15,7 @@
           <span class="caret">▾</span>
         </button>
         <div class="menu" id="user-menu" role="menu">
-          <a role="menuitem" routerLink="/404" (click)="closeUserMenu()" data-i18n="header.admin.profile">Hồ
+          <a role="menuitem" routerLink="/admin-profile" (click)="closeUserMenu()" data-i18n="header.admin.profile">Hồ
             sơ</a>
           <button role="menuitem" id="btn-logout" type="button" (click)="onLogout($event)"
             data-i18n="header.admin.logout">Đăng xuất</button>
@@ -33,15 +33,15 @@
       <img src="assets/icons/sanpham.png" alt="">
       <span data-i18n="header.admin.products">Sản phẩm</span>
     </a>
-    <a routerLink="/admin/order" routerLinkActive="active" class="nav-item">
+    <a routerLink="/admin-order" routerLinkActive="active" class="nav-item">
       <img src="assets/icons/Cart.png" alt="">
       <span data-i18n="header.admin.orders">Đơn hàng</span>
     </a>
-    <a routerLink="/404" routerLinkActive="active" class="nav-item">
+    <a routerLink="/admin-account" routerLinkActive="active" class="nav-item">
       <img src="assets/icons/account.png" alt="">
       <span data-i18n="header.admin.account">Tài khoản</span>
     </a>
-    <a routerLink="/admin/blog" routerLinkActive="active" class="nav-item">
+    <a routerLink="/admin-blog" routerLinkActive="active" class="nav-item">
       <img src="assets/icons/dien_dan.png" alt="">
       <span data-i18n="header.admin.forums">Diễn đàn</span>
     </a>

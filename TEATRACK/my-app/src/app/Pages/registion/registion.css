@@ -391,6 +391,23 @@
   transform: translateY(-1px);
 }
 
+.login-link{
+  margin-top:16px;
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
+}
+
+.login-link a{
+  margin-left:6px;
+  color:#0088FF;
+  text-decoration:none;
+}
+
+.login-link a:hover{
+  text-decoration:underline;
+}
+
 @keyframes registionAlertFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

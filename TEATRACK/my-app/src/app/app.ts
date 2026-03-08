@@ -3,7 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { ROUTE_TITLES, APP_TITLE_SUFFIX } from './route-titles';
+import { ROUTE_TITLES, APP_TITLE_SUFFIX, getRouteTitle } from './route-titles';
 import { CartService } from './cart.service';
 
 @Component({
@@ -76,7 +76,8 @@ export class App implements OnInit, OnDestroy {
   private updateTitle(path: string): void {
     if (/^\/blog\/[^/]+$/.test(path)) return;
     if (path === '/product' || path.startsWith('/product/') || path.startsWith('/menu/product/')) return;
-    const pageTitle = ROUTE_TITLES[path];
+    const lang = (typeof localStorage !== 'undefined' && (localStorage.getItem('lang') === 'en' ? 'en' : 'vi')) as 'vi' | 'en';
+    const pageTitle = getRouteTitle(path, lang) || ROUTE_TITLES[path];
     const full = pageTitle ? `${pageTitle} | ${APP_TITLE_SUFFIX}` : APP_TITLE_SUFFIX;
     this.titleService.setTitle(full);
   }

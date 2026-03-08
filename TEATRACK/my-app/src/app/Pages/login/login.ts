@@ -46,7 +46,7 @@ export class Login implements OnInit {
 
   private updatePageTitle(): void {
     const suffix = 'Hồng trà ngô gia';
-    this.title.setTitle(this.currentLang === 'vi' ? `Login | ${suffix}` : `Đăng nhập | ${suffix}`);
+    this.title.setTitle(this.currentLang === 'vi' ? `Đăng nhập | ${suffix}` : `Login | ${suffix}`);
   }
 
   loadLang(lang: string): void {
