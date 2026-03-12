@@ -34,6 +34,8 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
   ORDERS_ALL: Order[] = [];
   filterState = { orderId: '', search: '' };
   currentTabStatus = '';
+  showAlertOrder = false;
+  alertMessageOrder = '';
   private escHandler = (e: KeyboardEvent) => this.onEscKey(e);
   private storageHandler = (e: StorageEvent) => this.onStorageOrders(e);
 
@@ -602,7 +604,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
         },
         error: (err) => {
           console.error('Update status DB error:', err);
-          alert('Lỗi cập nhật database!');
+          this.showAlertModal('Lỗi cập nhật database!');
         }
       });
     } else {
@@ -620,33 +622,68 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  exportOrders(): void {
+  async exportOrders(): Promise<void> {
     if (!this.ORDERS_ALL?.length) {
-      alert('Không có đơn hàng để xuất!');
+      this.showAlertModal('Không có đơn hàng để xuất!');
       return;
     }
+    const ExcelJSLib = (window as any).ExcelJS;
+    const saveAsLib = (window as any).saveAs;
+    if (!ExcelJSLib || !saveAsLib) {
+      this.showAlertModal('Thư viện xuất Excel chưa tải xong. Vui lòng tải lại trang.');
+      return;
+    }
+    const workbook = new ExcelJSLib.Workbook();
+    const sheet = workbook.addWorksheet('Danh sách đơn hàng', { views: [{ state: 'frozen', ySplit: 1 }] });
+    const headerStyle = {
+      font: { bold: true, color: { argb: 'FFFFFFFF' } },
+      fill: { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FF0088FF' } },
+      alignment: { horizontal: 'center' as const },
+    };
+    sheet.columns = [
+      { header: 'Mã đơn hàng', key: 'code', width: 18 },
+      { header: 'Khách hàng', key: 'customer', width: 22 },
+      { header: 'Số điện thoại', key: 'phone', width: 14 },
+      { header: 'Địa chỉ', key: 'address', width: 28 },
+      { header: 'Ngày đặt', key: 'date', width: 18 },
+      { header: 'Trạng thái', key: 'status', width: 14 },
+      { header: 'Tổng tiền (VNĐ)', key: 'total', width: 16 },
+    ];
+    sheet.getRow(1).eachCell((cell: any) => {
+      cell.font = headerStyle.font;
+      cell.fill = headerStyle.fill;
+      cell.alignment = headerStyle.alignment;
+    });
+    for (const o of this.ORDERS_ALL) {
+      sheet.addRow({
+        code: o.id || o.orderId || '',
+        customer: o.customerName || '',
+        phone: o.customerPhone || '',
+        address: (o.customerAddress || '').replace(/\n/g, ' '),
+        date: this.fmtDate(o.date || o.createdAt),
+        status: o.status || '',
+        total: (o.total ?? 0).toLocaleString('vi-VN'),
+      });
+    }
+    const buffer = await workbook.xlsx.writeBuffer();
+    const today = new Date().toISOString().split('T')[0];
+    saveAsLib(new Blob([buffer]), `Don_hang_${today}.xlsx`);
+    this.showAlertModal('Đã xuất danh sách đơn hàng ra file Excel thành công.');
+  }
 
-    const header = 'Mã đơn hàng,Khách hàng,Số điện thoại,Địa chỉ,Ngày đặt,Trạng thái,Tổng tiền\n';
-    const rows = this.ORDERS_ALL.map((o) => {
-      const id = o.id || o.orderId || '';
-      const name = (o.customerName || '').replace(/,/g, ' ');
-      const phone = o.customerPhone || '';
-      const addr = (o.customerAddress || '').replace(/,/g, ' ');
-      const date = this.fmtDate(o.date || o.createdAt);
-      const status = o.status || '';
-      const total = o.total ?? 0;
-      return `${id},${name},${phone},${addr},${date},${status},${total}`;
-    }).join('\n');
+  showAlertModal(message: string): void {
+    this.alertMessageOrder = message;
+    this.showAlertOrder = true;
+    this.cdr.detectChanges();
+  }
 
-    const blob = new Blob(['\ufeff' + header + rows], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `orders_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+  closeAlertModal(): void {
+    this.showAlertOrder = false;
+    this.cdr.detectChanges();
+  }
 
-    this.showSuccess('XUẤT DANH SÁCH THÀNH CÔNG');
+  closeAlertOnOverlay(event: Event): void {
+    if ((event.target as HTMLElement).classList.contains('alert-overlay')) this.closeAlertModal();
   }
 
   private initExportButton(): void {

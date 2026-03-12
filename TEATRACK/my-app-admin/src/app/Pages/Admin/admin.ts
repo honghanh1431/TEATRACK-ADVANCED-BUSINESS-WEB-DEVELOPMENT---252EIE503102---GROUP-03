@@ -127,7 +127,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     try {
@@ -181,7 +181,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     this.chartInstances.forEach((c) => {
       try {
         c?.destroy();
-      } catch (_) { }
+      } catch (_) {}
     });
     this.chartInstances = [];
     document.removeEventListener('click', this.boundClick);
@@ -192,8 +192,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   /** Sort đơn hàng theo ngày giảm dần (mới nhất trước). */
   private sortOrdersByDateDesc(): void {
     this.ORDERS_ALL.sort((a, b) => {
-      const tA = new Date((a.date || a.createdAt) as string | number | undefined || 0).getTime();
-      const tB = new Date((b.date || b.createdAt) as string | number | undefined || 0).getTime();
+      const tA = new Date(((a.date || a.createdAt) as string | number | undefined) || 0).getTime();
+      const tB = new Date(((b.date || b.createdAt) as string | number | undefined) || 0).getTime();
       return tB - tA;
     });
   }
@@ -207,7 +207,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       this.renderOrdersTable(this.ORDERS_ALL);
       this.updateOrdersStats();
       this.cdr.detectChanges();
-    } catch (_) { }
+    } catch (_) {}
   }
 
   /** Gọi khi vào lại trang admin-dashboard để luôn thấy dữ liệu mới nhất (orders + products). */
@@ -262,7 +262,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const btn = document.getElementById('btn-close-success');
     const modal = document.getElementById('modal-success');
     if (btn) btn.addEventListener('click', () => this.hideSuccess());
-    document.querySelectorAll('[data-close-success]').forEach((el) => el.addEventListener('click', () => this.hideSuccess()));
+    document
+      .querySelectorAll('[data-close-success]')
+      .forEach((el) => el.addEventListener('click', () => this.hideSuccess()));
     document.addEventListener('keydown', this.successKeydown);
   }
 
@@ -288,7 +290,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     this.chartInstances.forEach((c) => {
       try {
         c?.destroy();
-      } catch (_) { }
+      } catch (_) {}
     });
     this.chartInstances = [];
     if (revCostCtx) {
@@ -387,7 +389,14 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       const pieChart = new Chart(catPieCtx, {
         type: 'doughnut',
         data: {
-          labels: ['Loại Thuần Trà', 'Loại Trà Sữa', 'Loại Trà Latte', 'Thức Uống Hot', 'Thức Uống Mới', 'Loại Trà Trái Cây'],
+          labels: [
+            'Loại Thuần Trà',
+            'Loại Trà Sữa',
+            'Loại Trà Latte',
+            'Thức Uống Hot',
+            'Thức Uống Mới',
+            'Loại Trà Trái Cây',
+          ],
           datasets: [
             {
               data: categoryData,
@@ -428,7 +437,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
               displayColors: true,
               callbacks: {
                 label: (ctx: any) => {
-                  const t = (ctx.chart?.data?.datasets?.[0]?.data as number[]).reduce((a: number, b: number) => a + b, 0) || 1;
+                  const t =
+                    (ctx.chart?.data?.datasets?.[0]?.data as number[]).reduce(
+                      (a: number, b: number) => a + b,
+                      0,
+                    ) || 1;
                   return `${ctx.label || ''}: ${((ctx.parsed / t) * 100).toFixed(1)}%`;
                 },
               },
@@ -466,7 +479,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
   applyDashboardFilter(): void {
     if (!this.dashboardData?.data) return;
-    const branch = typeof localStorage !== 'undefined' ? localStorage.getItem('admin_branch') || 'all' : 'all';
+    const branch =
+      typeof localStorage !== 'undefined' ? localStorage.getItem('admin_branch') || 'all' : 'all';
     let month = typeof localStorage !== 'undefined' ? localStorage.getItem('admin_month') : '';
     if (!month) {
       const now = new Date();
@@ -476,7 +490,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const byMonth = byBranch?.[month];
     const slice = byMonth ?? this.dashboardData.data['all']?.[month];
     const fallbackMonth = Object.keys(this.dashboardData.data['all'] || {})[0] || month;
-    const s = slice ?? this.dashboardData.data[branch]?.[fallbackMonth] ?? this.dashboardData.data['all']?.[fallbackMonth];
+    const s =
+      slice ??
+      this.dashboardData.data[branch]?.[fallbackMonth] ??
+      this.dashboardData.data['all']?.[fallbackMonth];
     if (!s) return;
 
     const fmtDelta = (delta: number) => `${delta >= 0 ? '+' : ''}${delta}%`;
@@ -498,20 +515,26 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       el('sRevenueDelta')!.textContent = fmtDelta(s.revenueDelta);
       setDeltaColor(el('sRevenueDelta'), s.revenueDelta);
     }
-    if (el('sRevenueDeltaAbs')) el('sRevenueDeltaAbs')!.textContent = fmtRevenueAbs(s.revenueDiff) + ' tuần này';
+    if (el('sRevenueDeltaAbs'))
+      el('sRevenueDeltaAbs')!.textContent = fmtRevenueAbs(s.revenueDiff) + ' tuần này';
     if (el('sOrdersDelta')) {
       el('sOrdersDelta')!.textContent = fmtDelta(s.ordersDelta);
       setDeltaColor(el('sOrdersDelta'), s.ordersDelta);
     }
-    if (el('sOrdersDeltaAbs')) el('sOrdersDeltaAbs')!.textContent = (s.ordersDiff >= 0 ? '+' : '') + s.ordersDiff + ' tuần này';
+    if (el('sOrdersDeltaAbs'))
+      el('sOrdersDeltaAbs')!.textContent =
+        (s.ordersDiff >= 0 ? '+' : '') + s.ordersDiff + ' tuần này';
     if (el('sCustomersDelta')) {
       el('sCustomersDelta')!.textContent = fmtDelta(s.productsSoldDelta);
       setDeltaColor(el('sCustomersDelta'), s.productsSoldDelta);
     }
     if (el('sCustomersDeltaAbs')) {
-      const absStr = Math.abs(s.productsSoldDiff) >= 1000
-        ? (s.productsSoldDiff >= 0 ? '+' : '-') + (Math.abs(s.productsSoldDiff) / 1000).toFixed(1) + 'k'
-        : (s.productsSoldDiff >= 0 ? '+' : '') + s.productsSoldDiff;
+      const absStr =
+        Math.abs(s.productsSoldDiff) >= 1000
+          ? (s.productsSoldDiff >= 0 ? '+' : '-') +
+            (Math.abs(s.productsSoldDiff) / 1000).toFixed(1) +
+            'k'
+          : (s.productsSoldDiff >= 0 ? '+' : '') + s.productsSoldDiff;
       el('sCustomersDeltaAbs')!.textContent = absStr + ' tuần này';
     }
 
@@ -525,14 +548,18 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const pieChart = this.chartInstances[1];
     if (pieChart && s.doughnut) {
       pieChart.data.datasets[0].data = s.doughnut.data;
-      if (pieChart.options) (pieChart.options as any).centerDisplay = { value: s.doughnut.centerValue, unit: s.doughnut.centerUnit };
+      if (pieChart.options)
+        (pieChart.options as any).centerDisplay = {
+          value: s.doughnut.centerValue,
+          unit: s.doughnut.centerUnit,
+        };
       pieChart.update();
     }
   }
 
   fetchOrders(): void {
     const token = localStorage.getItem('token');
-    const headers = { 'Authorization': `Bearer ${token}` };
+    const headers = { Authorization: `Bearer ${token}` };
 
     // 1. Lọc từ MongoDB API
     this.http.get<{ orders: Order[] }>(`${this.API_BASE}/api/admin/orders`, { headers }).subscribe({
@@ -549,7 +576,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             try {
               const raw = localStorage.getItem('orders');
               if (raw) fromStorage = JSON.parse(raw) as Order[];
-            } catch (_) { }
+            } catch (_) {}
 
             // Hợp nhất và loại trùng (Dedupe)
             const ids = new Set<string>();
@@ -577,21 +604,21 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             console.error('Fetch json orders error:', err);
             // Vẫn hiển thị từ DB nếu JSON lỗi
             this.processOrders(fromDb);
-          }
+          },
         });
       },
       error: (err) => {
         console.error('Fetch DB orders error:', err);
         // Fallback về cách cũ nếu API lỗi
         this.fallbackFetchOrders();
-      }
+      },
     });
   }
 
   private processOrders(orders: Order[]): void {
     const ids = new Set<string>();
     this.ORDERS_ALL = [];
-    orders.forEach(o => {
+    orders.forEach((o) => {
       const id = String(o._id || o.id || o.orderId || '').trim();
       if (id && !ids.has(id)) {
         ids.add(id);
@@ -613,13 +640,15 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         try {
           const raw = localStorage.getItem('orders');
           if (raw) fromStorage = JSON.parse(raw) as Order[];
-        } catch (_) { }
+        } catch (_) {}
         this.processOrders([...fromStorage, ...fromJson]);
       },
       error: () => {
         const tbody = this.$('#ordersBody');
-        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">Không thể tải đơn hàng</td></tr>';
-      }
+        if (tbody)
+          tbody.innerHTML =
+            '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">Không thể tải đơn hàng</td></tr>';
+      },
     });
   }
 
@@ -654,23 +683,47 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const orderDate = this.fmtDate(order.date || order.createdAt);
         const total = this.fmtMoney(order.total || order.totalAmount || 0);
         const statusLower = (order.status || '').toLowerCase().trim();
-        const englishKeys = ['pending', 'processing', 'ready', 'shipping', 'completed', 'cancelled'];
+        const englishKeys = [
+          'pending',
+          'processing',
+          'ready',
+          'shipping',
+          'completed',
+          'cancelled',
+        ];
         let statusKey = 'pending';
         if (englishKeys.includes(statusLower)) {
           statusKey = statusLower;
-        } else if (statusLower.includes('hoàn') || statusLower.includes('complete') || statusLower.includes('thành công')) {
+        } else if (
+          statusLower.includes('hoàn') ||
+          statusLower.includes('complete') ||
+          statusLower.includes('thành công')
+        ) {
           statusKey = 'completed';
         } else if (statusLower.includes('hủy') || statusLower.includes('cancel')) {
           statusKey = 'cancelled';
-        } else if (statusLower.includes('giao') && (statusLower.includes('đang') || statusLower.includes('shipping'))) {
+        } else if (
+          statusLower.includes('giao') &&
+          (statusLower.includes('đang') || statusLower.includes('shipping'))
+        ) {
           statusKey = 'shipping';
-        } else if (statusLower.includes('lấy hàng') || statusLower.includes('chờ lấy') || statusLower.includes('ready')) {
+        } else if (
+          statusLower.includes('lấy hàng') ||
+          statusLower.includes('chờ lấy') ||
+          statusLower.includes('ready')
+        ) {
           statusKey = 'ready';
-        } else if (statusLower.includes('đang') || statusLower.includes('processing') || statusLower.includes('chuẩn bị') || statusLower.includes('xác nhận')) {
+        } else if (
+          statusLower.includes('đang') ||
+          statusLower.includes('processing') ||
+          statusLower.includes('chuẩn bị') ||
+          statusLower.includes('xác nhận')
+        ) {
           statusKey = statusLower.includes('chuẩn bị') ? 'processing' : 'pending';
         }
         const badgeClass = statusMap[statusKey] || statusMap['pending'];
-        const statusText = statusLabels[statusKey] || this.t(`admin.order.status.${statusKey}`) || order.status;
+        const statusText =
+          statusLabels[statusKey] || this.t(`admin.order.status.${statusKey}`) || order.status;
         const paymentLabel = order.paymentMethod || 'Tiền mặt';
         return `<tr><td>#${orderId}</td><td>${customerName}</td><td>${orderDate}</td><td><span class="${badgeClass}">${statusText}</span></td><td>${total}</td><td>${paymentLabel}</td><td><span class="btns"><button class="btn" data-edit-order="${orderId}"><img src="assets/icons/edit2.png" alt="Chỉnh sửa" aria-hidden="true"></button></span></td></tr>`;
       })
@@ -736,7 +789,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         : weekProductsSold > 0
           ? 100
           : 0;
-
   }
 
   fetchProducts(): void {
@@ -763,7 +815,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             if (body)
               body.innerHTML =
                 '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">Không thể tải sản phẩm</td></tr>';
-          }
+          },
         });
       },
     });
@@ -887,8 +939,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     items.forEach((p: Product) => {
       const tr = document.createElement('tr');
       const price = this.fmtMoney(p.price ?? 0);
-      const imageUrl =
-        p.image || p.img || p.imageUrl || p.thumbnail || Admin.PLACEHOLDER_IMG;
+      const imageUrl = p.image || p.img || p.imageUrl || p.thumbnail || Admin.PLACEHOLDER_IMG;
       const visible = p.visible !== false;
       const pid = (p?.id ?? '').replace(/"/g, '&quot;');
       tr.innerHTML = `<td>${p?.id ?? ''}</td><td>${p?.name ?? ''}</td><td>${p?.category ?? p?.type ?? ''}</td><td><img src="${imageUrl}" alt="${(p?.name ?? '').replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='${Admin.PLACEHOLDER_IMG}'"></td><td>${price}</td><td class="col-visible"><label class="visible-check-wrap"><input type="checkbox" class="product-visible-cb" data-product-id="${pid}" ${visible ? 'checked' : ''} aria-label="Hiển thị trên menu"></label></td><td><span class="btns"><button class="btn" data-edit="${pid}"><img src="assets/icons/edit2.png" alt="" aria-hidden="true"></button><button class="btn" data-delete="${pid}"><img src="assets/icons/delete2.png" alt="" aria-hidden="true"></button></span></td>`;
@@ -923,7 +974,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             console.error('Toggle visible error:', err);
             input.checked = !checked;
             this.showAlertModal('Lỗi khi cập nhật trạng thái hiển thị.');
-          }
+          },
         });
       });
     });
@@ -934,6 +985,88 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (sProducts) sProducts.textContent = String(this.PRODUCTS_ALL.length);
   }
 
+  async exportProducts(): Promise<void> {
+    if (!this.PRODUCTS_ALL.length) {
+      this.showAlertModal('Không có sản phẩm để xuất.');
+      return;
+    }
+    const ExcelJSLib = (window as any).ExcelJS;
+    const saveAsLib = (window as any).saveAs;
+    if (!ExcelJSLib || !saveAsLib) {
+      this.showAlertModal('Thư viện xuất Excel chưa tải xong. Vui lòng tải lại trang.');
+      return;
+    }
+    const byCategory = new Map<string, Product[]>();
+    for (const p of this.PRODUCTS_ALL) {
+      const cat = (p.category || p.type || '').trim() || 'Chưa phân loại';
+      if (!byCategory.has(cat)) byCategory.set(cat, []);
+      byCategory.get(cat)!.push(p);
+    }
+    const categoryOrder = [
+      'Loại Thuần Trà',
+      'Loại Trà Sữa',
+      'Loại Trà Latte',
+      'Thức Uống Hot',
+      'Thức Uống Mới',
+      'Loại Trà Trái Cây',
+      'Chưa phân loại',
+    ];
+    const sortedCategories = Array.from(byCategory.keys()).sort((a, b) => {
+      const i = categoryOrder.indexOf(a);
+      const j = categoryOrder.indexOf(b);
+      if (i !== -1 && j !== -1) return i - j;
+      if (i !== -1) return -1;
+      if (j !== -1) return 1;
+      return a.localeCompare(b);
+    });
+    const workbook = new ExcelJSLib.Workbook();
+    const headerStyle = {
+      font: { bold: true, color: { argb: 'FFFFFFFF' } },
+      fill: { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FF0088FF' } },
+      alignment: { horizontal: 'center' as const },
+    };
+    const safeSheetName = (name: string) => name.replace(/[\\/*?:\[\]]/g, '').slice(0, 31);
+    for (const cat of sortedCategories) {
+      const products = byCategory.get(cat)!;
+      const sheet = workbook.addWorksheet(safeSheetName(cat), {
+        views: [{ state: 'frozen', ySplit: 1 }],
+      });
+      sheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Tên', key: 'name', width: 28 },
+        { header: 'Danh mục', key: 'category', width: 18 },
+        { header: 'Giá', key: 'price', width: 12 },
+        { header: 'Giá L', key: 'priceL', width: 10 },
+        { header: 'VIP M', key: 'vipM', width: 10 },
+        { header: 'VIP L', key: 'vipL', width: 10 },
+        { header: 'Hiển thị', key: 'visible', width: 12 },
+        { header: 'Đặc biệt', key: 'special', width: 12 },
+      ];
+      sheet.getRow(1).eachCell((cell: any) => {
+        cell.font = headerStyle.font;
+        cell.fill = headerStyle.fill;
+        cell.alignment = headerStyle.alignment;
+      });
+      for (const p of products) {
+        sheet.addRow({
+          id: p.id ?? '',
+          name: p.name ?? '',
+          category: p.category || p.type || '',
+          price: p.price ?? '',
+          priceL: p.priceL ?? '',
+          vipM: p.vipPriceM ?? '',
+          vipL: p.vipPriceL ?? '',
+          visible: p.visible ? 'Có' : 'Không',
+          special: p.special ? 'Có' : 'Không',
+        });
+      }
+    }
+    const buffer = await workbook.xlsx.writeBuffer();
+    const today = new Date().toISOString().slice(0, 10);
+    saveAsLib(new Blob([buffer]), `San_pham_theo_danh_muc_${today}.xlsx`);
+    this.showAlertModal('Đã xuất danh sách sản phẩm theo từng danh mục ra file Excel thành công.');
+  }
+
   private getOrderItemDetailLines(item: any): string[] {
     const lines: string[] = [];
     const ngot = item.sweetness || 'Ít';
@@ -941,9 +1074,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const qty = item.qty ?? item.quantity ?? 1;
     if (item.size) {
       const first = `Size ${item.size} - Ngọt: ${ngot} - Đá: ${da}`;
-      lines.push(
-        Array.isArray(item.toppings) && item.toppings.length ? first + ',' : first,
-      );
+      lines.push(Array.isArray(item.toppings) && item.toppings.length ? first + ',' : first);
     } else if (item.sweetness || item.ice) {
       const part = [item.sweetness && `Ngọt: ${item.sweetness}`, item.ice && `Đá: ${item.ice}`]
         .filter(Boolean)
@@ -956,7 +1087,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       item.toppings.forEach((t: string) => lines.push(t));
     }
     if (lines.length <= 1 && (item.specs || item.options)) {
-      const opts = Array.isArray(item.options) ? item.options.join(', ') : (item.specs || (item.options as string) || '');
+      const opts = Array.isArray(item.options)
+        ? item.options.join(', ')
+        : item.specs || (item.options as string) || '';
       if (opts) lines.splice(lines.length - 1, 0, opts);
     }
     if (item.note && !lines.some((l: string) => l.includes(item.note))) {
@@ -987,7 +1120,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     set('customer-name', order.customerName || order.customer?.name || '');
     set('customer-phone', order.customerPhone ?? order.customer?.phone ?? '');
     set('customer-address', order.customerAddress ?? order.customer?.address ?? '');
-    const statusSelect = document.getElementById('order-status-dropdown') as HTMLSelectElement | null;
+    const statusSelect = document.getElementById(
+      'order-status-dropdown',
+    ) as HTMLSelectElement | null;
     if (statusSelect) {
       const statusMap: Record<string, string> = {
         pending: 'pending',
@@ -1025,11 +1160,19 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             product?.img ||
             product?.imageUrl ||
             Admin.PLACEHOLDER_IMG;
-          if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('data:') && !imgUrl.startsWith('/')) {
+          if (
+            imgUrl &&
+            !imgUrl.startsWith('http') &&
+            !imgUrl.startsWith('data:') &&
+            !imgUrl.startsWith('/')
+          ) {
             imgUrl = '/' + imgUrl;
           }
           const rawName = item.name || product?.name || item.productName || 'Sản phẩm';
-          const name = String(rawName).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+          const name = String(rawName)
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
           const lines = this.getOrderItemDetailLines(item);
           const qty = item.qty ?? (item as any).quantity ?? 1;
           const totalPrice = (item.price || 0) * qty;
@@ -1037,11 +1180,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           const specsHtml =
             lines.length > 0
               ? lines
-                .map(
-                  (line) =>
-                    `<p class="item-detail-line">${String(line).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</p>`,
-                )
-                .join('')
+                  .map(
+                    (line) =>
+                      `<p class="item-detail-line">${String(line).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</p>`,
+                  )
+                  .join('')
               : '';
           return `<div class="order-item"><img src="${imgUrl}" alt="${name}" class="item-image"><div class="item-details"><div class="item-name">${name}</div><div class="item-specs">${specsHtml}</div></div><div class="item-price">${price}</div></div>`;
         })
@@ -1170,7 +1313,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     });
     fileInput.addEventListener('change', (e) => {
       const files = Array.from((e.target as HTMLInputElement).files || []);
-      const imageFiles = files.filter((f) => f.type.startsWith('image/')).slice(0, this.ADD_PRODUCT_MAX_IMAGES - this.addProductImageUrls.length);
+      const imageFiles = files
+        .filter((f) => f.type.startsWith('image/'))
+        .slice(0, this.ADD_PRODUCT_MAX_IMAGES - this.addProductImageUrls.length);
       for (const file of imageFiles) {
         if (file.size > 5 * 1024 * 1024) {
           this.showAlertModal('Kích thước file không được vượt quá 5MB.');
@@ -1189,7 +1334,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           }
           loaded++;
           if (loaded === toAdd.length) {
-            this.addProductImageUrls = this.addProductImageUrls.slice(0, this.ADD_PRODUCT_MAX_IMAGES);
+            this.addProductImageUrls = this.addProductImageUrls.slice(
+              0,
+              this.ADD_PRODUCT_MAX_IMAGES,
+            );
             this.renderAddProductPreviews();
           }
         };
@@ -1240,8 +1388,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         description:
           (document.getElementById('add-product-desc') as HTMLTextAreaElement)?.value || '',
         detail: (document.getElementById('add-product-detail') as HTMLTextAreaElement)?.value || '',
-        image:
-          this.addProductImageUrls[0] || Admin.PLACEHOLDER_IMG,
+        image: this.addProductImageUrls[0] || Admin.PLACEHOLDER_IMG,
       };
       if (!data.name?.trim()) {
         this.showAlertModal('Vui lòng nhập tên sản phẩm.');
@@ -1266,7 +1413,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         error: (err) => {
           console.error('Add product error:', err);
           this.showAlertModal('Lỗi khi thêm sản phẩm vào database.');
-        }
+        },
       });
     });
   }
@@ -1412,7 +1559,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           }
           loaded++;
           if (loaded === toAdd.length) {
-            this.editProductImageUrls = this.editProductImageUrls.slice(0, this.EDIT_PRODUCT_MAX_IMAGES);
+            this.editProductImageUrls = this.editProductImageUrls.slice(
+              0,
+              this.EDIT_PRODUCT_MAX_IMAGES,
+            );
             this.renderEditProductPreviews();
           }
         };
@@ -1470,7 +1620,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         error: (err) => {
           console.error('Update product error:', err);
           this.showAlertModal('Lỗi khi cập nhật sản phẩm vào database.');
-        }
+        },
       });
     });
   }
@@ -1479,7 +1629,13 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const product = this.PRODUCTS_ALL.find((p) => p.id === productId);
     this.pendingDeleteProductId = productId;
     const hasName = product && String(product.name || '').trim() !== '';
-    const displayText = hasName ? String(product!.name || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : 'này';
+    const displayText = hasName
+      ? String(product!.name || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+      : 'này';
     const messageEl = document.querySelector('.confirm-message');
     if (messageEl) {
       const namePart = hasName
@@ -1519,7 +1675,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         console.error('Delete product error:', err);
         this.showAlertModal('Lỗi khi xóa sản phẩm khỏi database.');
-      }
+      },
     });
   }
 
@@ -1541,7 +1697,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardData = data;
         this.applyDashboardFilter();
       },
-      error: () => { },
+      error: () => {},
     });
     if (typeof window !== 'undefined') {
       window.addEventListener('admin:filters', this.filterListener);
@@ -1586,20 +1742,26 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         // Nếu là đơn hàng từ DB (có _id), gọi API cập nhật
         if (order._id) {
           const token = localStorage.getItem('token');
-          const headers = { 'Authorization': `Bearer ${token}` };
-          this.http.put(`${this.API_BASE}/api/admin/orders/${order._id}/status`, { status: newStatus }, { headers }).subscribe({
-            next: () => {
-              order.status = newStatus;
-              this.sortOrdersByDateDesc();
-              localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
-              this.renderOrdersTable(this.ORDERS_ALL);
-              this.showSuccess('Cập nhật trạng thái đơn hàng thành công');
-            },
-            error: (err) => {
-              console.error('Update status error:', err);
-              this.showAlertModal('Lỗi khi cập nhật trạng thái vào database.');
-            }
-          });
+          const headers = { Authorization: `Bearer ${token}` };
+          this.http
+            .put(
+              `${this.API_BASE}/api/admin/orders/${order._id}/status`,
+              { status: newStatus },
+              { headers },
+            )
+            .subscribe({
+              next: () => {
+                order.status = newStatus;
+                this.sortOrdersByDateDesc();
+                localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
+                this.renderOrdersTable(this.ORDERS_ALL);
+                this.showSuccess('Cập nhật trạng thái đơn hàng thành công');
+              },
+              error: (err) => {
+                console.error('Update status error:', err);
+                this.showAlertModal('Lỗi khi cập nhật trạng thái vào database.');
+              },
+            });
         } else {
           // Đơn hàng local/json
           order.status = newStatus;
@@ -1629,7 +1791,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const btnOk = document.getElementById('btn-alert-ok');
     if (!modal || !msgEl) return;
     const close = () => this.closeAlertModal();
-    document.querySelectorAll('[data-close-alert]').forEach((el) => el.addEventListener('click', close));
+    document
+      .querySelectorAll('[data-close-alert]')
+      .forEach((el) => el.addEventListener('click', close));
     if (btnOk) btnOk.addEventListener('click', close);
   }
 
@@ -1685,7 +1849,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     };
 
     /* ================= DASHBOARD ================= */
-    const dashboard = workbook.addWorksheet('Dashboard', { views: [{ state: 'frozen', ySplit: 1 }] });
+    const dashboard = workbook.addWorksheet('Dashboard', {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    });
     dashboard.mergeCells('A1:E1');
     const titleCell = dashboard.getCell('A1');
     titleCell.value = 'HỒNG TRÀ NGÔ GIA - BÁO CÁO TỔNG KẾT';
@@ -1791,7 +1957,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const buffer = await workbook.xlsx.writeBuffer();
     const today = new Date().toISOString().slice(0, 10);
     saveAsLib(new Blob([buffer]), `HongTraNgoGia_Sales_Report_${today}.xlsx`);
-    this.showNotification('Đã xuất báo cáo Excel thành công', 'success');
+    this.showAlertModal('Đã xuất báo cáo tổng kết ra file Excel thành công.');
   }
 
   private initTopbarDropdowns(): void {
