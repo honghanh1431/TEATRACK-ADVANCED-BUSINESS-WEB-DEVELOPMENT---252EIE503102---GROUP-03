@@ -15,6 +15,7 @@ interface Order {
   shippingFee?: number;
   discount?: number;
   paymentMethod?: string;
+  deliveryAgency?: string;
   customerName?: string;
   customerPhone?: string;
   customerAddress?: string;
@@ -243,7 +244,6 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     if (messageEl) messageEl.textContent = message;
     (modal as HTMLElement).style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
-    setTimeout(() => this.hideSuccess(), 1500);
   }
 
   hideSuccess(): void {
@@ -431,6 +431,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
             <td><span class="${badge.class}">${badge.text}</span></td>
             <td>${total}</td>
             <td>${paymentMethod}</td>
+            <td>${order.deliveryAgency || 'Chưa xác định'}</td>
             <td><span class="btns"><button type="button" class="btn" data-edit-order="${orderId}" title="Chi tiết"><img src="assets/icons/edit2.png" alt="Chỉnh sửa" aria-hidden="true"></button></span></td>
           </tr>
         `;

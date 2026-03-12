@@ -1,0 +1,32 @@
+[
+    {
+        "name": "244 đường số 8 - H071",
+        "address": "244 Đường Số 8, Khu Phố 3, Linh Xuân, Thủ Đức",
+        "phone": "0999.888.777",
+        "mapEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14182.903941439841!2d106.75868788715823!3d10.875831500000016!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d9fae15ace3d%3A0xd82774e6f288eaa1!2zSOG7k25nIFRyw6AgTmfDtCBHaWEgSDI0Ng!5e1!3m2!1svi!2s!4v1761293503652!5m2!1svi!2s",
+        "image": "assets/icons/chi_nhanh1.png",
+        "createdAt": {
+            "$date": "2026-03-13T00:00:00.000Z"
+        }
+    },
+    {
+        "name": "60 đường Nguyễn An Ninh - H246",
+        "address": "60 đường Nguyễn An Ninh, Dĩ An, Bình Dương",
+        "phone": "0789.654.321",
+        "mapEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14182.903941439841!2d106.75868788715823!3d10.875831500000016!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d9fae15ace3d%3A0xd82774e6f288eaa1!2zSOG7k25nIFRyw6AgTmfDtCBHaWEgSDI0Ng!5e1!3m2!1svi!2s!4v1761293503652!5m2!1svi!2s",
+        "image": "assets/icons/chi_nhanh2.png",
+        "createdAt": {
+            "$date": "2026-03-13T00:00:00.000Z"
+        }
+    },
+    {
+        "name": "24 đường Lý Thường Kiệt - H033",
+        "address": "24 đường Lý Thường Kiệt, Dĩ An, Bình Dương",
+        "phone": "0159.753.456",
+        "mapEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14181.91561997498!2d106.74865978715823!3d10.8965924!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d9c6bfb7f1d5%3A0x8372b67d534b8675!2zSOG7k25nIFRyw6AgTmfDtCBHaWEgSDAzMw!5e1!3m2!1svi!2s!4v1761293527849!5m2!1svi!2s",
+        "image": "assets/icons/chi_nhanh3.png",
+        "createdAt": {
+            "$date": "2026-03-13T00:00:00.000Z"
+        }
+    }
+]
