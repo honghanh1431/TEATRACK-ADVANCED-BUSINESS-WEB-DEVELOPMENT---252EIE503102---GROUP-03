@@ -58,6 +58,9 @@ body {
 }
 
 .export-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 9px 18px;
   background: #0088ff;
   color: white;
@@ -68,6 +71,7 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .export-btn:hover {
@@ -1055,15 +1059,119 @@ body {
   border-radius: 10px;
 }
 
-/* Modal thông báo - theo mẫu modal-confirm */
-.modal-alert-container .confirm-icon.alert-icon {
+/* Modal thông báo - giống cart alert */
+#modal-alert.alert-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: alertFadeIn 0.2s;
+}
+
+#modal-alert.alert-overlay.show {
+  display: flex;
+}
+
+#modal-alert .alert-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  cursor: default;
+}
+
+#modal-alert .alert-dialog {
+  position: relative;
+  z-index: 1;
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: alertSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#modal-alert .alert-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #dbeafe;
-  border-color: #93c5fd;
   color: #0088ff;
 }
 
-.modal-alert-container .confirm-title {
-  color: var(--text);
+#modal-alert .alert-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+#modal-alert .alert-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px;
+}
+
+#modal-alert .alert-message {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+#modal-alert .alert-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+#modal-alert .alert-btn {
+  flex: 1;
+  max-width: 140px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#modal-alert .alert-btn-primary {
+  background: #0088ff;
+  color: white;
+  font-weight: 700;
+}
+
+#modal-alert .alert-btn-primary:hover {
+  background: #ffffff;
+  border: 2px solid #0088ff;
+  color: #0088ff;
+}
+
+@keyframes alertFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .form-row-equal {

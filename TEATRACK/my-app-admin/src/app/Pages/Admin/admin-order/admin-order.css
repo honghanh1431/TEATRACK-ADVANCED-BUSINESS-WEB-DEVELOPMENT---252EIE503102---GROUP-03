@@ -32,6 +32,8 @@
   .main {
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
+    width: 100%;
   }
   
   .content {
@@ -41,7 +43,6 @@
     gap: 0;
   }
   
-  /* Topbar */
   .topbar {
     display: flex;
     align-items: center;
@@ -53,26 +54,45 @@
     top: 0;
     z-index: 5;
   }
-  
-  .export-btn {
-    background: white;
-    color: #0088ff;
-    border: 2px solid #0088ff;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
+
+  .topbar-right {
+    display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 12px;
+    margin-left: auto;
+  }
+
+  .table-info-inline {
+    font-size: 14px;
+    color: #6b7280;
+  }
+
+  .table-info-inline strong {
+    color: #0088ff;
+    font-weight: 700;
+  }
+
+  /* Nút Xuất CSV giống "Xuất báo cáo tổng kết" trong admin */
+  .export-btn {
+    padding: 9px 18px;
+    background: #0088ff;
+    color: white;
+    border: 1.5px solid #0088ff;
+    border-radius: 999px;
     font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
   }
-  
+
   .export-btn:hover {
-    background: #e0f2fe;
+    background: #0077e6;
+    transform: translateY(-2px);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
-  
+
   .topbar .top-actions {
     display: flex;
     align-items: center;
@@ -210,17 +230,37 @@
   /* Bộ lọc */
   .order-filters {
     background: white;
-    border-radius: 0;
-    padding: 16px 24px;
+    padding: 16px 24px 24px;
     margin-bottom: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: nowrap;
-    box-shadow: none;
-    border-top: none;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     position: relative;
     z-index: 2;
+  }
+  
+  .order-filters > .filter-left {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+  }
+  
+  .order-filters > .filter-right {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .order-filters > #orders {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
   }
   
   .filter-left {
@@ -292,15 +332,22 @@
   }
   
   .card.table {
-    background: white;
-    border-top: none;
-    border-radius: 16px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     padding: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin: 20px;
-    max-width: calc(100% - 40px);
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
     position: relative;
     z-index: 2;
+  }
+  
+  .order-filters .card.table {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0;
   }
   
   .card-header-block {
@@ -328,11 +375,14 @@
     overflow-x: auto;
     overflow-y: auto;
   }
-  /* Ghim header bảng: khi cuộn thì thead không cuộn theo */
-  #orders .table-scroll {
+  .order-filters > #orders .table-scroll {
+    display: block;
+    width: 1305px;
     max-height: 70vh;
+    margin-left: 40px;
     overflow-y: auto;
     overflow-x: auto;
+    border-radius: 16px;
   }
   #orders .table-scroll thead th {
     position: sticky;
@@ -528,7 +578,6 @@
     border-color: #fecaca;
   }
   
-  /* Nút hành động - GIỐNG ADMIN.CSS */
   .btns {
     display: inline-flex;
     align-items: center;
@@ -576,73 +625,7 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 136, 255, 0.3);
   }
-  
-  /* Pagination - GIỐNG ADMIN.CSS */
-  .productsPagers {
-    padding: 10px 24px;
-    border-top: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    background: white;
-  }
-  
-  .productsPager button {
-    padding: 6px 10px;
-    background: white;
-    border: 2px solid #0088ff;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #0088ff;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 32px;
-  }
-  
-  .productsPager button:hover:not(:disabled):not(.active) {
-    background: #e0f2fe;
-    border-color: #0088ff;
-    color: #0088ff;
-  }
-  
-  .productsPager button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    border-color: #cbd5e1;
-    color: #cbd5e1;
-  }
-  
-  /* Active page number - KHOANH TRÒN (chỉ số trang, không phải arrow) */
-  .productsPager button.active:not(:first-child):not(:last-child) {
-    background: #0088ff;
-    border-color: #0088ff;
-    color: white;
-  }
-  
-  /* Arrow buttons */
-  .productsPager button:first-child,
-  .productsPager button:last-child {
-    border: 2px solid #0088ff;
-    background: white;
-    color: #0088ff;
-    font-size: 16px;
-  }
-  
-  /* Arrow hover */
-  .productsPager button:first-child:hover:not(:disabled),
-  .productsPager button:last-child:hover:not(:disabled) {
-    background: #e0f2fe;
-  }
-  
-  /* Arrow disabled */
-  .productsPager button:first-child:disabled,
-  .productsPager button:last-child:disabled {
-    border-color: #cbd5e1;
-    color: #cbd5e1;
-  }
-  
+
   /* Topbar */
   .topbar-title h1 {
     font-size: 20px;
@@ -1129,3 +1112,108 @@
   :host ::ng-deep #orders table tbody td:nth-child(3) {
     text-align: left !important;
   }
+
+.alert-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: alertFadeIn 0.2s;
+}
+
+.alert-overlay.show {
+  display: flex;
+}
+
+.alert-dialog {
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: alertSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.alert-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dbeafe;
+  color: #0088ff;
+}
+
+.alert-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.alert-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px;
+}
+
+.alert-message {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.alert-btn {
+  flex: 1;
+  max-width: 140px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.alert-btn-primary {
+  background: #0088ff;
+  color: white;
+  font-weight: 700;
+}
+
+.alert-btn-primary:hover {
+  background: #ffffff;
+  border: 2px solid #0088ff;
+  color: #0088ff;
+}
+
+@keyframes alertFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

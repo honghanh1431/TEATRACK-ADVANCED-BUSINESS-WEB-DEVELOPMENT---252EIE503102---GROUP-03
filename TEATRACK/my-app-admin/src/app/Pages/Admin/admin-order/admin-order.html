@@ -2,7 +2,7 @@
   <div class="main">
     <header class="topbar">
       <div class="topbar-title">
-        <h1>ĐƠN HÀNG</h1>
+        <h1>QUẢN LÍ ĐƠN HÀNG</h1>
       </div>
     </header>
 
@@ -66,37 +66,28 @@
               <img src="assets/icons/search.png" alt="Search" style="width:28px;height:28px;">
             </button>
           </div>
+          <button type="button" class="export-btn" id="btnExportOrders">Xuất Excel</button>
         </div>
-      </section>
-
-      <!-- Bảng đơn hàng -->
-      <section class="card table" id="orders">
-        <div class="card-header-block">
-          <h2 class="card-title">Danh sách đơn hàng</h2>
-          <div class="table-info">
-            Tổng: <strong id="totalOrders">0</strong> đơn hàng
-            <button type="button" class="btn btn-primary" id="btnExportOrders" style="margin-left:12px;">Xuất CSV</button>
+        <section class="card table" id="orders">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th data-i18n="admin.dashboard.orderCode">Mã</th>
+                  <th data-i18n="admin.dashboard.customer">Khách</th>
+                  <th data-i18n="admin.dashboard.time">Thời gian</th>
+                  <th data-i18n="admin.dashboard.status">Trạng thái</th>
+                  <th data-i18n="admin.dashboard.total">Tổng</th>
+                  <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
+                  <th data-i18n="admin.dashboard.actions"></th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+              </tbody>
+            </table>
           </div>
-        </div>
-        
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th data-i18n="admin.dashboard.orderCode">Mã</th>
-                <th data-i18n="admin.dashboard.customer">Khách</th>
-                <th data-i18n="admin.dashboard.time">Thời gian</th>
-                <th data-i18n="admin.dashboard.status">Trạng thái</th>
-                <th data-i18n="admin.dashboard.total">Tổng</th>
-                <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
-                <th data-i18n="admin.dashboard.actions"></th>
-              </tr>
-            </thead>
-            <tbody id="ordersTableBody">
-            </tbody>
-          </table>
-        </div>
+        </section>
       </section>
     </main>
   </div>
@@ -265,6 +256,29 @@
           Đóng
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert modal (giống cart) -->
+<div
+  *ngIf="showAlertOrder"
+  class="alert-overlay show"
+  role="dialog"
+  aria-modal="true"
+  (click)="closeAlertOnOverlay($event)"
+>
+  <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
+    <div class="alert-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9 12l2 2 4-4"></path>
+      </svg>
+    </div>
+    <h3 class="alert-title">Thông báo</h3>
+    <p class="alert-message">{{ alertMessageOrder }}</p>
+    <div class="alert-actions">
+      <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">OK</button>
     </div>
   </div>
 </div>
