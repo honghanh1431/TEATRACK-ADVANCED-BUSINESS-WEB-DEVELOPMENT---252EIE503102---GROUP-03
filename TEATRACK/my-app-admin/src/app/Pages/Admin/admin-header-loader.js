@@ -60,8 +60,8 @@
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
     
-    // Auto close sau 2 giây
-    setTimeout(() => hideSuccess(), 2000);
+    // Auto close sau 1.5 giây
+    setTimeout(() => hideSuccess(), 1500);
   }
 
   function hideSuccess() {

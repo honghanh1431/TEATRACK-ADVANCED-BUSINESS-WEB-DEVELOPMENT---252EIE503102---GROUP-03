@@ -17,6 +17,9 @@ interface Product {
   id?: string;
   name?: string;
   price?: number | string;
+  priceL?: number | string;
+  vipPriceM?: number | string;
+  vipPriceL?: number | string;
   category?: string;
   image?: string;
   rating?: number;
@@ -24,6 +27,7 @@ interface Product {
   /** Nếu false thì ẩn khỏi menu (chỉ hiện khi admin bật "Hiển thị sản phẩm"). */
   visible?: boolean;
 }
+
 
 interface CartItem {
   id: string;
@@ -188,18 +192,27 @@ export class Menu implements OnInit, AfterViewInit {
   }
 
   getPriceL(product: Product): number {
-    const price = Number(product.price) || 0;
-    return price + 3000;
+    // Dùng giá L từ database nếu có, nếu không thì tính +3000
+    if (product.priceL != null && Number(product.priceL) > 0) {
+      return Number(product.priceL);
+    }
+    return (Number(product.price) || 0) + 3000;
   }
 
   getVipPriceM(product: Product): number {
-    const price = Number(product.price) || 0;
-    return Math.max(0, price - 3000);
+    // Dùng giá VIP M từ database nếu có, nếu không thì tính -3000
+    if (product.vipPriceM != null && Number(product.vipPriceM) > 0) {
+      return Number(product.vipPriceM);
+    }
+    return Math.max(0, (Number(product.price) || 0) - 3000);
   }
 
   getVipPriceL(product: Product): number {
-    const priceL = this.getPriceL(product);
-    return Math.max(0, priceL - 3000);
+    // Dùng giá VIP L từ database nếu có, nếu không thì tính từ priceL - 3000
+    if (product.vipPriceL != null && Number(product.vipPriceL) > 0) {
+      return Number(product.vipPriceL);
+    }
+    return Math.max(0, this.getPriceL(product) - 3000);
   }
 
   getProductLink(product: Product): string {

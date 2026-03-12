@@ -80,6 +80,8 @@ interface AdminDashboardData {
   data?: Record<string, Record<string, DashboardSlice>>;
 }
 
+
+
 @Component({
   selector: 'app-admin',
   standalone: false,
@@ -89,6 +91,7 @@ interface AdminDashboardData {
 export class Admin implements OnInit, AfterViewInit, OnDestroy {
   ORDERS_ALL: Order[] = [];
   PRODUCTS_ALL: Product[] = [];
+
   currentPage = 1;
   totalPages = 1;
   filterState = { category: '', search: '' };
@@ -128,6 +131,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
   ) { }
+
 
   ngOnInit(): void {
     try {
@@ -248,7 +252,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (messageEl) messageEl.textContent = message;
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
-    setTimeout(() => this.hideSuccess(), 2000);
+    setTimeout(() => this.hideSuccess(), 1500);
   }
 
   hideSuccess(): void {
@@ -914,8 +918,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             const product = this.PRODUCTS_ALL.find((p) => p.id === prodId);
             if (product) {
               this.showNotification(
-                product.visible ? 'Sản phẩm sẽ hiển thị trên menu' : 'Sản phẩm đã ẩn khỏi menu',
-                'info',
+                product.visible !== false ? 'Sản phẩm sẽ hiển thị trên menu' : 'Sản phẩm đã ẩn khỏi menu',
+                'success',
               );
             }
           },
@@ -1064,18 +1068,44 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   }
 
   showNotification(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info'): void {
-    document.querySelectorAll('.notification-toast').forEach((n) => n.remove());
-    const notification = document.createElement('div');
-    notification.className = `notification-toast notification-${type}`;
+    // Lấy hoặc tạo container toast (DOM thuần, không dùng *ngFor vì Admin không có CommonModule)
+    let wrap = document.getElementById('admin-toast-wrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'admin-toast-wrap';
+      wrap.className = 'toast-wrap';
+      document.body.appendChild(wrap);
+    }
+
     const icons: Record<string, string> = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-    notification.innerHTML = `<span class="notification-icon">${icons[type] || icons['info']}</span><span class="notification-message">${message}</span>`;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.classList.add('show'), 10);
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    const titles: Record<string, string> = { success: 'THÀNH CÔNG', error: 'THẤT BẠI', warning: 'CẢNH BÁO', info: 'THÔNG BÁO' };
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-ico">${icons[type]}</div>
+      <div class="toast-text">
+        <div class="toast-title">${titles[type]}</div>
+        <div class="toast-sub">${message}</div>
+      </div>
+      <button class="toast-x" type="button">×</button>
+    `;
+    wrap.prepend(toast);
+
+    const dismiss = () => {
+      if (toast.classList.contains('hiding')) return;
+      toast.classList.add('hiding');
+      setTimeout(() => toast.remove(), 400);
+    };
+
+    const closeBtn = toast.querySelector('.toast-x');
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+    setTimeout(dismiss, 1500);
   }
+
+  removeToast(_id: string): void { /* handled via DOM in showNotification */ }
+  trackToast(index: number, _t: any): number { return index; }
+
 
   openAddProductModal(): void {
     const modal = document.getElementById('modal-add-product');

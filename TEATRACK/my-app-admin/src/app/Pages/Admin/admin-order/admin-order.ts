@@ -241,7 +241,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     if (messageEl) messageEl.textContent = message;
     (modal as HTMLElement).style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
-    setTimeout(() => this.hideSuccess(), 2000);
+    setTimeout(() => this.hideSuccess(), 1500);
   }
 
   hideSuccess(): void {

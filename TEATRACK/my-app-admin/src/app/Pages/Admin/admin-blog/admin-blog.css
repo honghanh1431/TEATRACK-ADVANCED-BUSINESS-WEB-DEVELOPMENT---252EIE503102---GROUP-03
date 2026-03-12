@@ -296,8 +296,16 @@
 }
 
 .table-wrap {
-  overflow-x: auto;
+  overflow: auto;
   padding: 0 10px 8px;
+  max-height: 600px; /* Giới hạn chiều cao để bắt đầu cuộn sau khoảng 8 bài viết */
+}
+
+/* Giữ tiêu đề bảng cố định khi cuộn */
+.posts thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .posts {
@@ -360,24 +368,32 @@
   padding: 18px;
 }
 
-.col-id {
-  width: 90px;
+.col-id { width: 90px; }
+.col-date { width: 140px; }
+.col-img { width: 120px; }
+.col-status { width: 140px; }
+.col-show { width: 110px; }
+.col-actions { width: 110px; }
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.col-date {
-  width: 140px;
+.badge-published {
+  background: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
 }
 
-.col-img {
-  width: 120px;
-}
-
-.col-show {
-  width: 120px;
-}
-
-.col-actions {
-  width: 120px;
+.badge-draft {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
 }
 
 .thumb {
@@ -471,6 +487,7 @@
   border-radius: 18px;
   box-shadow: 0 18px 70px rgba(15, 23, 42, 0.28);
   overflow: hidden;
+  pointer-events: auto;
 }
 
 .modal-header {
@@ -511,7 +528,8 @@
 }
 
 .form-row input,
-.form-row textarea {
+.form-row textarea,
+.form-row select {
   width: 100%;
   border: 1px solid #cfe2ff;
   border-radius: 14px;
@@ -519,15 +537,72 @@
   padding: 12px 12px;
   outline: none;
   font-weight: 500;
+  font-family: inherit;
 }
 
-.form-row input[type="color"] {
-  height: 48px;
-  padding: 4px;
+.form-row input.is-invalid,
+.form-row textarea.is-invalid {
+  border-color: #ef4444;
+  background: #fffafa;
 }
 
 .form-row textarea {
   resize: vertical;
+  text-align: justify;
+}
+
+::ng-deep .angular-editor-wrapper .angular-editor-textarea {
+  border: 1px solid #cfe2ff !important;
+  border-radius: 0 0 14px 14px !important;
+  background: #f8fbff !important;
+  font-family: inherit !important;
+}
+
+::ng-deep .angular-editor-wrapper .angular-editor-toolbar {
+  background: #f1f8ff !important;
+  border: 1px solid #cfe2ff !important;
+  border-bottom: none !important;
+  border-radius: 14px 14px 0 0 !important;
+}
+
+::ng-deep .angular-editor-wrapper .angular-editor-toolbar .angular-editor-toolbar-set {
+  background: transparent !important;
+}
+
+/* Invalid state for Editor */
+.form-row:has(angular-editor.ng-invalid.ng-touched) ::ng-deep .angular-editor-toolbar,
+.form-row:has(angular-editor.ng-invalid.ng-touched) ::ng-deep .angular-editor-textarea {
+  border-color: #ef4444 !important;
+}
+
+.color-picker-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-picker-wrapper input[type="color"] {
+  width: 60px;
+  height: 48px;
+  padding: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.color-picker-wrapper input[type="text"] {
+  flex: 1;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.req {
+  color: #ef4444;
+  margin-left: 2px;
 }
 
 .gallery {
@@ -680,9 +755,11 @@
   flex-direction: column;
   gap: 10px;
   z-index: 10000;
+  pointer-events: none;
 }
 
 .toast {
+  pointer-events: auto;
   width: 320px;
   background: #fff;
   border: 1px solid #e8eef6;
@@ -692,6 +769,33 @@
   display: flex;
   gap: 10px;
   align-items: flex-start;
+  animation: toast-in 0.3s ease-out forwards;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast.hiding {
+  animation: toast-out 0.4s ease-in forwards;
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 .toast.ok {

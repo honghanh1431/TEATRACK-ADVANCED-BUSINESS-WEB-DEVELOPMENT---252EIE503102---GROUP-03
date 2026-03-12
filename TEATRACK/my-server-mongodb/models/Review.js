@@ -34,14 +34,26 @@ const create = async (body) => {
 
 const updateById = async (id, body) => {
   const col = collection();
-  const filter = { $or: [{ id: String(id) }, { _id: new ObjectId(id) }] };
+  const filterArr = [{ id: String(id) }];
+  try {
+    if (ObjectId.isValid(id)) {
+      filterArr.push({ _id: new ObjectId(id) });
+    }
+  } catch (_) { }
+  const filter = { $or: filterArr };
   const result = await col.updateOne(filter, { $set: body });
   return result.matchedCount > 0 ? findAll() : null;
 };
 
 const deleteById = async (id) => {
   const col = collection();
-  const filter = { $or: [{ id: String(id) }, { _id: new ObjectId(id) }] };
+  const filterArr = [{ id: String(id) }];
+  try {
+    if (ObjectId.isValid(id)) {
+      filterArr.push({ _id: new ObjectId(id) });
+    }
+  } catch (_) { }
+  const filter = { $or: filterArr };
   await col.deleteOne(filter);
   return findAll();
 };

@@ -82,6 +82,7 @@
                 <th class="col-date">Ngày đăng</th>
                 <th class="col-img">Hình ảnh</th>
                 <th class="col-title">Tiêu đề</th>
+                <th class="col-status">Trạng thái</th>
                 <th class="col-show">Hiển thị</th>
                 <th class="col-actions"></th>
               </tr>
@@ -101,6 +102,13 @@
 
                 <td class="col-title">
                   <div class="title-strong">{{ p.title || p.heading || 'Chưa có tiêu đề' }}</div>
+                </td>
+
+                <td class="col-status">
+                  <span class="badge" [class.badge-published]="p.status==='published'"
+                    [class.badge-draft]="p.status==='draft'">
+                    {{ p.status === 'published' ? 'Công khai' : 'Bản nháp' }}
+                  </span>
                 </td>
 
                 <td class="col-show">
@@ -127,16 +135,6 @@
           </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="pager" *ngIf="totalPages > 1">
-          <button class="page-btn" (click)="goPage(page - 1)" [disabled]="page === 1">‹</button>
-
-          <button class="page-btn" *ngFor="let n of pages" (click)="goPage(n)" [class.active]="n === page">
-            {{ n }}
-          </button>
-
-          <button class="page-btn" (click)="goPage(page + 1)" [disabled]="page === totalPages">›</button>
-        </div>
       </div>
     </div>
   </div>
@@ -151,18 +149,33 @@
 
       <form class="modal-body" [formGroup]="form" (ngSubmit)="save()">
         <div class="form-row">
-          <label>Tiêu đề trang</label>
-          <input formControlName="title" type="text" placeholder="Nhập tiêu đề" />
+          <label>Tiêu đề trang <span class="req">*</span></label>
+          <input formControlName="title" type="text" placeholder="Nhập tiêu đề"
+            [class.is-invalid]="form.get('title')?.invalid && form.get('title')?.touched" />
+          <div class="error-text"
+            *ngIf="form.get('title')?.invalid && (form.get('title')?.touched || form.get('title')?.dirty)">
+            Vui lòng nhập tiêu đề trang
+          </div>
         </div>
 
         <div class="form-row">
-          <label>Tiêu đề nội dung chính (Heading)</label>
-          <input formControlName="heading" type="text" placeholder="Nhập tiêu đề hiển thị" />
+          <label>Tiêu đề nội dung chính (Heading) <span class="req">*</span></label>
+          <input formControlName="heading" type="text" placeholder="Nhập tiêu đề hiển thị"
+            [class.is-invalid]="form.get('heading')?.invalid && form.get('heading')?.touched" />
+          <div class="error-text"
+            *ngIf="form.get('heading')?.invalid && (form.get('heading')?.touched || form.get('heading')?.dirty)">
+            Vui lòng nhập tiêu đề chính
+          </div>
         </div>
 
         <div class="form-row">
           <label>Màu chữ tiêu đề (Heading Color)</label>
-          <input formControlName="headingColor" type="color" />
+          <div class="color-picker-wrapper">
+            <input [value]="form.get('headingColor')?.value"
+              (input)="form.get('headingColor')?.setValue($any($event.target).value)" type="color" />
+            <input formControlName="headingColor" (input)="onColorInput($any($event.target).value)" type="text"
+              placeholder="#000000" />
+          </div>
         </div>
 
         <div class="form-row">
@@ -174,13 +187,20 @@
         </div>
 
         <div class="form-row">
-          <label>Tiêu đề nội dung</label>
-          <input formControlName="excerpt" type="text" placeholder="Nhập tiêu đề nội dung" />
+          <label>Trạng thái bài viết</label>
+          <select formControlName="status">
+            <option value="published">Công khai (Published)</option>
+            <option value="draft">Bản nháp (Draft)</option>
+          </select>
         </div>
 
         <div class="form-row">
-          <label>Nội dung bài viết</label>
-          <textarea formControlName="content" rows="8" placeholder="Nhập nội dung bài viết"></textarea>
+          <label>Nội dung bài viết <span class="req">*</span></label>
+          <angular-editor formControlName="content" [config]="editorConfig"></angular-editor>
+          <div class="error-text"
+            *ngIf="form.get('content')?.invalid && (form.get('content')?.touched || form.get('content')?.dirty)">
+            Vui lòng nhập nội dung bài viết
+          </div>
         </div>
 
         <div class="form-row">
@@ -226,7 +246,7 @@
 
         <div class="modal-footer">
           <button class="btn-danger" type="button" (click)="closeModal()">Hủy bỏ</button>
-          <button class="btn-save" type="submit" [disabled]="form.invalid">
+          <button class="btn-save" type="submit">
             {{ editing ? 'Lưu' : 'Thêm' }}
           </button>
         </div>
@@ -250,7 +270,8 @@
 
   <!-- ===== Toasts ===== -->
   <div class="toast-wrap">
-    <div class="toast" *ngFor="let t of toasts" [class.ok]="t.type==='ok'" [class.err]="t.type==='err'">
+    <div class="toast" *ngFor="let t of toasts; trackBy: trackToast" [class.ok]="t.type==='ok'"
+      [class.err]="t.type==='err'" [class.hiding]="t.closing">
       <div class="toast-ico">
         <span *ngIf="t.type==='ok'">✓</span>
         <span *ngIf="t.type==='err'">✕</span>

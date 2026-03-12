@@ -1,14 +1,16 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
 type PostStatus = 'published' | 'draft';
 interface ToastItem {
   id: string;
   type: 'ok' | 'err';
   title: string;
   sub?: string;
+  closing?: boolean;
 }
 interface BlogRow {
   id: string;
@@ -31,7 +33,7 @@ interface BlogRow {
 @Component({
   selector: 'admin-blog',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, AngularEditorModule],
   templateUrl: './admin-blog.html',
   styleUrls: ['./admin-blog.css'],
 })
@@ -51,7 +53,7 @@ export class AdminBlog implements OnInit {
   filtered: BlogRow[] = [];
 
   page = 1;
-  pageSize = 8;
+  pageSize = 999; // Tăng lên số lớn để hiển thị tất cả bài viết trên 1 trang (cuộn)
 
   modalOpen = false;
   editing = false;
@@ -69,20 +71,44 @@ export class AdminBlog implements OnInit {
 
   toasts: ToastItem[] = [];
 
+  editorConfig: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    height: 'auto',
+    minHeight: '250px',
+    maxHeight: 'auto',
+    width: 'auto',
+    minWidth: '0',
+    translate: 'no',
+    enableToolbar: true,
+    showToolbar: true,
+    placeholder: 'Nhập nội dung bài viết...',
+    defaultParagraphSeparator: 'p',
+    defaultFontName: 'Inter',
+    fonts: [
+      { class: 'arial', name: 'Arial' },
+      { class: 'times-new-roman', name: 'Times New Roman' },
+      { class: 'inter', name: 'Inter' }
+    ],
+    toolbarHiddenButtons: [
+      ['insertImage', 'insertVideo']
+    ]
+  };
+
   private readonly LS_KEY = 'admin_blog_posts_v2';
   private readonly API_BASE = 'http://localhost:3002';
   private readonly BLOG_API = 'http://localhost:3002/blog';
 
-  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef, private http: HttpClient) { }
+  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef, private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
       title: ['', [Validators.required]],
       heading: ['', [Validators.required]],
-      headingColor: ['#305C33', []],
-      excerpt: ['', [Validators.required]],
+      headingColor: ['#ffffff', []],
       content: ['', [Validators.required]],
       layoutType: ['single', []],
+      status: ['published', []],
     });
 
     this.load();
@@ -141,26 +167,43 @@ export class AdminBlog implements OnInit {
   openAdd(): void {
     this.editing = false;
     this.editingId = null;
-    this.form.reset({ title: '', heading: '', headingColor: '#305C33', excerpt: '', content: '', layoutType: 'single' });
+    this.form.reset({ title: '', heading: '', headingColor: '#305C33', content: '', layoutType: 'single', status: 'published' });
     this.formImages = [];
     this.formThumbnail = null;
     this.modalOpen = true;
+    this.cdr.detectChanges();
   }
 
   openEdit(p: BlogRow): void {
     this.editing = true;
     this.editingId = p.id;
     this.form.reset({
-      title: p.title,
+      title: p.title || '',
       heading: p.heading || '',
       headingColor: p.headingColor || '#305C33',
-      excerpt: p.excerpt,
-      content: p.content,
-      layoutType: p.layoutType || 'single'
+      content: p.content || '',
+      layoutType: p.layoutType || 'single',
+      status: p.status || 'published'
     });
     this.formImages = [...(p.images || [])];
     this.formThumbnail = p.thumbnailImage || null;
     this.modalOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  // Bỏ stripTags vì giờ dùng Editor cần giữ HTML
+
+
+
+  onColorInput(v: string): void {
+    let hex = v.trim();
+    if (hex && !hex.startsWith('#')) {
+      hex = '#' + hex;
+    }
+    // Update if it's a valid hex format (3 or 6 hex digits, or in between while typing)
+    if (/^#[0-9A-Fa-f]{0,6}$/.test(hex)) {
+      this.form.get('headingColor')?.setValue(hex);
+    }
   }
 
   closeModal(): void {
@@ -229,12 +272,18 @@ export class AdminBlog implements OnInit {
         title: String(v.title || '').trim(),
         heading: String(v.heading || '').trim(),
         headingColor: String(v.headingColor || '').trim(),
-        excerpt: String(v.excerpt || '').trim(),
         content: String(v.content || '').trim(),
         images: [...this.formImages],
         thumbnailImage: this.formThumbnail || this.formImages[0],
         image: this.formImages[0],
         layoutType: String(v.layoutType || 'single'),
+        status: (v.status === 'draft' ? 'draft' : 'published') as PostStatus,
+      };
+
+      // Cập nhật dữ liệu vào mảng postsAll hiện tại một cách an toàn
+      this.postsAll[idx] = {
+        ...this.postsAll[idx],
+        ...body
       };
 
       this.http.put<BlogRow[]>(`${this.BLOG_API}/${this.editingId}`, body).subscribe({
@@ -255,19 +304,19 @@ export class AdminBlog implements OnInit {
       return;
     }
 
-    const newPost: Partial<BlogRow> = {
+    const newPost: Omit<BlogRow, 'id'> = {
       code: this.nextCode(),
       title: String(v.title || '').trim(),
       heading: String(v.heading || '').trim(),
       headingColor: String(v.headingColor || '').trim(),
-      excerpt: String(v.excerpt || '').trim(),
       content: String(v.content || '').trim(),
+      excerpt: '', // Thêm trường còn thiếu trong BlogRow
       date: new Date().toLocaleDateString('en-GB'),
       images: [...this.formImages],
       thumbnailImage: this.formThumbnail || this.formImages[0],
       image: this.formImages[0],
       layoutType: String(v.layoutType || 'single'),
-      status: 'published',
+      status: (v.status === 'draft' ? 'draft' : 'published') as PostStatus,
       views: 0,
       visible: true,
     };
@@ -356,12 +405,34 @@ export class AdminBlog implements OnInit {
       title,
       sub,
     };
-    this.toasts.unshift(t);
-    setTimeout(() => this.removeToast(t.id), 2500);
+    this.toasts = [t, ...this.toasts];
+    this.cdr.detectChanges();
+
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.zone.run(() => {
+          this.removeToast(t.id);
+        });
+      }, 1500);
+    });
   }
 
   removeToast(id: string): void {
-    this.toasts = this.toasts.filter(t => t.id !== id);
+    const t = this.toasts.find(x => x.id === id);
+    if (!t || t.closing) return;
+
+    t.closing = true;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.toasts = this.toasts.filter(x => x.id !== id);
+      this.cdr.markForCheck();
+      this.cdr.detectChanges();
+    }, 400);
+  }
+
+  trackToast(index: number, t: ToastItem): string {
+    return t.id;
   }
 
   private load(): void {
