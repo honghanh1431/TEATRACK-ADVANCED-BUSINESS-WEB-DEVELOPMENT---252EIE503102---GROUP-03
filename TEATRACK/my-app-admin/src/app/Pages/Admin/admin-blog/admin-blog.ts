@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  ChangeDetectorRef,
+  NgZone,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -37,7 +45,7 @@ interface BlogRow {
   templateUrl: './admin-blog.html',
   styleUrls: ['./admin-blog.css'],
 })
-export class AdminBlog implements OnInit {
+export class AdminBlog implements OnInit, AfterViewInit {
   currentUserName = 'Nguyễn Ba Đù';
   stats = {
     total: 0,
@@ -69,6 +77,9 @@ export class AdminBlog implements OnInit {
   deleteOpen = false;
   deleteTarget: BlogRow | null = null;
 
+  showAlert = false;
+  alertMessage = '';
+
   toasts: ToastItem[] = [];
 
   editorConfig: AngularEditorConfig = {
@@ -88,18 +99,21 @@ export class AdminBlog implements OnInit {
     fonts: [
       { class: 'arial', name: 'Arial' },
       { class: 'times-new-roman', name: 'Times New Roman' },
-      { class: 'inter', name: 'Inter' }
+      { class: 'inter', name: 'Inter' },
     ],
-    toolbarHiddenButtons: [
-      ['insertImage', 'insertVideo']
-    ]
+    toolbarHiddenButtons: [['insertImage', 'insertVideo']],
   };
 
   private readonly LS_KEY = 'admin_blog_posts_v2';
   private readonly API_BASE = 'http://localhost:3002';
   private readonly BLOG_API = 'http://localhost:3002/blog';
 
-  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef, private http: HttpClient, private zone: NgZone) { }
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient,
+    private zone: NgZone,
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -114,6 +128,39 @@ export class AdminBlog implements OnInit {
     this.load();
     this.applyFilters();
     this.cdr.detectChanges();
+  }
+
+  ngAfterViewInit(): void {
+    this.initSuccessModal();
+  }
+
+  showSuccess(message = 'THÀNH CÔNG'): void {
+    const modal = document.getElementById('modal-success');
+    const messageEl = document.getElementById('success-message');
+    if (!modal) return;
+    if (messageEl) messageEl.textContent = message;
+    (modal as HTMLElement).style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+  }
+
+  hideSuccess(): void {
+    const modal = document.getElementById('modal-success');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => ((modal as HTMLElement).style.display = 'none'), 300);
+  }
+
+  private initSuccessModal(): void {
+    const btn = document.getElementById('btn-close-success');
+    if (btn) btn.addEventListener('click', () => this.hideSuccess());
+    document
+      .querySelectorAll('[data-close-success]')
+      .forEach((el) => el.addEventListener('click', () => this.hideSuccess()));
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      const m = document.getElementById('modal-success');
+      if (m?.classList.contains('show')) this.hideSuccess();
+    });
   }
 
   get totalPages(): number {
@@ -146,15 +193,80 @@ export class AdminBlog implements OnInit {
     this.applyFilters();
   }
 
+  async exportExcel(): Promise<void> {
+    const data = this.filtered.length ? this.filtered : this.postsAll;
+    if (!data.length) {
+      this.showAlertModal('Không có bài viết để xuất!');
+      return;
+    }
+    const ExcelJSLib = (window as any).ExcelJS;
+    const saveAsLib = (window as any).saveAs;
+    if (!ExcelJSLib || !saveAsLib) {
+      this.showAlertModal('Thư viện xuất Excel chưa tải xong. Vui lòng tải lại trang.');
+      return;
+    }
+    const workbook = new ExcelJSLib.Workbook();
+    const sheet = workbook.addWorksheet('Danh sách bài viết', {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    });
+    const headerStyle = {
+      font: { bold: true, color: { argb: 'FFFFFFFF' } },
+      fill: { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FF0088FF' } },
+      alignment: { horizontal: 'center' as const },
+    };
+    sheet.columns = [
+      { header: 'ID', key: 'code', width: 12 },
+      { header: 'Ngày đăng', key: 'date', width: 14 },
+      { header: 'Tiêu đề', key: 'title', width: 32 },
+      { header: 'Trạng thái', key: 'status', width: 14 },
+      { header: 'Lượt xem', key: 'views', width: 12 },
+      { header: 'Hiển thị', key: 'visible', width: 10 },
+    ];
+    sheet.getRow(1).eachCell((cell: any) => {
+      cell.font = headerStyle.font;
+      cell.fill = headerStyle.fill;
+      cell.alignment = headerStyle.alignment;
+    });
+    for (const p of data) {
+      sheet.addRow({
+        code: p.code || p.id || '',
+        date: p.date || '',
+        title: (p.title || p.heading || '').slice(0, 100),
+        status: p.status === 'published' ? 'Công khai' : 'Bản nháp',
+        views: p.views ?? 0,
+        visible: p.visible ? 'Có' : 'Không',
+      });
+    }
+    const buffer = await workbook.xlsx.writeBuffer();
+    const today = new Date().toISOString().split('T')[0];
+    saveAsLib(new Blob([buffer]), `Dien_dan_${today}.xlsx`);
+    this.showAlertModal('Đã xuất danh sách bài viết ra file Excel thành công.');
+  }
+
+  showAlertModal(message: string): void {
+    this.alertMessage = message;
+    this.showAlert = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAlertModal(): void {
+    this.showAlert = false;
+    this.cdr.detectChanges();
+  }
+
+  closeAlertOnOverlay(event: Event): void {
+    if ((event.target as HTMLElement).classList.contains('alert-overlay')) this.closeAlertModal();
+  }
+
   private applyFilters(): void {
     const q = this.q.trim().toLowerCase();
 
-    this.filtered = this.postsAll.filter(p => {
+    this.filtered = this.postsAll.filter((p) => {
       const okStatus = this.status ? p.status === this.status : true;
       const okQuery = q
         ? (p.title || '').toLowerCase().includes(q) ||
-        (p.excerpt || '').toLowerCase().includes(q) ||
-        (p.code || '').toLowerCase().includes(q)
+          (p.excerpt || '').toLowerCase().includes(q) ||
+          (p.code || '').toLowerCase().includes(q)
         : true;
       return okStatus && okQuery;
     });
@@ -167,7 +279,14 @@ export class AdminBlog implements OnInit {
   openAdd(): void {
     this.editing = false;
     this.editingId = null;
-    this.form.reset({ title: '', heading: '', headingColor: '#305C33', content: '', layoutType: 'single', status: 'published' });
+    this.form.reset({
+      title: '',
+      heading: '',
+      headingColor: '#305C33',
+      content: '',
+      layoutType: 'single',
+      status: 'published',
+    });
     this.formImages = [];
     this.formThumbnail = null;
     this.modalOpen = true;
@@ -183,7 +302,7 @@ export class AdminBlog implements OnInit {
       headingColor: p.headingColor || '#305C33',
       content: p.content || '',
       layoutType: p.layoutType || 'single',
-      status: p.status || 'published'
+      status: p.status || 'published',
     });
     this.formImages = [...(p.images || [])];
     this.formThumbnail = p.thumbnailImage || null;
@@ -192,8 +311,6 @@ export class AdminBlog implements OnInit {
   }
 
   // Bỏ stripTags vì giờ dùng Editor cần giữ HTML
-
-
 
   onColorInput(v: string): void {
     let hex = v.trim();
@@ -251,20 +368,20 @@ export class AdminBlog implements OnInit {
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.toast('err', '❌ Thiếu thông tin', 'Vui lòng nhập đủ tiêu đề / mô tả / nội dung.');
+      this.toast('err', 'Thiếu thông tin', 'Vui lòng nhập đủ tiêu đề / mô tả / nội dung.');
       return;
     }
     if (this.formImages.length === 0) {
-      this.toast('err', '❌ Thiếu hình ảnh', 'Vui lòng tải lên ít nhất 1 hình.');
+      this.toast('err', 'Thiếu hình ảnh', 'Vui lòng tải lên ít nhất 1 hình.');
       return;
     }
 
     const v = this.form.value;
 
     if (this.editing && this.editingId) {
-      const idx = this.postsAll.findIndex(x => x.id === this.editingId);
+      const idx = this.postsAll.findIndex((x) => x.id === this.editingId);
       if (idx === -1) {
-        this.toast('err', '❌ Không tìm thấy bài', 'Bài viết không tồn tại.');
+        this.toast('err', 'Không tìm thấy bài', 'Bài viết không tồn tại.');
         return;
       }
 
@@ -283,23 +400,23 @@ export class AdminBlog implements OnInit {
       // Cập nhật dữ liệu vào mảng postsAll hiện tại một cách an toàn
       this.postsAll[idx] = {
         ...this.postsAll[idx],
-        ...body
+        ...body,
       };
 
       this.http.put<BlogRow[]>(`${this.BLOG_API}/${this.editingId}`, body).subscribe({
         next: (data) => {
-          this.postsAll = (data || []).map(x => this.hydrate(x));
+          this.postsAll = (data || []).map((x) => this.hydrate(x));
           this.persist();
           this.applyFilters();
           this.closeModal();
-          this.toast('ok', 'CẬP NHẬT THÀNH CÔNG');
+          this.showSuccess('CẬP NHẬT THÀNH CÔNG');
           this.cdr.detectChanges();
         },
         error: (err) => {
           console.error(err);
           this.toast('err', 'LỖI CẬP NHẬT');
           this.cdr.detectChanges();
-        }
+        },
       });
       return;
     }
@@ -323,18 +440,18 @@ export class AdminBlog implements OnInit {
 
     this.http.post<BlogRow[]>(this.BLOG_API, newPost).subscribe({
       next: (data) => {
-        this.postsAll = (data || []).map(x => this.hydrate(x));
+        this.postsAll = (data || []).map((x) => this.hydrate(x));
         this.persist();
         this.applyFilters();
         this.closeModal();
-        this.toast('ok', 'THÊM BÀI VIẾT THÀNH CÔNG');
+        this.showSuccess('THÊM BÀI VIẾT THÀNH CÔNG');
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
         this.toast('err', 'LỖI THÊM BÀI VIẾT');
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -342,7 +459,7 @@ export class AdminBlog implements OnInit {
     const newVal = !p.visible;
     this.http.put<BlogRow[]>(`${this.BLOG_API}/${p.id}`, { visible: newVal }).subscribe({
       next: (data) => {
-        this.postsAll = (data || []).map(x => this.hydrate(x));
+        this.postsAll = (data || []).map((x) => this.hydrate(x));
         this.persist();
         this.applyFilters();
         this.toast('ok', newVal ? 'Đã bật hiển thị' : 'Đã tắt hiển thị');
@@ -351,7 +468,7 @@ export class AdminBlog implements OnInit {
       error: () => {
         this.toast('err', 'LỖI THAY ĐỔI HIỂN THỊ');
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -376,17 +493,17 @@ export class AdminBlog implements OnInit {
     const id = this.deleteTarget.id;
     this.http.delete<BlogRow[]>(`${this.BLOG_API}/${id}`).subscribe({
       next: (data) => {
-        this.postsAll = (data || []).map(x => this.hydrate(x));
+        this.postsAll = (data || []).map((x) => this.hydrate(x));
         this.persist();
         this.applyFilters();
         this.closeDelete();
-        this.toast('ok', 'XÓA BÀI VIẾT THÀNH CÔNG');
+        this.showSuccess('XÓA BÀI VIẾT THÀNH CÔNG');
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast('err', 'LỖI XÓA BÀI VIẾT');
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -418,14 +535,14 @@ export class AdminBlog implements OnInit {
   }
 
   removeToast(id: string): void {
-    const t = this.toasts.find(x => x.id === id);
+    const t = this.toasts.find((x) => x.id === id);
     if (!t || t.closing) return;
 
     t.closing = true;
     this.cdr.detectChanges();
 
     setTimeout(() => {
-      this.toasts = this.toasts.filter(x => x.id !== id);
+      this.toasts = this.toasts.filter((x) => x.id !== id);
       this.cdr.markForCheck();
       this.cdr.detectChanges();
     }, 400);
@@ -439,7 +556,7 @@ export class AdminBlog implements OnInit {
     this.http.get<BlogRow[]>(this.BLOG_API).subscribe({
       next: (data) => {
         if (Array.isArray(data) && data.length) {
-          this.postsAll = data.map(x => this.hydrate(x));
+          this.postsAll = data.map((x) => this.hydrate(x));
           this.computeStats();
           this.persist();
           this.applyFilters();
@@ -450,7 +567,7 @@ export class AdminBlog implements OnInit {
       },
       error: () => {
         this.loadLocal();
-      }
+      },
     });
   }
 
@@ -460,12 +577,12 @@ export class AdminBlog implements OnInit {
       try {
         const arr = JSON.parse(raw) as any[];
         if (Array.isArray(arr) && arr.length) {
-          this.postsAll = arr.map(x => this.hydrate(x));
+          this.postsAll = arr.map((x) => this.hydrate(x));
           this.computeStats();
           this.applyFilters();
           return;
         }
-      } catch { }
+      } catch {}
     }
     this.postsAll = this.seed();
     this.persist();
@@ -489,8 +606,12 @@ export class AdminBlog implements OnInit {
       date: x.date || new Date().toLocaleDateString('en-GB'),
       image: String(x.image || AdminBlog.PLACEHOLDER_IMG),
       thumbnailImage: String(x.thumbnailImage || x.image || AdminBlog.PLACEHOLDER_IMG),
-      images: Array.isArray(x.images) ? x.images.map((s: any) => String(s)) : [String(x.image || '')].filter(Boolean),
-      layoutType: String(x.layoutType || (Array.isArray(x.images) && x.images.length > 1 ? 'gallery' : 'single')),
+      images: Array.isArray(x.images)
+        ? x.images.map((s: any) => String(s))
+        : [String(x.image || '')].filter(Boolean),
+      layoutType: String(
+        x.layoutType || (Array.isArray(x.images) && x.images.length > 1 ? 'gallery' : 'single'),
+      ),
       status: (x.status === 'draft' ? 'draft' : 'published') as PostStatus,
       views: Number(x.views || 0),
       visible: Boolean(x.visible ?? true),
@@ -589,15 +710,15 @@ export class AdminBlog implements OnInit {
   private computeStats(): void {
     this.stats.total = this.postsAll.length;
     this.stats.views = this.postsAll.reduce((s, p) => s + (p.views || 0), 0);
-    this.stats.published = this.postsAll.filter(p => p.status === 'published').length;
-    this.stats.draft = this.postsAll.filter(p => p.status === 'draft').length;
+    this.stats.published = this.postsAll.filter((p) => p.status === 'published').length;
+    this.stats.draft = this.postsAll.filter((p) => p.status === 'draft').length;
   }
 
   private nextCode(): string {
     const nums = this.postsAll
-      .map(p => (p.code || '').replace(/\D/g, ''))
-      .map(s => Number(s))
-      .filter(n => Number.isFinite(n) && n > 0);
+      .map((p) => (p.code || '').replace(/\D/g, ''))
+      .map((s) => Number(s))
+      .filter((n) => Number.isFinite(n) && n > 0);
 
     const max = nums.length ? Math.max(...nums) : 100;
     const next = max + 1;

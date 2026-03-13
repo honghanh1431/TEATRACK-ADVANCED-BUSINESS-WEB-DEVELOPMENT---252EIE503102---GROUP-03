@@ -1,244 +1,268 @@
-<div class="admin-page">
-  <!-- Content -->
-  <div class="admin-content">
-    <div class="content-card">
-      <h1 class="page-title">DIỄN ĐÀN</h1>
+<header class="topbar">
+  <div class="topbar-title">
+    <h1>DIỄN ĐÀN</h1>
+  </div>
+</header>
+<div class="account-page">
+  <section class="cards stats">
+    <div class="card stat stat-posts">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/tongbaiviet.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TỔNG BÀI VIẾT</span>
+      </div>
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>↗</span>
+        </span>
+        <span class="stat-desc-right">Tháng này</span>
+      </div>
+    </div>
+    <div class="card stat stat-views">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/luotxem.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>LƯỢT XEM</span>
+      </div>
+      <div class="stat-value">{{ stats.views }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>↗</span>
+        </span>
+        <span class="stat-desc-right">Tuần này</span>
+      </div>
+    </div>
+    <div class="card stat stat-published">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/daxuatban.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>ĐÃ XUẤT BẢN</span>
+      </div>
+      <div class="stat-value">{{ stats.published }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Đang hoạt động</span>
+      </div>
+    </div>
+    <div class="card stat stat-draft">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/bannhap.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>BẢN NHÁP</span>
+      </div>
+      <div class="stat-value">{{ stats.draft }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Chờ xuất bản</span>
+      </div>
+    </div>
+  </section>
 
-      <!-- Stats -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <img src="/assets/icons/tongbaiviet.png" alt="" />
-          </div>
-          <div>
-            <div class="stat-label">Tổng bài viết</div>
-            <div class="stat-value">{{ stats.total }}</div>
-            <div class="stat-note">↗ Tháng này</div>
-          </div>
+  <section class="card table" id="posts-table">
+    <div class="card-title">Danh sách bài viết</div>
+    <div class="card-header-block">
+      <div class="card-actions-row">
+        <button type="button" class="btn btn-add" (click)="openAdd()">
+          <span class="btn-icon">+</span>
+          <span>Thêm bài viết</span>
+        </button>
+        <div class="search-box">
+          <input
+            type="search"
+            placeholder="Tìm kiếm..."
+            [value]="q"
+            (input)="onSearch($any($event.target).value)"
+            aria-label="Tìm kiếm bài viết"
+          />
+          <button type="button" class="search-btn" aria-label="Tìm kiếm">
+            <img src="assets/icons/search.png" alt="Search" />
+          </button>
         </div>
+        <div class="card-actions-filters">
+          <select
+            class="category-filter"
+            [value]="status"
+            (change)="onStatus($any($event.target).value)"
+            aria-label="Lọc theo trạng thái"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="published">Đã xuất bản</option>
+            <option value="draft">Bản nháp</option>
+          </select>
+        </div>
+        <button type="button" class="export-btn" (click)="exportExcel()">Xuất Excel</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="posts">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th class="col-date">Ngày đăng</th>
+            <th class="col-img">Hình ảnh</th>
+            <th class="col-title">Tiêu đề</th>
+            <th class="col-status">Trạng thái</th>
+            <th class="col-show">Hiển thị</th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
 
-        <div class="stat-card">
-          <div class="stat-icon">
-            <img src="/assets/icons/luotxem.png" alt="" />
-          </div>
-          <div>
-            <div class="stat-label">Lượt xem</div>
-            <div class="stat-value">{{ stats.views }}</div>
-            <div class="stat-note">↗ Tuần này</div>
-          </div>
-        </div>
+        <tbody>
+          <tr *ngFor="let p of pagedPosts; let i = index" [class.alt]="i % 2 === 0">
+            <td class="col-id">{{ p.code || p.id }}</td>
+            <td class="col-date">{{ p.date }}</td>
 
-        <div class="stat-card">
-          <div class="stat-icon">
-            <img src="/assets/icons/daxuatban.png" alt="" />
-          </div>
-          <div>
-            <div class="stat-label">Đã xuất bản</div>
-            <div class="stat-value">{{ stats.published }}</div>
-            <div class="stat-note">Đang hoạt động</div>
-          </div>
-        </div>
+            <td class="col-img">
+              <div class="thumb">
+                <img
+                  [src]="p.thumbnailImage || p.image"
+                  [alt]="p.title || p.heading"
+                  (error)="imgFallback($event)"
+                />
+              </div>
+            </td>
 
-        <div class="stat-card">
-          <div class="stat-icon">
-            <img src="/assets/icons/bannhap.png" alt="" />
-          </div>
-          <div>
-            <div class="stat-label">Bản nháp</div>
-            <div class="stat-value">{{ stats.draft }}</div>
-            <div class="stat-note">Chờ xuất bản</div>
-          </div>
-        </div>
+            <td class="col-title">
+              <div class="title-strong">{{ p.title || p.heading || 'Chưa có tiêu đề' }}</div>
+            </td>
+
+            <td class="col-status">
+              <span
+                class="badge"
+                [class.badge-published]="p.status === 'published'"
+                [class.badge-draft]="p.status === 'draft'"
+              >
+                {{ p.status === 'published' ? 'Công khai' : 'Bản nháp' }}
+              </span>
+            </td>
+
+            <td class="col-show">
+              <label class="switch">
+                <input type="checkbox" [checked]="p.visible" (change)="toggleVisible(p)" />
+                <span class="slider"></span>
+              </label>
+            </td>
+
+            <td class="col-actions">
+              <button class="icon-btn" type="button" (click)="openEdit(p)" title="Sửa">
+                <img src="/assets/icons/edit2.png" alt="edit" />
+              </button>
+              <button class="icon-btn" type="button" (click)="openDelete(p)" title="Xóa">
+                <img src="/assets/icons/delete2.png" alt="delete" />
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="pagedPosts.length === 0">
+            <td colspan="7" class="empty-row">Không có bài viết</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== Edit Modal ===== -->
+  <div
+    class="account-modal-overlay account-edit-modal-overlay"
+    [style.display]="modalOpen ? 'flex' : 'none'"
+    (click)="backdropClose($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal-container modal-add-product" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ editing ? 'CHỈNH SỬA BÀI VIẾT' : 'THÊM BÀI VIẾT' }}</h2>
+        <button type="button" class="modal-close" (click)="closeModal()" aria-label="Đóng">&times;</button>
+        <p class="modal-subtitle">{{ editing ? 'Cập nhật thông tin bài viết.' : 'Thêm bài viết mới vào diễn đàn.' }}</p>
       </div>
 
-      <!-- Table card -->
-      <div class="table-card">
-        <div class="table-head">
-          <button class="btn-primary" type="button" (click)="openAdd()">
-            <span class="btn-plus">+</span>
-            Thêm bài viết
-          </button>
+      <form class="modal-body" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-row-equal">
+          <div class="form-group">
+            <label>Tiêu đề trang <span class="req">*</span></label>
+            <input
+              formControlName="title"
+              type="text"
+              placeholder="Nhập tiêu đề"
+              [class.is-invalid]="form.get('title')?.invalid && form.get('title')?.touched"
+            />
+            <div class="error-text" *ngIf="form.get('title')?.invalid && (form.get('title')?.touched || form.get('title')?.dirty)">Vui lòng nhập tiêu đề trang</div>
+          </div>
+          <div class="form-group">
+            <label>Tiêu đề nội dung chính (Heading) <span class="req">*</span></label>
+            <input
+              formControlName="heading"
+              type="text"
+              placeholder="Nhập tiêu đề hiển thị"
+              [class.is-invalid]="form.get('heading')?.invalid && form.get('heading')?.touched"
+            />
+            <div class="error-text" *ngIf="form.get('heading')?.invalid && (form.get('heading')?.touched || form.get('heading')?.dirty)">Vui lòng nhập tiêu đề chính</div>
+          </div>
+        </div>
 
-          <div class="table-actions">
-            <div class="search">
-              <input type="search" placeholder="Tìm kiếm..." [value]="q"
-                (input)="onSearch($any($event.target).value)" />
-              <img class="search-ico" src="/assets/icons/search.png" alt="" />
-            </div>
+        <div class="form-group">
+          <label>Màu chữ tiêu đề (Heading Color)</label>
+          <div class="color-picker-wrapper">
+            <input [value]="form.get('headingColor')?.value" (input)="form.get('headingColor')?.setValue($any($event.target).value)" type="color" />
+            <input formControlName="headingColor" (input)="onColorInput($any($event.target).value)" type="text" placeholder="#000000" />
+          </div>
+        </div>
 
-            <select class="status-filter" [value]="status" (change)="onStatus($any($event.target).value)">
-              <option value="">Tất cả trạng thái</option>
-              <option value="published">Đã xuất bản</option>
-              <option value="draft">Bản nháp</option>
+        <div class="form-row-equal">
+          <div class="form-group">
+            <label>Loại giao diện (Layout Type)</label>
+            <select formControlName="layoutType">
+              <option value="single">Single (1 ảnh ngang)</option>
+              <option value="gallery">Gallery (Nhóm 3 ảnh dọc)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Trạng thái bài viết</label>
+            <select formControlName="status">
+              <option value="published">Công khai (Published)</option>
+              <option value="draft">Bản nháp (Draft)</option>
             </select>
           </div>
         </div>
 
-        <div class="table-wrap">
-          <table class="posts">
-            <thead>
-              <tr>
-                <th class="col-id">ID</th>
-                <th class="col-date">Ngày đăng</th>
-                <th class="col-img">Hình ảnh</th>
-                <th class="col-title">Tiêu đề</th>
-                <th class="col-status">Trạng thái</th>
-                <th class="col-show">Hiển thị</th>
-                <th class="col-actions"></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr *ngFor="let p of pagedPosts; let i = index" [class.alt]="i % 2 === 0">
-                <td class="col-id">{{ p.code || p.id }}</td>
-                <td class="col-date">{{ p.date }}</td>
-
-                <td class="col-img">
-                  <div class="thumb">
-                    <img [src]="p.thumbnailImage || p.image" [alt]="p.title || p.heading"
-                      (error)="imgFallback($event)" />
-                  </div>
-                </td>
-
-                <td class="col-title">
-                  <div class="title-strong">{{ p.title || p.heading || 'Chưa có tiêu đề' }}</div>
-                </td>
-
-                <td class="col-status">
-                  <span class="badge" [class.badge-published]="p.status==='published'"
-                    [class.badge-draft]="p.status==='draft'">
-                    {{ p.status === 'published' ? 'Công khai' : 'Bản nháp' }}
-                  </span>
-                </td>
-
-                <td class="col-show">
-                  <label class="switch">
-                    <input type="checkbox" [checked]="p.visible" (change)="toggleVisible(p)" />
-                    <span class="slider"></span>
-                  </label>
-                </td>
-
-                <td class="col-actions">
-                  <button class="icon-btn" type="button" (click)="openEdit(p)" title="Sửa">
-                    <img src="/assets/icons/edit2.png" alt="edit" />
-                  </button>
-                  <button class="icon-btn" type="button" (click)="openDelete(p)" title="Xóa">
-                    <img src="/assets/icons/delete2.png" alt="delete" />
-                  </button>
-                </td>
-              </tr>
-
-              <tr *ngIf="pagedPosts.length === 0">
-                <td colspan="6" class="empty">Không có bài viết</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Modal: Add/Edit ===== -->
-  <div class="modal" [class.show]="modalOpen" (click)="backdropClose($event)">
-    <div class="modal-card" role="dialog" aria-modal="true">
-      <div class="modal-header">
-        <div class="modal-title">{{ editing ? 'CHỈNH SỬA BÀI VIẾT' : 'THÊM BÀI VIẾT' }}</div>
-        <button class="modal-x" type="button" (click)="closeModal()">×</button>
-      </div>
-
-      <form class="modal-body" [formGroup]="form" (ngSubmit)="save()">
-        <div class="form-row">
-          <label>Tiêu đề trang <span class="req">*</span></label>
-          <input formControlName="title" type="text" placeholder="Nhập tiêu đề"
-            [class.is-invalid]="form.get('title')?.invalid && form.get('title')?.touched" />
-          <div class="error-text"
-            *ngIf="form.get('title')?.invalid && (form.get('title')?.touched || form.get('title')?.dirty)">
-            Vui lòng nhập tiêu đề trang
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label>Tiêu đề nội dung chính (Heading) <span class="req">*</span></label>
-          <input formControlName="heading" type="text" placeholder="Nhập tiêu đề hiển thị"
-            [class.is-invalid]="form.get('heading')?.invalid && form.get('heading')?.touched" />
-          <div class="error-text"
-            *ngIf="form.get('heading')?.invalid && (form.get('heading')?.touched || form.get('heading')?.dirty)">
-            Vui lòng nhập tiêu đề chính
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label>Màu chữ tiêu đề (Heading Color)</label>
-          <div class="color-picker-wrapper">
-            <input [value]="form.get('headingColor')?.value"
-              (input)="form.get('headingColor')?.setValue($any($event.target).value)" type="color" />
-            <input formControlName="headingColor" (input)="onColorInput($any($event.target).value)" type="text"
-              placeholder="#000000" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label>Loại giao diện (Layout Type)</label>
-          <select formControlName="layoutType">
-            <option value="single">Single (1 ảnh ngang)</option>
-            <option value="gallery">Gallery (Nhóm 3 ảnh dọc)</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label>Trạng thái bài viết</label>
-          <select formControlName="status">
-            <option value="published">Công khai (Published)</option>
-            <option value="draft">Bản nháp (Draft)</option>
-          </select>
-        </div>
-
-        <div class="form-row">
+        <div class="form-group">
           <label>Nội dung bài viết <span class="req">*</span></label>
           <angular-editor formControlName="content" [config]="editorConfig"></angular-editor>
-          <div class="error-text"
-            *ngIf="form.get('content')?.invalid && (form.get('content')?.touched || form.get('content')?.dirty)">
-            Vui lòng nhập nội dung bài viết
-          </div>
+          <div class="error-text" *ngIf="form.get('content')?.invalid && (form.get('content')?.touched || form.get('content')?.dirty)">Vui lòng nhập nội dung bài viết</div>
         </div>
 
-        <div class="form-row">
+        <div class="image-upload-section">
           <label>Ảnh đại diện ở danh sách (Thumbnail)</label>
           <input #thumbInput type="file" accept="image/*" hidden (change)="onThumbFile($event)" />
-
           <div class="gallery">
             <div class="img-item" *ngIf="formThumbnail">
               <img [src]="formThumbnail" alt="thumbnail" (error)="imgFallback($event)" />
               <button type="button" class="img-remove" (click)="removeThumb()">×</button>
               <div class="img-cap">Thumbnail</div>
             </div>
-
             <button type="button" class="upload-box" *ngIf="!formThumbnail" (click)="thumbInput.click()">
-              <div class="upload-circle">
-                <img src="/assets/icons/upload.png" alt="upload" />
-              </div>
+              <div class="upload-circle"><img src="assets/icons/upload.png" alt="upload" /></div>
               <div class="upload-text">Tải ảnh đại diện</div>
             </button>
           </div>
         </div>
 
-        <div class="form-row">
-          <label>Hình ảnh bài viết (Dùng cho Layout Single hoặc Gallery)</label>
-
+        <div class="image-upload-section">
+          <label>Hình ảnh bài viết (Layout Single / Gallery)</label>
           <input #fileInput type="file" accept="image/*" multiple hidden (change)="onFiles($event)" />
-
           <div class="gallery">
             <div class="img-item" *ngFor="let img of formImages; let i = index">
               <img [src]="img" alt="poster" (error)="imgFallback($event)" />
               <button type="button" class="img-remove" (click)="removeImg(i)">×</button>
               <div class="img-cap">Poster {{ i + 1 }}</div>
             </div>
-
             <button type="button" class="upload-box" (click)="fileInput.click()">
-              <div class="upload-circle">
-                <img src="/assets/icons/upload.png" alt="upload" />
-              </div>
+              <div class="upload-circle"><img src="assets/icons/upload.png" alt="upload" /></div>
               <div class="upload-text">Tải ảnh lên</div>
             </button>
           </div>
@@ -246,35 +270,155 @@
 
         <div class="modal-footer">
           <button class="btn-danger" type="button" (click)="closeModal()">Hủy bỏ</button>
-          <button class="btn-save" type="submit">
-            {{ editing ? 'Lưu' : 'Thêm' }}
-          </button>
+          <button class="btn-primary" type="submit">{{ editing ? 'Lưu' : 'Thêm' }}</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- ===== Delete confirm ===== -->
-  <div class="modal" [class.show]="deleteOpen" (click)="backdropCloseDelete($event)">
-    <div class="confirm-card" role="dialog" aria-modal="true">
-      <button class="modal-x" type="button" (click)="closeDelete()">×</button>
-      <div class="confirm-title">XÁC NHẬN XÓA BÀI VIẾT</div>
-      <div class="confirm-desc">Sau khi xóa, bạn sẽ không thể khôi phục bài viết.</div>
+  <!-- ===== Delete confirm (theo admin-account) ===== -->
+  <div
+    class="account-modal-overlay account-delete-modal-overlay"
+    [style.display]="deleteOpen ? 'flex' : 'none'"
+    (click)="backdropCloseDelete($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="modal-container modal-confirm modal-delete-container"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-body modal-confirm-body">
+        <div class="delete-modal-icon-wrap">
+          <div class="delete-modal-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+          </div>
+        </div>
+        <div class="delete-modal-content">
+          <h2 class="delete-modal-title">Xác nhận xóa bài viết</h2>
+          <p class="delete-modal-subtitle">
+            Bài viết
+            <strong class="delete-product-name">{{
+              deleteTarget?.title || deleteTarget?.heading || 'này'
+            }}</strong>
+            sẽ bị xóa vĩnh viễn.
+          </p>
+          <p class="delete-modal-subtitle">Bạn sẽ không thể khôi phục lại.</p>
+        </div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-cancel-ghost" (click)="closeDelete()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            Hủy
+          </button>
+          <button type="button" class="btn btn-danger-solid" (click)="confirmDelete()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+            Xóa bài viết
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-      <div class="confirm-actions">
-        <button class="btn-danger" type="button" (click)="closeDelete()">Hủy bỏ</button>
-        <button class="btn-save" type="button" (click)="confirmDelete()">Tiếp tục</button>
+  <!-- Modal Success -->
+  <div id="modal-success" class="modal" style="display: none" role="dialog" aria-labelledby="success-message" aria-modal="true">
+    <div class="modal-overlay" data-close-success></div>
+    <div class="modal-container modal-confirm modal-success-container">
+      <div class="modal-body modal-confirm-body">
+        <div class="modal-confirm-header">
+          <div class="confirm-icon success-icon">
+            <img src="assets/icons/tick2.png" alt="Success" style="width: 24px; height: 24px" />
+          </div>
+          <div class="confirm-text">
+            <h2 id="success-message" class="confirm-title">THÀNH CÔNG</h2>
+            <p class="confirm-message">Thao tác đã được thực hiện thành công.</p>
+          </div>
+        </div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-confirm" id="btn-close-success">
+            <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert modal -->
+  <div
+    *ngIf="showAlert"
+    class="alert-overlay show"
+    role="dialog"
+    aria-modal="true"
+    (click)="closeAlertOnOverlay($event)"
+  >
+    <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+      </div>
+      <h3 class="alert-title">Thông báo</h3>
+      <p class="alert-message">{{ alertMessage }}</p>
+      <div class="alert-actions">
+        <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">OK</button>
       </div>
     </div>
   </div>
 
   <!-- ===== Toasts ===== -->
   <div class="toast-wrap" id="admin-toast-wrap">
-    <div class="toast" *ngFor="let t of toasts; trackBy: trackToast" [class.success]="t.type==='ok'"
-      [class.error]="t.type==='err'" [class.hiding]="t.closing">
+    <div
+      class="toast"
+      *ngFor="let t of toasts; trackBy: trackToast"
+      [class.success]="t.type === 'ok'"
+      [class.error]="t.type === 'err'"
+      [class.hiding]="t.closing"
+    >
       <div class="toast-ico">
-        <img *ngIf="t.type==='ok'" src="assets/icons/tick.png" alt="" />
-        <img *ngIf="t.type==='err'" src="assets/icons/delete2.png" alt="" />
+        <img *ngIf="t.type === 'ok'" src="assets/icons/tick.png" alt="" />
+        <img *ngIf="t.type === 'err'" src="assets/icons/delete2.png" alt="" />
       </div>
       <div class="toast-text">
         <div class="toast-title">{{ t.title }}</div>

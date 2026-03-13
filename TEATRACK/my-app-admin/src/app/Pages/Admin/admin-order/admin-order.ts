@@ -75,7 +75,6 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
         this.initEventDelegation();
         document.addEventListener('keydown', this.escHandler);
         window.addEventListener('storage', this.storageHandler);
-        /* Cập nhật số liệu stat và bảng ngay khi DOM đã render (ngOnInit gọi update khi DOM chưa có) */
         this.updateOrdersStats();
         this.applyFilters();
         this.cdr.detectChanges();
@@ -90,7 +89,6 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     window.removeEventListener('storage', this.storageHandler);
   }
 
-  /** Sort đơn hàng theo ngày giảm dần (mới nhất trước). */
   private sortOrdersByDateDesc(): void {
     this.ORDERS_ALL.sort((a, b) => {
       const tA = new Date((a.date || a.createdAt) as string | number | undefined || 0).getTime();
@@ -384,7 +382,6 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** Badge class + text giống admin (status-badge pending, Xác nhận đơn hàng, ...) */
   private getBadgeForStatus(status: string): { class: string; text: string } {
     const map: Record<string, { class: string; text: string }> = {
       pending: { class: 'status-badge pending', text: 'Xác nhận đơn hàng' },
@@ -439,7 +436,6 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
       .join('');
   }
 
-  /** Giống admin: tạo dòng chi tiết cho từng item (size, ngọt, đá, số lượng, topping). */
   private getOrderItemDetailLines(item: any): string[] {
     const lines: string[] = [];
     const ngot = item.sweetness || 'Ít';
@@ -618,7 +614,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
       }
       this.updateOrdersStats();
       this.applyFilters();
-      this.showSuccess('CẬP NHẬT TRẠNG THÁI THÀNH CÔNG (Local)');
+      this.showSuccess('CẬP NHẬT TRẠNG THÁI THÀNH CÔNG');
       this.closeOrderDetailModal();
     }
   }

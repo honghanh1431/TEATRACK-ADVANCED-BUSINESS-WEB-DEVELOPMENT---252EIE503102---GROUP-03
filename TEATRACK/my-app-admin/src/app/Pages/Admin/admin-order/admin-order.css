@@ -1065,6 +1065,9 @@
     gap: 16px;
     margin-bottom: 20px;
   }
+  #modal-success .confirm-text {
+    margin-left: 20px;
+  }
   #modal-success .confirm-icon {
     width: 60px;
     height: 60px;
