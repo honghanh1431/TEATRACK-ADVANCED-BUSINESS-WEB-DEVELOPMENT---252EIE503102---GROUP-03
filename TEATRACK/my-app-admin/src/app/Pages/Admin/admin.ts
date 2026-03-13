@@ -1848,7 +1848,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
                 this.sortOrdersByDateDesc();
                 localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
                 this.renderOrdersTable(this.ORDERS_ALL);
-                this.showSuccess('Cập nhật trạng thái đơn hàng thành công');
+                this.showSuccess('CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG THÀNH CÔNG');
               },
               error: (err) => {
                 console.error('Update status error:', err);
@@ -1861,7 +1861,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           this.sortOrdersByDateDesc();
           localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
           this.renderOrdersTable(this.ORDERS_ALL);
-          this.showSuccess('Cập nhật đơn hàng thành công (Local)');
+          this.showSuccess('CẬP NHẬT ĐƠN HÀNG THÀNH CÔNG');
         }
 
         const orderModal = document.getElementById('modal-order-detail');

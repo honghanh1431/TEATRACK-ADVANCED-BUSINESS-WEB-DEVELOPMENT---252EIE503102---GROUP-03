@@ -5,11 +5,12 @@ export interface Account {
   name: string;
   username: string;
   email: string;
-  role: 'admin' | 'vip' | 'user';
+  role: 'admin' | 'vip customer' | 'normal customer';
   status: 'active' | 'locked';
   phone: string;
   address: string;
   createdAt: string;
+  avatar?: string;
 }
 
 const AVATAR_COLORS: [string, string, string][] = [
@@ -22,15 +23,15 @@ const AVATAR_COLORS: [string, string, string][] = [
 
 const MOCK_ACCOUNTS: Account[] = [
   { id: 1, name: 'Administrator', username: 'Admin123', email: 'admin@teatrack.com', role: 'admin', status: 'active', phone: '', address: '', createdAt: '2026-03-01' },
-  { id: 2, name: 'Nguyễn Thị Lan', username: 'lanngoc99', email: 'lan.nguyen@gmail.com', role: 'vip', status: 'active', phone: '0912345678', address: 'Hà Nội', createdAt: '2026-01-15' },
-  { id: 3, name: 'Trần Minh Hoàng', username: 'hoangTM', email: 'hoang.tran@yahoo.com', role: 'user', status: 'active', phone: '0987654321', address: 'TP.HCM', createdAt: '2026-01-20' },
-  { id: 4, name: 'Phạm Thu Hà', username: 'thuha2k', email: 'thuha@outlook.com', role: 'user', status: 'locked', phone: '0911222333', address: 'Đà Nẵng', createdAt: '2026-02-01' },
+  { id: 2, name: 'Nguyễn Thị Lan', username: 'lanngoc99', email: 'lan.nguyen@gmail.com', role: 'vip customer', status: 'active', phone: '0912345678', address: 'Hà Nội', createdAt: '2026-01-15' },
+  { id: 3, name: 'Trần Minh Hoàng', username: 'hoangTM', email: 'hoang.tran@yahoo.com', role: 'normal customer', status: 'active', phone: '0987654321', address: 'TP.HCM', createdAt: '2026-01-20' },
+  { id: 4, name: 'Phạm Thu Hà', username: 'thuha2k', email: 'thuha@outlook.com', role: 'normal customer', status: 'locked', phone: '0911222333', address: 'Đà Nẵng', createdAt: '2026-02-01' },
   { id: 5, name: 'Lê Văn Đức', username: 'duc.le', email: 'duc.le@teatrack.com', role: 'admin', status: 'active', phone: '0933111222', address: 'Hải Phòng', createdAt: '2026-02-05' },
-  { id: 6, name: 'Bùi Khánh Linh', username: 'klinh_bui', email: 'klinh@gmail.com', role: 'vip', status: 'active', phone: '0944555666', address: 'Cần Thơ', createdAt: '2026-02-10' },
-  { id: 7, name: 'Võ Quốc Bảo', username: 'baovq', email: 'bao.vo@email.com', role: 'user', status: 'locked', phone: '0922333444', address: 'Nha Trang', createdAt: '2026-02-14' },
-  { id: 8, name: 'Đặng Thị Mai', username: 'mai.dang', email: 'mai.dang@gmail.com', role: 'user', status: 'active', phone: '0955777888', address: 'Huế', createdAt: '2026-02-18' },
-  { id: 9, name: 'Hồ Thanh Tùng', username: 'tunght', email: 'tung.ho@gmail.com', role: 'vip', status: 'active', phone: '0966888999', address: 'TP.HCM', createdAt: '2026-02-22' },
-  { id: 10, name: 'Ngô Quỳnh Anh', username: 'quinhanh', email: 'quynhanh@email.com', role: 'user', status: 'active', phone: '0977999000', address: 'Hà Nội', createdAt: '2026-03-01' },
+  { id: 6, name: 'Bùi Khánh Linh', username: 'klinh_bui', email: 'klinh@gmail.com', role: 'vip customer', status: 'active', phone: '0944555666', address: 'Cần Thơ', createdAt: '2026-02-10' },
+  { id: 7, name: 'Võ Quốc Bảo', username: 'baovq', email: 'bao.vo@email.com', role: 'normal customer', status: 'locked', phone: '0922333444', address: 'Nha Trang', createdAt: '2026-02-14' },
+  { id: 8, name: 'Đặng Thị Mai', username: 'mai.dang', email: 'mai.dang@gmail.com', role: 'normal customer', status: 'active', phone: '0955777888', address: 'Huế', createdAt: '2026-02-18' },
+  { id: 9, name: 'Hồ Thanh Tùng', username: 'tunght', email: 'tung.ho@gmail.com', role: 'vip customer', status: 'active', phone: '0966888999', address: 'TP.HCM', createdAt: '2026-02-22' },
+  { id: 10, name: 'Ngô Quỳnh Anh', username: 'quinhanh', email: 'quynhanh@email.com', role: 'normal customer', status: 'active', phone: '0977999000', address: 'Hà Nội', createdAt: '2026-03-01' }
 ];
 
 @Component({
@@ -60,24 +61,35 @@ export class AdminAccount implements OnInit {
 
   editModalTitle = 'Chỉnh sửa tài khoản';
   editModalSub = 'Cập nhật thông tin người dùng';
+  editModalSubBold = '';
   editName = '';
   editUsername = '';
   editEmail = '';
   editPhone = '';
   editAddress = '';
-  editRole: 'admin' | 'vip' | 'user' = 'user';
+  editRole: 'admin' | 'vip customer' | 'normal customer' = 'normal customer';
+  editAvatarPreview = '';
+  editAvatarFile: File | null = null;
 
   deleteTargetName = '';
   lockTitle = 'Khoá tài khoản?';
   lockSub = 'Người dùng sẽ không thể đăng nhập.';
   lockText = '';
   lockTargetName = '';
-  lockConfirmText = '🔒 Khoá tài khoản';
+  lockConfirmText = 'Khoá tài khoản';
   lockConfirmClass = 'btn-warn';
   vipTargetName = '';
   vipDuration = '6 tháng';
 
-  toasts: { type: string; message: string }[] = [];
+  toasts: { type: string; message?: string; segments?: { text: string; bold?: boolean }[] }[] = [];
+
+  readonly toastIconSrc: Record<string, string> = {
+    success: 'assets/icons/tick.png',
+    danger: 'assets/icons/delete2.png',
+    vip: 'assets/icons/vip.png',
+    warn: 'assets/icons/lock.png',
+    error: 'assets/icons/lock.png',
+  };
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -96,6 +108,24 @@ export class AdminAccount implements OnInit {
 
   getAvatarColor(i: number): [string, string, string] {
     return AVATAR_COLORS[i % AVATAR_COLORS.length];
+  }
+
+  getRoleBadgeClass(role: Account['role']): string {
+    if (role === 'admin') return 'badge-admin';
+    if (role === 'vip customer') return 'badge-vip';
+    return 'badge-user';
+  }
+
+  fmtDate(dateStr?: string): string {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '-';
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
   isSelected(id: number): boolean {
@@ -134,22 +164,28 @@ export class AdminAccount implements OnInit {
   }
 
   openCreate(): void {
-    this.editModalTitle = 'Thêm tài khoản mới';
+    this.editModalTitle = 'THÊM TÀI KHOẢN';
     this.editModalSub = 'Điền thông tin để tạo tài khoản';
+    this.editModalSubBold = '';
     this.editName = '';
     this.editUsername = '';
     this.editEmail = '';
     this.editPhone = '';
     this.editAddress = '';
-    this.editRole = 'user';
+    this.editRole = 'normal customer';
+    this.editAvatarPreview = '';
+    this.editAvatarFile = null;
     this.targetId = null;
     this.showEditModal = true;
   }
 
   openEdit(acc: Account): void {
     this.targetId = acc.id;
-    this.editModalTitle = 'Chỉnh sửa tài khoản';
-    this.editModalSub = `Cập nhật thông tin của @${acc.username}`;
+    this.editModalTitle = 'CHỈNH SỬA TÀI KHOẢN';
+    this.editModalSub = 'Cập nhật thông tin của ';
+    this.editModalSubBold = `"${acc.name}" (@${acc.username} )`;
+    this.editAvatarPreview = acc.avatar || '';
+    this.editAvatarFile = null;
     this.editName = acc.name;
     this.editUsername = acc.username;
     this.editEmail = acc.email;
@@ -159,10 +195,33 @@ export class AdminAccount implements OnInit {
     this.showEditModal = true;
   }
 
+  triggerAvatarInput(): void {
+    document.getElementById('edit-account-avatar')?.click();
+  }
+
+  clearAvatar(): void {
+    this.editAvatarPreview = '';
+    this.editAvatarFile = null;
+  }
+
+  onAvatarFileChange(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.editAvatarPreview = reader.result as string;
+      this.editAvatarFile = file;
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
   saveEdit(): void {
     const name = this.editName.trim();
     if (!name) {
-      this.showToast('error', '⚠️ Vui lòng nhập họ tên');
+      this.showToast('warn', 'Vui lòng nhập họ tên');
       return;
     }
     if (this.targetId) {
@@ -173,7 +232,9 @@ export class AdminAccount implements OnInit {
       acc.phone = this.editPhone.trim();
       acc.address = this.editAddress.trim();
       acc.role = this.editRole;
-      this.showToast('success', '✅ Đã cập nhật tài khoản thành công');
+      if (this.editAvatarPreview) acc.avatar = this.editAvatarPreview;
+      else delete acc.avatar;
+      this.showToastWithBold('success', [{ text: 'Đã cập nhật tài khoản ' }, { text: `"${this.editName}" (@${this.editUsername})`, bold: true }, { text: ' thành công' }]);
     } else {
       this.accounts.unshift({
         id: Date.now(),
@@ -185,8 +246,9 @@ export class AdminAccount implements OnInit {
         role: this.editRole,
         status: 'active',
         createdAt: new Date().toISOString().slice(0, 10),
+        ...(this.editAvatarPreview ? { avatar: this.editAvatarPreview } : {}),
       });
-      this.showToast('success', '✅ Đã tạo tài khoản mới');
+      this.showToast('success', 'Đã tạo tài khoản mới');
     }
     this.closeEditModal();
     this.filterTable();
@@ -194,6 +256,16 @@ export class AdminAccount implements OnInit {
 
   closeEditModal(): void {
     this.showEditModal = false;
+    this.editAvatarPreview = '';
+    this.editAvatarFile = null;
+  }
+
+  openDeleteFromEdit(): void {
+    this.deleteTargetName = `"${this.editName}" (@${this.editUsername})`;
+    this.showEditModal = false;
+    this.editAvatarPreview = '';
+    this.editAvatarFile = null;
+    this.showDeleteModal = true;
   }
 
   openDelete(acc: Account): void {
@@ -204,12 +276,13 @@ export class AdminAccount implements OnInit {
 
   confirmDelete(): void {
     if (this.targetId == null) return;
+    const name = this.deleteTargetName;
     this.accounts = this.accounts.filter((a) => a.id !== this.targetId);
     this.selectedIds.delete(this.targetId);
     this.showDeleteModal = false;
     this.targetId = null;
     this.filterTable();
-    this.showToast('success', '🗑 Đã xoá tài khoản');
+    this.showToastWithBold('danger', [{ text: 'Đã xoá tài khoản ' }, { text: name, bold: true }]);
   }
 
   closeDeleteModal(): void {
@@ -224,19 +297,23 @@ export class AdminAccount implements OnInit {
     this.lockSub = isLock ? 'Người dùng sẽ không thể đăng nhập.' : 'Người dùng sẽ có thể đăng nhập trở lại.';
     this.lockTargetName = `"${acc.name}" (@${acc.username})`;
     this.lockText = isLock ? 'khoá' : 'mở khoá';
-    this.lockConfirmText = isLock ? '🔒 Khoá tài khoản' : '🔓 Mở khoá';
+    this.lockConfirmText = isLock ? 'Khoá tài khoản' : 'Mở khoá';
     this.lockConfirmClass = isLock ? 'btn-warn' : 'btn-vip';
     this.showLockModal = true;
   }
 
   confirmLock(): void {
     if (this.targetId == null) return;
+    const name = this.lockTargetName;
     const acc = this.accounts.find((a) => a.id === this.targetId)!;
     acc.status = this.lockAction === 'lock' ? 'locked' : 'active';
     this.showLockModal = false;
     this.targetId = null;
     this.filterTable();
-    this.showToast(this.lockAction === 'lock' ? 'warn' : 'success', this.lockAction === 'lock' ? '🔒 Đã khoá tài khoản' : '🔓 Đã mở khoá tài khoản');
+    this.showToastWithBold('warn', [
+      { text: this.lockAction === 'lock' ? 'Đã khoá tài khoản ' : 'Đã mở khoá tài khoản ' },
+      { text: name, bold: true },
+    ]);
   }
 
   closeLockModal(): void {
@@ -245,18 +322,24 @@ export class AdminAccount implements OnInit {
 
   openVip(acc: Account): void {
     this.targetId = acc.id;
-    this.vipTargetName = `"${acc.name}"`;
+    this.vipTargetName = `"${acc.name}" (@${acc.username})`;
     this.showVipModal = true;
   }
 
   confirmVip(): void {
     if (this.targetId == null) return;
     const acc = this.accounts.find((a) => a.id === this.targetId)!;
-    acc.role = 'vip';
+    acc.role = 'vip customer';
     this.showVipModal = false;
     this.targetId = null;
     this.filterTable();
-    this.showToast('success', `💎 Đã nâng cấp VIP ${this.vipDuration} cho "${acc.name}"`);
+    this.showToastWithBold('vip', [
+      { text: 'Đã nâng cấp VIP ' },
+      { text: this.vipDuration, bold: true },
+      { text: ' cho ' },
+      { text: `"${acc.name}" (@${acc.username})`, bold: true },
+      { text: ' thành công' },
+    ]);
   }
 
   closeVipModal(): void {
@@ -266,12 +349,16 @@ export class AdminAccount implements OnInit {
   bulkVip(): void {
     this.selectedIds.forEach((id) => {
       const a = this.accounts.find((x) => x.id === id);
-      if (a) a.role = 'vip';
+      if (a) a.role = 'vip customer';
     });
     const n = this.selectedIds.size;
     this.selectedIds.clear();
     this.filterTable();
-    this.showToast('success', `💎 Đã nâng VIP ${n} tài khoản`);
+    this.showToastWithBold('vip', [
+      { text: 'Đã nâng VIP ' },
+      { text: String(n), bold: true },
+      { text: ' tài khoản' },
+    ]);
   }
 
   bulkLock(): void {
@@ -282,7 +369,11 @@ export class AdminAccount implements OnInit {
     const n = this.selectedIds.size;
     this.selectedIds.clear();
     this.filterTable();
-    this.showToast('warn', `🔒 Đã khoá ${n} tài khoản`);
+    this.showToastWithBold('warn', [
+      { text: 'Đã khoá ' },
+      { text: String(n), bold: true },
+      { text: ' tài khoản' },
+    ]);
   }
 
   bulkDelete(): void {
@@ -290,7 +381,11 @@ export class AdminAccount implements OnInit {
     this.accounts = this.accounts.filter((a) => !this.selectedIds.has(a.id));
     this.selectedIds.clear();
     this.filterTable();
-    this.showToast('success', `🗑 Đã xoá ${count} tài khoản`);
+    this.showToastWithBold('danger', [
+      { text: 'Đã xoá ' },
+      { text: String(count), bold: true },
+      { text: ' tài khoản' },
+    ]);
   }
 
   async exportExcel(): Promise<void> {
@@ -362,11 +457,26 @@ export class AdminAccount implements OnInit {
     if ((event.target as HTMLElement).classList.contains('alert-overlay')) this.closeAlertModal();
   }
 
+  getToastIconSrc(type: string): string {
+    return this.toastIconSrc[type] || this.toastIconSrc['success'];
+  }
+
   showToast(type: string, message: string): void {
     this.toasts.push({ type, message });
     this.cdr.detectChanges();
     setTimeout(() => {
       this.toasts = this.toasts.filter((t) => t.message !== message);
+      this.cdr.detectChanges();
+    }, 2800);
+  }
+
+  showToastWithBold(type: string, segments: { text: string; bold?: boolean }[]): void {
+    const payload = { type, segments };
+    this.toasts.push(payload);
+    this.cdr.detectChanges();
+    const key = segments.map((s) => s.text).join('');
+    setTimeout(() => {
+      this.toasts = this.toasts.filter((t) => !t.segments || t.segments.map((s) => s.text).join('') !== key);
       this.cdr.detectChanges();
     }, 2800);
   }

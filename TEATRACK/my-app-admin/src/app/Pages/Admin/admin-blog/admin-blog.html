@@ -269,12 +269,12 @@
   </div>
 
   <!-- ===== Toasts ===== -->
-  <div class="toast-wrap">
-    <div class="toast" *ngFor="let t of toasts; trackBy: trackToast" [class.ok]="t.type==='ok'"
-      [class.err]="t.type==='err'" [class.hiding]="t.closing">
+  <div class="toast-wrap" id="admin-toast-wrap">
+    <div class="toast" *ngFor="let t of toasts; trackBy: trackToast" [class.success]="t.type==='ok'"
+      [class.error]="t.type==='err'" [class.hiding]="t.closing">
       <div class="toast-ico">
-        <span *ngIf="t.type==='ok'">✓</span>
-        <span *ngIf="t.type==='err'">✕</span>
+        <img *ngIf="t.type==='ok'" src="assets/icons/tick.png" alt="" />
+        <img *ngIf="t.type==='err'" src="assets/icons/delete2.png" alt="" />
       </div>
       <div class="toast-text">
         <div class="toast-title">{{ t.title }}</div>

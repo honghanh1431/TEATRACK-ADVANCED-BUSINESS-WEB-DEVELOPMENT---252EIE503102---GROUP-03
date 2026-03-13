@@ -4,28 +4,68 @@
   </div>
 </header>
 <div class="account-page">
-  <div class="stats">
-    <div class="stat-card stat-card--green">
-      <div class="stat-label">Tổng tài khoản</div>
-      <div class="stat-value stat-value--green">{{ accounts.length }}</div>
-      <div class="stat-change"><span>+12</span> so với tháng trước</div>
+  <section class="cards stats">
+    <div class="card stat stat-accounts">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/account.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TỔNG TÀI KHOẢN</span>
+      </div>
+      <div class="stat-value">{{ accounts.length }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>+12</span>
+        </span>
+        <span class="stat-desc-right">so với tháng trước</span>
+      </div>
     </div>
-    <div class="stat-card stat-card--purple">
-      <div class="stat-label">Thành viên VIP</div>
-      <div class="stat-value stat-value--purple">{{ accounts.filter(a => a.role === 'vip').length }}</div>
-      <div class="stat-change"><span>+5</span> tuần này</div>
+    <div class="card stat stat-vip">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/vip.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>THÀNH VIÊN VIP</span>
+      </div>
+      <div class="stat-value">{{ accounts.filter(a => a.role === 'vip customer').length }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>+5</span>
+        </span>
+        <span class="stat-desc-right">tuần này</span>
+      </div>
     </div>
-    <div class="stat-card stat-card--red">
-      <div class="stat-label">Đang bị khoá</div>
-      <div class="stat-value stat-value--red">{{ accounts.filter(a => a.status === 'locked').length }}</div>
-      <div class="stat-change">3 yêu cầu mở khoá</div>
+    <div class="card stat stat-locked">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/lock.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>ĐANG BỊ KHOÁ</span>
+      </div>
+      <div class="stat-value">{{ accounts.filter(a => a.status === 'locked').length }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">3 yêu cầu mở khoá</span>
+      </div>
     </div>
-    <div class="stat-card stat-card--blue">
-      <div class="stat-label">Hoạt động hôm nay</div>
-      <div class="stat-value stat-value--blue">341</div>
-      <div class="stat-change"><span>+18%</span> so với hôm qua</div>
+    <div class="card stat stat-activity">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/order.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>HOẠT ĐỘNG HÔM NAY</span>
+      </div>
+      <div class="stat-value">341</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>+18%</span>
+        </span>
+        <span class="stat-desc-right">so với hôm qua</span>
+      </div>
     </div>
-  </div>
+  </section>
 
   <div class="bulk-bar" *ngIf="selectedIds.size > 0">
     <span class="bulk-count">{{ selectedIds.size }}</span>
@@ -33,7 +73,9 @@
     <div class="bulk-actions">
       <button type="button" class="btn btn-sm btn-vip" (click)="bulkVip()">Nâng VIP</button>
       <button type="button" class="btn btn-sm btn-warn" (click)="bulkLock()">Khoá hàng loạt</button>
-      <button type="button" class="btn btn-sm btn-danger" (click)="bulkDelete()">Xoá hàng loạt</button>
+      <button type="button" class="btn btn-sm btn-danger" (click)="bulkDelete()">
+        Xoá hàng loạt
+      </button>
     </div>
   </div>
 
@@ -58,13 +100,23 @@
           </button>
         </div>
         <div class="card-actions-filters">
-          <select class="category-filter" [(ngModel)]="roleFilter" (change)="filterTable()" aria-label="Lọc theo vai trò">
+          <select
+            class="category-filter"
+            [(ngModel)]="roleFilter"
+            (change)="filterTable()"
+            aria-label="Lọc theo vai trò"
+          >
             <option value="">Tất cả vai trò</option>
-            <option value="admin">Quản trị viên</option>
-            <option value="vip">Khách hàng VIP</option>
-            <option value="user">Khách hàng</option>
+            <option value="normal customer">Khách hàng</option>
+            <option value="vip customer">Khách hàng VIP</option>
+            <option value="admin">Admin</option>
           </select>
-          <select class="category-filter" [(ngModel)]="statusFilter" (change)="filterTable()" aria-label="Lọc theo trạng thái">
+          <select
+            class="category-filter"
+            [(ngModel)]="statusFilter"
+            (change)="filterTable()"
+            aria-label="Lọc theo trạng thái"
+          >
             <option value="">Tất cả trạng thái</option>
             <option value="active">Hoạt động</option>
             <option value="locked">Bị khoá</option>
@@ -78,19 +130,24 @@
         <thead>
           <tr>
             <th class="check">
-              <input type="checkbox" [checked]="allSelected" (change)="toggleAll($any($event.target).checked)" />
+              <input
+                type="checkbox"
+                [checked]="allSelected"
+                (change)="toggleAll($any($event.target).checked)"
+              />
             </th>
+            <th>Avatar</th>
             <th>Người dùng</th>
             <th>Username</th>
             <th>Vai trò</th>
             <th>Trạng thái</th>
             <th>Ngày tạo</th>
-            <th>Thao tác</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="filteredAccounts.length === 0">
-            <td colspan="7" class="empty-row">Không tìm thấy tài khoản nào</td>
+            <td colspan="8" class="empty-row">Không tìm thấy tài khoản nào</td>
           </tr>
           <tr
             *ngFor="let acc of filteredAccounts; let i = index"
@@ -98,43 +155,103 @@
             (click)="openEdit(acc)"
           >
             <td (click)="$event.stopPropagation()">
-              <input type="checkbox" [checked]="isSelected(acc.id)" (change)="toggleRow(acc.id, $any($event.target).checked)" />
+              <input
+                type="checkbox"
+                [checked]="isSelected(acc.id)"
+                (change)="toggleRow(acc.id, $any($event.target).checked)"
+              />
+            </td>
+            <td class="avatar-cell">
+              <div
+                class="user-avatar"
+                [style.background]="
+                  'linear-gradient(135deg,' +
+                  getAvatarColor(i)[0] +
+                  ',' +
+                  getAvatarColor(i)[1] +
+                  ')'
+                "
+                [style.color]="getAvatarColor(i)[2]"
+              >
+                {{ getInitials(acc) }}
+              </div>
             </td>
             <td>
               <div class="user-cell">
-                <div
-                  class="user-avatar"
-                  [style.background]="'linear-gradient(135deg,' + getAvatarColor(i)[0] + ',' + getAvatarColor(i)[1] + ')'"
-                  [style.color]="getAvatarColor(i)[2]"
-                >
-                  {{ getInitials(acc) }}
-                </div>
-                <div>
-                  <div class="user-name">{{ acc.name }}</div>
-                  <div class="user-email">{{ acc.email }}</div>
-                </div>
+                <div class="user-name">{{ acc.name }}</div>
+                <div class="user-email">{{ acc.email }}</div>
               </div>
             </td>
             <td class="username-cell">@{{ acc.username }}</td>
             <td>
-              <span class="badge" [ngClass]="'badge-' + acc.role">
-                {{ acc.role === 'admin' ? '👑 Admin' : acc.role === 'vip' ? '💎 VIP' : '👤 User' }}
+              <span class="badge" [ngClass]="getRoleBadgeClass(acc.role)">
+                {{
+                  acc.role === 'admin'
+                    ? 'Admin'
+                    : acc.role === 'vip customer'
+                      ? 'Khách hàng VIP'
+                      : 'Khách hàng'
+                }}
               </span>
             </td>
             <td>
-              <span class="badge" [ngClass]="acc.status === 'active' ? 'badge-active' : 'badge-locked'">
+              <span
+                class="badge"
+                [ngClass]="acc.status === 'active' ? 'badge-active' : 'badge-locked'"
+              >
                 {{ acc.status === 'active' ? 'Hoạt động' : 'Bị khoá' }}
               </span>
             </td>
-            <td class="date-cell">{{ acc.createdAt }}</td>
+            <td class="date-cell">{{ fmtDate(acc.createdAt) }}</td>
             <td (click)="$event.stopPropagation()">
               <div class="actions">
-                <button type="button" class="icon-btn vip" title="Nâng VIP" (click)="openVip(acc)">💎</button>
-                <button type="button" class="icon-btn edit" title="Chỉnh sửa" (click)="openEdit(acc)">✏️</button>
-                <button type="button" class="icon-btn lock" [title]="acc.status === 'active' ? 'Khoá' : 'Mở khoá'" (click)="openLock(acc, acc.status === 'active' ? 'lock' : 'unlock')">
-                  {{ acc.status === 'active' ? '🔒' : '🔓' }}
+                <button type="button" class="icon-btn vip" title="Nâng VIP" (click)="openVip(acc)">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 8L7 3H17L21 8L12 21L3 8Z"
+                      stroke="#1596D5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M3 8H21M7 3L12 8L17 3M12 8V21"
+                      stroke="#1596D5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                 </button>
-                <button type="button" class="icon-btn delete" title="Xoá" (click)="openDelete(acc)">🗑</button>
+                <button
+                  type="button"
+                  class="icon-btn edit"
+                  title="Chỉnh sửa"
+                  (click)="openEdit(acc)"
+                >
+                  <img src="assets/icons/edit2.png" alt="Chỉnh sửa" />
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn lock"
+                  [title]="acc.status === 'active' ? 'Khoá' : 'Mở khoá'"
+                  (click)="openLock(acc, acc.status === 'active' ? 'lock' : 'unlock')"
+                >
+                  <img
+                    src="assets/icons/lock.png"
+                    [ngClass]="acc.status === 'active' ? 'lock' : 'unlock'"
+                    alt="Khoá"
+                  />
+                </button>
+                <button type="button" class="icon-btn delete" title="Xoá" (click)="openDelete(acc)">
+                  <img src="assets/icons/delete2.png" alt="Xoá" />
+                </button>
               </div>
             </td>
           </tr>
@@ -145,108 +262,451 @@
 </div>
 
 <!-- EDIT MODAL -->
-<div class="account-modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()" role="dialog" aria-modal="true">
-  <div class="account-modal" (click)="$event.stopPropagation()">
-    <button type="button" class="account-modal__close" (click)="closeEditModal()">×</button>
-    <h3 class="account-modal__title">{{ editModalTitle }}</h3>
-    <p class="account-modal__subtitle">{{ editModalSub }}</p>
-    <div class="account-modal__form">
-      <div class="form-grid">
-        <label class="form-group">
-          <span class="form-label">HỌ VÀ TÊN</span>
-          <input type="text" class="form-input" [(ngModel)]="editName" placeholder="Nguyễn Văn A" />
-        </label>
-        <label class="form-group">
-          <span class="form-label">USERNAME</span>
-          <input type="text" class="form-input" [(ngModel)]="editUsername" placeholder="username123" />
-        </label>
-        <label class="form-group form-group--full">
-          <span class="form-label">EMAIL</span>
-          <input type="email" class="form-input" [(ngModel)]="editEmail" placeholder="email@example.com" />
-        </label>
-        <label class="form-group">
-          <span class="form-label">SỐ ĐIỆN THOẠI</span>
-          <input type="text" class="form-input" [(ngModel)]="editPhone" placeholder="0912 345 678" />
-        </label>
-        <label class="form-group">
-          <span class="form-label">VAI TRÒ</span>
-          <select class="form-input" [(ngModel)]="editRole">
-            <option value="user">User</option>
-            <option value="vip">VIP</option>
+<div
+  class="account-modal-overlay account-edit-modal-overlay"
+  *ngIf="showEditModal"
+  (click)="closeEditModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="modal-container modal-add-product" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ editModalTitle }}</h2>
+      <button type="button" class="modal-close" (click)="closeEditModal()" aria-label="Đóng">
+        &times;
+      </button>
+      <p class="modal-subtitle">
+        {{ editModalSub }}<strong *ngIf="editModalSubBold">{{ editModalSubBold }}</strong>
+      </p>
+    </div>
+    <div class="modal-body">
+      <!-- Avatar -->
+      <div class="image-upload-section">
+        <label>Avatar</label>
+        <input
+          type="file"
+          id="edit-account-avatar"
+          accept="image/*"
+          style="display: none"
+          (change)="onAvatarFileChange($event)"
+        />
+        <div class="image-preview-grid image-preview-grid--single">
+          <div class="image-preview-slot" data-slot="0" (click)="triggerAvatarInput()">
+            <div
+              class="upload-placeholder slot-placeholder"
+              [style.display]="!editAvatarPreview ? 'flex' : 'none'"
+            >
+              <img src="assets/icons/upload.png" alt="Upload" class="upload-icon" />
+              <span class="upload-text">Tải ảnh lên</span>
+            </div>
+            <img
+              [src]="editAvatarPreview || ''"
+              alt="Preview"
+              class="slot-preview-img"
+              [style.display]="editAvatarPreview ? 'block' : 'none'"
+            />
+            <button
+              type="button"
+              class="slot-remove-btn"
+              aria-label="Xóa ảnh"
+              [style.display]="editAvatarPreview ? 'flex' : 'none'"
+              (click)="$event.stopPropagation(); clearAvatar()"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Form -->
+      <div class="form-row-equal">
+        <div class="form-group">
+          <label for="edit-account-name">Họ và tên</label>
+          <input
+            type="text"
+            id="edit-account-name"
+            [(ngModel)]="editName"
+            name="editName"
+            placeholder="Nguyễn Văn A"
+            style="color: #0088ff"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-account-username">Username</label>
+          <input
+            type="text"
+            id="edit-account-username"
+            [(ngModel)]="editUsername"
+            name="editUsername"
+            placeholder="username123"
+            style="color: #0088ff"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-account-email">Email</label>
+        <input
+          type="email"
+          id="edit-account-email"
+          [(ngModel)]="editEmail"
+          name="editEmail"
+          placeholder="email@example.com"
+          style="color: #0088ff"
+        />
+      </div>
+      <div class="form-row-equal">
+        <div class="form-group">
+          <label for="edit-account-phone">Số điện thoại</label>
+          <input
+            type="text"
+            id="edit-account-phone"
+            [(ngModel)]="editPhone"
+            name="editPhone"
+            placeholder="0912 345 678"
+            style="color: #0088ff"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-account-role">Vai trò</label>
+          <select
+            id="edit-account-role"
+            [(ngModel)]="editRole"
+            name="editRole"
+            style="color: #0088ff"
+          >
+            <option value="normal customer">Khách hàng</option>
+            <option value="vip customer">Khách hàng VIP</option>
             <option value="admin">Admin</option>
           </select>
-        </label>
-        <label class="form-group form-group--full">
-          <span class="form-label">ĐỊA CHỈ</span>
-          <input type="text" class="form-input" [(ngModel)]="editAddress" placeholder="123 Đường ABC, TP.HCM" />
-        </label>
+        </div>
       </div>
-      <div class="account-modal__actions">
-        <button type="button" class="btn btn-ghost" (click)="closeEditModal()">Huỷ</button>
-        <button type="button" class="btn btn-primary" (click)="saveEdit()">💾 Lưu thay đổi</button>
+      <div class="form-group">
+        <label for="edit-account-address">Địa chỉ</label>
+        <input
+          type="text"
+          id="edit-account-address"
+          [(ngModel)]="editAddress"
+          name="editAddress"
+          placeholder="123 Đường ABC, TP.HCM"
+          style="color: #0088ff"
+        />
       </div>
+    </div>
+    <div class="modal-footer">
+      <ng-container *ngIf="targetId">
+        <button type="button" class="btn-danger" (click)="openDeleteFromEdit()">
+          <span class="btn-icon"
+            ><img src="assets/icons/delete3.png" alt="" style="width: 18px; height: 18px"
+          /></span>
+          <span>Xóa</span>
+        </button>
+        <button type="button" class="btn-primary" (click)="saveEdit()">
+          <span class="btn-icon"
+            ><img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px"
+          /></span>
+          <span>Lưu</span>
+        </button>
+      </ng-container>
+      <ng-container *ngIf="!targetId">
+        <button type="button" class="btn-danger" (click)="closeEditModal()">
+          <span class="btn-icon"
+            ><img src="assets/icons/delete3.png" alt="" style="width: 18px; height: 18px"
+          /></span>
+          <span>Hủy bỏ</span>
+        </button>
+        <button type="button" class="btn-primary" (click)="saveEdit()">
+          <span class="btn-icon">+</span>
+          <span>Thêm</span>
+        </button>
+      </ng-container>
     </div>
   </div>
 </div>
 
 <!-- DELETE CONFIRM MODAL -->
-<div class="account-modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()" role="dialog" aria-modal="true">
-  <div class="account-modal account-modal--sm" (click)="$event.stopPropagation()">
-    <button type="button" class="account-modal__close" (click)="closeDeleteModal()">×</button>
-    <div class="confirm-icon confirm-icon--danger">🗑</div>
-    <h3 class="account-modal__title">Xoá tài khoản?</h3>
-    <p class="account-modal__subtitle">Hành động này không thể hoàn tác.</p>
-    <p class="confirm-text">Bạn đang xoá tài khoản <strong class="confirm-name">{{ deleteTargetName }}</strong>. Toàn bộ dữ liệu liên quan sẽ bị xoá vĩnh viễn khỏi hệ thống.</p>
-    <div class="account-modal__actions">
-      <button type="button" class="btn btn-ghost" (click)="closeDeleteModal()">Huỷ</button>
-      <button type="button" class="btn btn-danger" (click)="confirmDelete()">🗑 Xác nhận xoá</button>
+<div
+  class="account-modal-overlay account-delete-modal-overlay"
+  *ngIf="showDeleteModal"
+  (click)="closeDeleteModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="modal-container modal-confirm modal-delete-container"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-body modal-confirm-body">
+      <div class="delete-modal-icon-wrap">
+        <div class="delete-modal-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+        </div>
+      </div>
+      <div class="delete-modal-content">
+        <h2 id="delete-account-title" class="delete-modal-title">Xác nhận xóa tài khoản</h2>
+        <p class="delete-modal-subtitle">
+          Tài khoản <strong class="delete-product-name">{{ deleteTargetName }}</strong> sẽ bị xóa
+          vĩnh viễn.
+        </p>
+        <p class="delete-modal-subtitle">Bạn sẽ không thể khôi phục lại.</p>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-cancel-ghost" (click)="closeDeleteModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Hủy
+        </button>
+        <button type="button" class="btn btn-danger-solid" (click)="confirmDelete()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+          Xóa tài khoản
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- LOCK CONFIRM MODAL -->
-<div class="account-modal-overlay" *ngIf="showLockModal" (click)="closeLockModal()" role="dialog" aria-modal="true">
-  <div class="account-modal account-modal--sm" (click)="$event.stopPropagation()">
-    <button type="button" class="account-modal__close" (click)="closeLockModal()">×</button>
-    <div class="confirm-icon" [ngClass]="lockAction === 'lock' ? 'confirm-icon--warn' : 'confirm-icon--vip'">
-      {{ lockAction === 'lock' ? '🔒' : '🔓' }}
-    </div>
-    <h3 class="account-modal__title">{{ lockTitle }}</h3>
-    <p class="account-modal__subtitle">{{ lockSub }}</p>
-    <p class="confirm-text">Bạn sắp {{ lockText }} tài khoản <strong class="confirm-name">{{ lockTargetName }}</strong>.</p>
-    <div class="account-modal__actions">
-      <button type="button" class="btn btn-ghost" (click)="closeLockModal()">Huỷ</button>
-      <button type="button" class="btn" [ngClass]="lockConfirmClass" (click)="confirmLock()">{{ lockConfirmText }}</button>
+<div
+  class="account-modal-overlay account-lock-modal-overlay"
+  *ngIf="showLockModal"
+  (click)="closeLockModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="modal-container modal-confirm modal-lock-container"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-body modal-confirm-body">
+      <div class="lock-modal-icon-wrap">
+        <div class="lock-modal-icon">
+          <ng-container *ngIf="lockAction === 'lock'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="32"
+              height="32"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </ng-container>
+          <ng-container *ngIf="lockAction === 'unlock'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="32"
+              height="32"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+            </svg>
+          </ng-container>
+        </div>
+      </div>
+      <div class="delete-modal-content">
+        <h2 class="delete-modal-title lock-modal-title">{{ lockTitle }}</h2>
+        <p class="delete-modal-subtitle">{{ lockSub }}</p>
+        <p class="delete-modal-subtitle">
+          Bạn sắp {{ lockText }} tài khoản
+          <strong class="delete-product-name">{{ lockTargetName }}</strong
+          >.
+        </p>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-cancel-ghost" (click)="closeLockModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Hủy
+        </button>
+        <button type="button" class="btn btn-lock-solid" (click)="confirmLock()">
+          <ng-container *ngIf="lockAction === 'lock'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="18"
+              height="18"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </ng-container>
+          <ng-container *ngIf="lockAction === 'unlock'">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              width="18"
+              height="18"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+            </svg>
+          </ng-container>
+          {{ lockConfirmText }}
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- VIP MODAL -->
-<div class="account-modal-overlay" *ngIf="showVipModal" (click)="closeVipModal()" role="dialog" aria-modal="true">
-  <div class="account-modal account-modal--sm" (click)="$event.stopPropagation()">
-    <button type="button" class="account-modal__close" (click)="closeVipModal()">×</button>
-    <div class="confirm-icon confirm-icon--vip">💎</div>
-    <h3 class="account-modal__title">Nâng cấp VIP</h3>
-    <p class="account-modal__subtitle">Kích hoạt gói thành viên cao cấp</p>
-    <p class="confirm-text">Nâng cấp tài khoản <strong class="confirm-name">{{ vipTargetName }}</strong> lên gói VIP. Người dùng sẽ được hưởng đầy đủ quyền lợi thành viên cao cấp.</p>
-    <label class="form-group" style="margin-top: 20px">
-      <span class="form-label">THỜI HẠN GÓI VIP</span>
-      <select class="form-input" [(ngModel)]="vipDuration">
-        <option>1 tháng</option>
-        <option>3 tháng</option>
-        <option>6 tháng</option>
-        <option>1 năm</option>
-        <option>Vĩnh viễn</option>
-      </select>
-    </label>
-    <div class="account-modal__actions">
-      <button type="button" class="btn btn-ghost" (click)="closeVipModal()">Huỷ</button>
-      <button type="button" class="btn btn-vip" (click)="confirmVip()">💎 Kích hoạt VIP</button>
+<div
+  class="account-modal-overlay account-vip-modal-overlay"
+  *ngIf="showVipModal"
+  (click)="closeVipModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="modal-container modal-confirm modal-vip-container" (click)="$event.stopPropagation()">
+    <div class="modal-body modal-confirm-body">
+      <div class="vip-modal-icon-wrap">
+        <div class="vip-modal-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="32"
+            height="32"
+          >
+            <path d="M3 8L7 3H17L21 8L12 21L3 8Z" />
+            <path d="M3 8H21M7 3L12 8L17 3M12 8V21" />
+          </svg>
+        </div>
+      </div>
+      <div class="delete-modal-content">
+        <h2 id="vip-modal-title" class="delete-modal-title vip-modal-title">
+          Xác nhận nâng cấp VIP
+        </h2>
+        <p class="delete-modal-subtitle">
+          Nâng cấp tài khoản <strong class="delete-product-name">{{ vipTargetName }}</strong> lên
+          gói VIP. <br />Người dùng sẽ được hưởng đầy đủ quyền lợi thành viên cao cấp.
+        </p>
+        <div class="vip-duration-row">
+          <span class="vip-duration-label">Thời hạn gói VIP</span>
+          <select class="vip-duration-select" [(ngModel)]="vipDuration">
+            <option>1 tháng</option>
+            <option>3 tháng</option>
+            <option>6 tháng</option>
+            <option>1 năm</option>
+            <option>Vĩnh viễn</option>
+          </select>
+        </div>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-cancel-ghost" (click)="closeVipModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Hủy
+        </button>
+        <button type="button" class="btn btn-vip-solid" (click)="confirmVip()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="18"
+            height="18"
+          >
+            <path d="M3 8L7 3H17L21 8L12 21L3 8Z" />
+            <path d="M3 8H21M7 3L12 8L17 3M12 8V21" />
+          </svg>
+          Kích hoạt VIP
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Alert modal (giống cart) -->
+<!-- Alert modal -->
 <div
   *ngIf="showAlert"
   class="alert-overlay show"
@@ -256,7 +716,14 @@
 >
   <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
     <div class="alert-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
         <circle cx="12" cy="12" r="10"></circle>
         <path d="M9 12l2 2 4-4"></path>
       </svg>
@@ -264,15 +731,44 @@
     <h3 class="alert-title">Thông báo</h3>
     <p class="alert-message">{{ alertMessage }}</p>
     <div class="alert-actions">
-      <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">OK</button>
+      <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">
+        OK
+      </button>
     </div>
   </div>
 </div>
 
-<!-- TOASTS -->
 <div class="toasts">
-  <div *ngFor="let t of toasts; let i = index" class="toast" [ngClass]="'toast--' + t.type">
-    <span class="toast-icon">{{ t.type === 'success' ? '✓' : t.type === 'error' ? '✕' : '⚠' }}</span>
-    <span>{{ t.message }}</span>
+  <div
+    *ngFor="let t of toasts; let i = index"
+    class="toast"
+    [ngClass]="'toast--' + t.type"
+    role="status"
+    aria-live="polite"
+  >
+    <img *ngIf="t.type !== 'vip'" [src]="getToastIconSrc(t.type)" alt="" class="toast-icon-img" />
+    <svg
+      *ngIf="t.type === 'vip'"
+      class="toast-icon-img toast-icon-vip"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      width="18"
+      height="18"
+    >
+      <path d="M3 8L7 3H17L21 8L12 21L3 8Z" />
+      <path d="M3 8H21M7 3L12 8L17 3M12 8V21" />
+    </svg>
+    <span class="toast-message" *ngIf="t.message">{{ t.message }}</span>
+    <span class="toast-message" *ngIf="t.segments">
+      <ng-container *ngFor="let seg of t.segments">
+        <strong *ngIf="seg.bold" class="toast-bold">{{ seg.text }}</strong>
+        <ng-container *ngIf="!seg.bold">{{ seg.text }}</ng-container>
+      </ng-container>
+    </span>
   </div>
 </div>
