@@ -130,7 +130,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
 
   ngOnInit(): void {
@@ -185,7 +185,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     this.chartInstances.forEach((c) => {
       try {
         c?.destroy();
-      } catch (_) {}
+      } catch (_) { }
     });
     this.chartInstances = [];
     document.removeEventListener('click', this.boundClick);
@@ -211,14 +211,45 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       this.renderOrdersTable(this.ORDERS_ALL);
       this.updateOrdersStats();
       this.cdr.detectChanges();
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /** Gọi khi vào lại trang admin-dashboard để luôn thấy dữ liệu mới nhất (orders + products). */
   refreshData(): void {
     this.fetchOrders();
     this.fetchProducts();
+    this.fetchAgencyStats();
     this.cdr.detectChanges();
+  }
+
+  /** Fetch thống kê đơn hàng & doanh thu theo chi nhánh */
+  private fetchAgencyStats(): void {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const headers = { Authorization: `Bearer ${token}` };
+    this.http.get<{ agency: string; count: number; revenue: number }[]>(
+      `${this.API_BASE}/api/admin/orders/agency-stats`, { headers }
+    ).subscribe({
+      next: (stats) => {
+        const tbody = document.getElementById('agency-stats-body');
+        if (!tbody) return;
+        if (!stats || !stats.length) {
+          tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Chưa có dữ liệu</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = stats.map(s => `
+          <tr>
+            <td>${s.agency}</td>
+            <td style="text-align:center;">${s.count}</td>
+            <td>${new Intl.NumberFormat('vi-VN').format(s.revenue || 0)}đ</td>
+          </tr>
+        `).join('');
+      },
+      error: () => {
+        const tbody = document.getElementById('agency-stats-body');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#94a3b8;">Không thể tải dữ liệu</td></tr>`;
+      }
+    });
   }
 
   private $(s: string, r: ParentNode = document): Element | null {
@@ -252,7 +283,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (messageEl) messageEl.textContent = message;
     modal.style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
-    setTimeout(() => this.hideSuccess(), 1500);
   }
 
   hideSuccess(): void {
@@ -294,7 +324,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     this.chartInstances.forEach((c) => {
       try {
         c?.destroy();
-      } catch (_) {}
+      } catch (_) { }
     });
     this.chartInstances = [];
     if (revCostCtx) {
@@ -536,8 +566,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       const absStr =
         Math.abs(s.productsSoldDiff) >= 1000
           ? (s.productsSoldDiff >= 0 ? '+' : '-') +
-            (Math.abs(s.productsSoldDiff) / 1000).toFixed(1) +
-            'k'
+          (Math.abs(s.productsSoldDiff) / 1000).toFixed(1) +
+          'k'
           : (s.productsSoldDiff >= 0 ? '+' : '') + s.productsSoldDiff;
       el('sCustomersDeltaAbs')!.textContent = absStr + ' tuần này';
     }
@@ -580,7 +610,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             try {
               const raw = localStorage.getItem('orders');
               if (raw) fromStorage = JSON.parse(raw) as Order[];
-            } catch (_) {}
+            } catch (_) { }
 
             // Hợp nhất và loại trùng (Dedupe)
             const ids = new Set<string>();
@@ -644,7 +674,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         try {
           const raw = localStorage.getItem('orders');
           if (raw) fromStorage = JSON.parse(raw) as Order[];
-        } catch (_) {}
+        } catch (_) { }
         this.processOrders([...fromStorage, ...fromJson]);
       },
       error: () => {
@@ -962,22 +992,35 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const checked = input.checked;
         if (!prodId) return;
 
+        const updateLocal = () => {
+          const idx = this.PRODUCTS_ALL.findIndex(p => p.id === prodId);
+          if (idx !== -1) {
+            this.PRODUCTS_ALL[idx].visible = checked;
+          }
+          try {
+            localStorage.setItem('products', JSON.stringify(this.PRODUCTS_ALL));
+          } catch (e) {}
+          this.showNotification(checked ? 'Đã bật hiển thị' : 'Đã tắt hiển thị', 'success');
+        };
+
         this.http.put<Product[]>(`${this.PRODUCTS_API}/${prodId}`, { visible: checked }).subscribe({
           next: (updatedList) => {
-            this.PRODUCTS_ALL = updatedList;
-            this.applyFilters();
-            const product = this.PRODUCTS_ALL.find((p) => p.id === prodId);
-            if (product) {
-              this.showNotification(
-                product.visible !== false ? 'Sản phẩm sẽ hiển thị trên menu' : 'Sản phẩm đã ẩn khỏi menu',
-                'success',
-              );
+            if (Array.isArray(updatedList) && updatedList.length > 0) {
+              this.PRODUCTS_ALL = updatedList;
+            } else {
+              const idx = this.PRODUCTS_ALL.findIndex(p => p.id === prodId);
+              if (idx !== -1) this.PRODUCTS_ALL[idx].visible = checked;
             }
+            try { localStorage.setItem('products', JSON.stringify(this.PRODUCTS_ALL)); } catch(e){}
+            // Render lại nếu cần, nhưng chỉ cần hiện thông báo là đủ vì DOM state đã là checked
+            this.showNotification(
+              checked ? 'Đã bật hiển thị' : 'Đã tắt hiển thị',
+              'success',
+            );
           },
           error: (err) => {
-            console.error('Toggle visible error:', err);
-            input.checked = !checked;
-            this.showAlertModal('Lỗi khi cập nhật trạng thái hiển thị.');
+            console.warn('Toggle visible API error, fallback to local:', err);
+            updateLocal();
           },
         });
       });
@@ -1184,11 +1227,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           const specsHtml =
             lines.length > 0
               ? lines
-                  .map(
-                    (line) =>
-                      `<p class="item-detail-line">${String(line).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</p>`,
-                  )
-                  .join('')
+                .map(
+                  (line) =>
+                    `<p class="item-detail-line">${String(line).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</p>`,
+                )
+                .join('')
               : '';
           return `<div class="order-item"><img src="${imgUrl}" alt="${name}" class="item-image"><div class="item-details"><div class="item-name">${name}</div><div class="item-specs">${specsHtml}</div></div><div class="item-price">${price}</div></div>`;
         })
@@ -1207,7 +1250,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (!modal) return;
     modal.classList.remove('show');
     setTimeout(() => (modal.style.display = 'none'), 300);
-    this.showNotification('Đã đóng chi tiết đơn hàng', 'info');
   }
 
   showNotification(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info'): void {
@@ -1221,15 +1263,13 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const icons: Record<string, string> = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-    const titles: Record<string, string> = { success: 'THÀNH CÔNG', error: 'THẤT BẠI', warning: 'CẢNH BÁO', info: 'THÔNG BÁO' };
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `
       <div class="toast-ico">${icons[type]}</div>
       <div class="toast-text">
-        <div class="toast-title">${titles[type]}</div>
-        <div class="toast-sub">${message}</div>
+        <div class="toast-title">${message}</div>
       </div>
       <button class="toast-x" type="button">×</button>
     `;
@@ -1356,9 +1396,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       if (toAdd.length === 0 && imageFiles.length > 0) return;
       let loaded = 0;
       toAdd.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const dataUrl = (ev.target?.result as string) || '';
+        this.compressImage(file, 800, 0.75).then((dataUrl) => {
           if (dataUrl && this.addProductImageUrls.length < this.ADD_PRODUCT_MAX_IMAGES) {
             this.addProductImageUrls.push(dataUrl);
           }
@@ -1370,12 +1408,39 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             );
             this.renderAddProductPreviews();
           }
-        };
-        reader.readAsDataURL(file);
+        });
       });
       (e.target as HTMLInputElement).value = '';
     });
   }
+
+  /** Resize + compress ảnh xuống maxSize px và quality JPEG trước khi lưu base64. */
+  private compressImage(file: File, maxSize = 800, quality = 0.75): Promise<string> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) { height = Math.round((height * maxSize) / width); width = maxSize; }
+            else { width = Math.round((width * maxSize) / height); height = maxSize; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(ev.target?.result as string || '');
+        img.src = ev.target?.result as string;
+      };
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    });
+  }
+
+
 
   private parsePrice(value: string | number | null | undefined): number {
     if (value == null) return 0;
@@ -1581,9 +1646,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       if (toAdd.length === 0 && imageFiles.length > 0) return;
       let loaded = 0;
       toAdd.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const dataUrl = (ev.target?.result as string) || '';
+        this.compressImage(file, 800, 0.75).then((dataUrl) => {
           if (dataUrl && this.editProductImageUrls.length < this.EDIT_PRODUCT_MAX_IMAGES) {
             this.editProductImageUrls.push(dataUrl);
           }
@@ -1595,12 +1658,12 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             );
             this.renderEditProductPreviews();
           }
-        };
-        reader.readAsDataURL(file);
+        });
       });
       (e.target as HTMLInputElement).value = '';
     });
   }
+
 
   private initEditProductForm(): void {
     const form = document.getElementById('form-edit-product');
@@ -1658,21 +1721,13 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   openDeleteConfirmModal(productId: string): void {
     const product = this.PRODUCTS_ALL.find((p) => p.id === productId);
     this.pendingDeleteProductId = productId;
-    const hasName = product && String(product.name || '').trim() !== '';
-    const displayText = hasName
-      ? String(product!.name || '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-      : 'này';
-    const messageEl = document.querySelector('.confirm-message');
-    if (messageEl) {
-      const namePart = hasName
-        ? `<span class="confirm-product-name">${displayText}</span>`
-        : `${displayText}`;
-      messageEl.innerHTML = `Bạn có chắc chắn muốn xóa sản phẩm ${namePart} ?<br><span class="confirm-warning-line">Sau khi xóa, bạn sẽ không thể khôi phục.</span>`;
+    const productName = product ? String(product.name || '').trim() : '';
+
+    const nameEl = document.getElementById('delete-product-name');
+    if (nameEl) {
+      nameEl.textContent = productName || 'sản phẩm này';
     }
+
     const modal = document.getElementById('modal-delete-confirm');
     if (modal) {
       modal.style.display = 'flex';
@@ -1682,13 +1737,20 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
   closeDeleteConfirmModal(): void {
     const modal = document.getElementById('modal-delete-confirm');
-    if (modal) {
-      modal.classList.remove('show');
-      setTimeout(() => {
-        modal.style.display = 'none';
-        this.pendingDeleteProductId = null;
-      }, 300);
-    }
+    if (!modal) return;
+    const container = modal.querySelector('.modal-delete-container');
+
+    // Thêm class .closing để trigger CSS animation đóng
+    modal.classList.add('closing');
+    if (container) container.classList.add('closing');
+
+    // Sau khi animation xong (250ms) thì ẩn modal
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('show', 'closing');
+      if (container) container.classList.remove('closing');
+      this.pendingDeleteProductId = null;
+    }, 260);
   }
 
   confirmDeleteProduct(): void {
@@ -1727,7 +1789,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardData = data;
         this.applyDashboardFilter();
       },
-      error: () => {},
+      error: () => { },
     });
     if (typeof window !== 'undefined') {
       window.addEventListener('admin:filters', this.filterListener);
@@ -1744,6 +1806,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     });
     this.fetchOrders();
     this.fetchProducts();
+    this.fetchAgencyStats();
     this.initSuccessModal();
     this.initDeleteConfirmModal();
     this.initAddProductImageUpload();

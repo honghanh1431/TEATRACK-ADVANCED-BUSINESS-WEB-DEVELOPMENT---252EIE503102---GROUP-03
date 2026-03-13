@@ -22,6 +22,7 @@ export interface Order {
   total: string;
   activeStep: number;
   progressPercent: number;
+  deliveryAgency?: string;
 }
 
 export interface Tab {
@@ -308,6 +309,7 @@ export class OrderHistory implements OnInit {
       total: this.formatMoneyForOrder(totalNum),
       activeStep: stepIndex,
       progressPercent,
+      deliveryAgency: storage.deliveryAgency || 'Chưa xác định',
     };
   }
 

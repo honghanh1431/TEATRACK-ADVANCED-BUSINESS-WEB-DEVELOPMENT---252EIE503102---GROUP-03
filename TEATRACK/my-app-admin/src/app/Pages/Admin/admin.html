@@ -1,164 +1,161 @@
-  <div class="admin-layout" id="adminLayout">
-    <div class="main">
-      <header class="topbar">
-      <button
-        class="export-btn"
-        id="btnExportReport"
-        type="button"
-        data-i18n="admin.dashboard.exportReport"
-      >
+<div class="admin-layout" id="adminLayout">
+  <div class="main">
+    <header class="topbar">
+      <button class="export-btn" id="btnExportReport" type="button" data-i18n="admin.dashboard.exportReport">
         Xuất báo cáo tổng kết
       </button>
-        <div class="top-actions">
-          <div class="dropdown" id="ddUser">
-          <button
-            class="dd-btn"
-            id="ddUserBtn"
-            type="button"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-controls="ddUserMenu"
-          ></button>
-            <div class="dd-menu" id="ddUserMenu" role="menu" hidden></div>
-          </div>
-          <div class="dropdown" id="ddMore">
-          <button
-            class="dd-btn"
-            id="ddMoreBtn"
-            type="button"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-controls="ddMoreMenu"
-          ></button>
-            <div class="dd-menu" id="ddMoreMenu" role="menu" hidden></div>
-          </div>
+      <div class="top-actions">
+        <div class="dropdown" id="ddUser">
+          <button class="dd-btn" id="ddUserBtn" type="button" aria-haspopup="menu" aria-expanded="false"
+            aria-controls="ddUserMenu"></button>
+          <div class="dd-menu" id="ddUserMenu" role="menu" hidden></div>
         </div>
-      </header>
+        <div class="dropdown" id="ddMore">
+          <button class="dd-btn" id="ddMoreBtn" type="button" aria-haspopup="menu" aria-expanded="false"
+            aria-controls="ddMoreMenu"></button>
+          <div class="dd-menu" id="ddMoreMenu" role="menu" hidden></div>
+        </div>
+      </div>
+    </header>
 
-      <main class="content">
-        <section class="cards" id="overview">
-          <div class="card stat revenue">
-            <div class="stat-title">
+    <main class="content">
+      <section class="cards" id="overview">
+        <div class="card stat revenue">
+          <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/doanhthu.png" alt="Revenue icon" class="stat-title-icon" />
             </span>
-              <span data-i18n="admin.dashboard.revenue">DOANH THU</span>
-            </div>
-            <div class="stat-value" id="sRevenue">679.000đ</div>
-            <div class="stat-desc">
+            <span data-i18n="admin.dashboard.revenue">DOANH THU</span>
+          </div>
+          <div class="stat-value" id="sRevenue">679.000đ</div>
+          <div class="stat-desc">
             <span class="stat-desc-left">
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sRevenueDelta">+0%</span>
             </span>
             <span class="stat-desc-right" id="sRevenueDeltaAbs">+0 tuần này</span>
           </div>
-          </div>
-          
-          <div class="card stat orders">
-            <div class="stat-title">
+        </div>
+
+        <div class="card stat orders">
+          <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/order.png" alt="Order icon" class="stat-title-icon" />
             </span>
-              <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG TUẦN NÀY</span>
-            </div>
-            <div class="stat-value" id="sOrders">0</div>
-            <div class="stat-desc">
+            <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG TUẦN NÀY</span>
+          </div>
+          <div class="stat-value" id="sOrders">0</div>
+          <div class="stat-desc">
             <span class="stat-desc-left">
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sOrdersDelta">+0%</span>
             </span>
             <span class="stat-desc-right" id="sOrdersDeltaAbs">+0 tuần này</span>
           </div>
-          </div>
-          
-          <div class="card stat bestseller">
-            <div class="stat-title">
+        </div>
+
+        <div class="card stat bestseller">
+          <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/bestseller.png" alt="Best seller icon" class="stat-title-icon" />
             </span>
-              <span data-i18n="admin.dashboard.productsSold">SẢN PHẨM ĐÃ BÁN</span>
-            </div>
+            <span data-i18n="admin.dashboard.productsSold">SẢN PHẨM ĐÃ BÁN</span>
+          </div>
           <div class="stat-value" id="sCustomers">0</div>
-            <div class="stat-desc">
+          <div class="stat-desc">
             <span class="stat-desc-left">
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sCustomersDelta">+0%</span>
             </span>
             <span class="stat-desc-right" id="sCustomersDeltaAbs">+0 tuần này</span>
           </div>
-          </div>
-          
-          <div class="card stat products">
-            <div class="stat-title">
+        </div>
+
+        <div class="card stat products">
+          <div class="stat-title">
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/product.png" alt="Product icon" class="stat-title-icon" />
             </span>
-              <span data-i18n="admin.dashboard.products">SẢN PHẨM</span>
-            </div>
-            <div class="stat-value" id="sProducts">0</div>
+            <span data-i18n="admin.dashboard.products">SẢN PHẨM</span>
+          </div>
+          <div class="stat-value" id="sProducts">0</div>
           <div class="stat-desc">
             <span class="stat-desc-left" data-i18n="admin.dashboard.inBusiness">Đang kinh doanh</span>
           </div>
-          </div>
-        </section>
+        </div>
+      </section>
 
-        <section class="grid2">
-          <div class="card chart" id="reports">
+      <section class="grid2">
+        <div class="card chart" id="reports">
           <div class="card-title" data-i18n="admin.dashboard.performance">
             Hiệu suất (Doanh thu & Chi phí)
           </div>
           <canvas id="revCostChart" height="260"></canvas>
-          </div>
+        </div>
 
-          <div class="card tasks" id="settings">
-            <div class="card-title" data-i18n="admin.dashboard.topDrinks">Top thức uống bán chạy</div>
-            <div class="chart-wrap">
-              <canvas id="catPieChart" height="220"></canvas>
-            </div>
+        <div class="card tasks" id="settings">
+          <div class="card-title" data-i18n="admin.dashboard.topDrinks">Top thức uống bán chạy</div>
+          <div class="chart-wrap">
+            <canvas id="catPieChart" height="220"></canvas>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section class="card table" id="orders">
-          <div class="card-title" data-i18n="admin.dashboard.recentOrders">Đơn hàng gần đây</div>
-          <div class="table-scroll">         
-            <table>
-              <thead>
-                <tr>
-                  <th data-i18n="admin.dashboard.orderCode">Mã</th>
-                  <th data-i18n="admin.dashboard.customer">Khách</th>
-                  <th data-i18n="admin.dashboard.time">Thời Gian</th>
-                  <th data-i18n="admin.dashboard.status">Trạng thái</th>
-                  <th data-i18n="admin.dashboard.total">Tổng</th>
-                  <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
-                  <th data-i18n="admin.dashboard.actions"></th>
-                </tr>
-              </thead>
+      <section class="card table" id="orders">
+        <div class="card-title" data-i18n="admin.dashboard.recentOrders">Đơn hàng gần đây</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="admin.dashboard.orderCode">Mã</th>
+                <th data-i18n="admin.dashboard.customer">Khách</th>
+                <th data-i18n="admin.dashboard.time">Thời Gian</th>
+                <th data-i18n="admin.dashboard.status">Trạng thái</th>
+                <th data-i18n="admin.dashboard.total">Tổng</th>
+                <th data-i18n="admin.dashboard.paymentMethod">Thanh toán</th>
+                <th data-i18n="admin.dashboard.actions"></th>
+              </tr>
+            </thead>
             <tbody id="ordersBody"></tbody>
-            </table>  
-          </div>       
-        </section>
+          </table>
+        </div>
+      </section>
 
-        <section class="card table" id="products">
+      <!-- Thống kê theo chi nhánh -->
+      <section class="card table" id="agency-stats-section">
+        <div class="card-title">Thống kê theo chi nhánh</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Chi nhánh</th>
+                <th>Số đơn hàng</th>
+                <th>Doanh thu</th>
+              </tr>
+            </thead>
+            <tbody id="agency-stats-body">
+              <tr><td colspan="3" style="text-align:center;color:#94a3b8;">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card table" id="products">
         <div class="card-title" data-i18n="admin.dashboard.productList">Danh sách sản phẩm</div>
-          <div class="card-header-block">
-            <div class="card-actions-row">
-              <button type="button" class="btn btn-add" id="btn-add-product">
-                <span class="btn-icon">+</span>
-                <span data-i18n="admin.dashboard.addProduct">Thêm sản phẩm</span>
-              </button>
-              
-              <div class="search-box">
-              <input
-                type="search"
-                id="product-search"
-                data-i18n-placeholder="admin.dashboard.searchProduct"
-                placeholder="Tìm kiếm sản phẩm..."
-                aria-label="Tìm kiếm sản phẩm"
-              />
-                <button type="button" class="search-btn" aria-label="Tìm kiếm">
+        <div class="card-header-block">
+          <div class="card-actions-row">
+            <button type="button" class="btn btn-add" id="btn-add-product">
+              <span class="btn-icon">+</span>
+              <span data-i18n="admin.dashboard.addProduct">Thêm sản phẩm</span>
+            </button>
+
+            <div class="search-box">
+              <input type="search" id="product-search" data-i18n-placeholder="admin.dashboard.searchProduct"
+                placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm sản phẩm" />
+              <button type="button" class="search-btn" aria-label="Tìm kiếm">
                 <img src="assets/icons/search.png" alt="Search" />
-                </button>
-              </div>
+              </button>
+            </div>
             <div style="flex: 1">
               <select id="category-filter" class="category-filter" aria-label="Lọc theo danh mục">
                 <option value="1">Tất cả danh mục</option>
@@ -171,38 +168,32 @@
               </select>
             </div>
             <button type="button" class="export-btn" (click)="exportProducts()">Xuất Excel</button>
-            </div>
           </div>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th data-i18n="admin.dashboard.id">ID</th>
-                  <th data-i18n="admin.dashboard.name">Tên</th>
-                  <th data-i18n="admin.dashboard.category">Danh mục</th>
-                  <th data-i18n="admin.dashboard.image">Hình ảnh</th>
-                  <th data-i18n="admin.dashboard.price">Giá</th>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="admin.dashboard.id">ID</th>
+                <th data-i18n="admin.dashboard.name">Tên</th>
+                <th data-i18n="admin.dashboard.category">Danh mục</th>
+                <th data-i18n="admin.dashboard.image">Hình ảnh</th>
+                <th data-i18n="admin.dashboard.price">Giá</th>
                 <th data-i18n="admin.dashboard.visible">Hiển thị</th>
                 <th data-i18n="admin.dashboard.actions"></th>
-                </tr>
-              </thead>
-              <tbody id="productsBody"></tbody>
-            </table>
-          </div>
-        </section>
-      </main>
-    </div>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
+</div>
 
 <!-- Modal chỉnh sửa sản phẩm -->
-<div
-  id="modal-edit-product"
-  class="modal"
-  style="display: none"
-  role="dialog"
-  aria-labelledby="edit-product-title"
-  aria-modal="true"
->
+<div id="modal-edit-product" class="modal" style="display: none" role="dialog" aria-labelledby="edit-product-title"
+  aria-modal="true">
   <div class="modal-overlay" data-close-modal></div>
   <div class="modal-container modal-add-product">
     <div class="modal-header">
@@ -217,7 +208,7 @@
           <label for="edit-product-name">Tên sản phẩm</label>
           <input type="text" id="edit-product-name" placeholder="Nhập tên sản phẩm" required />
         </div>
-        
+
         <div class="form-group">
           <label for="edit-product-category">Loại</label>
           <select id="edit-product-category" required>
@@ -271,11 +262,7 @@
       <!-- Row 4: Thông tin sản phẩm -->
       <div class="form-group">
         <label for="edit-product-desc">Thông tin sản phẩm</label>
-        <textarea 
-          id="edit-product-desc" 
-          rows="4"
-          placeholder="Nhập thông tin sản phẩm..."
-        ></textarea>
+        <textarea id="edit-product-desc" rows="4" placeholder="Nhập thông tin sản phẩm..."></textarea>
       </div>
 
       <!-- Row 5: Mô tả sản phẩm -->
@@ -287,14 +274,8 @@
       <!-- Row 6: Hình ảnh (tối đa 4 ảnh) -->
       <div class="image-upload-section">
         <label>Hình ảnh sản phẩm <span class="image-limit-hint">(tối đa 4 ảnh)</span></label>
-        
-        <input 
-          type="file" 
-          id="edit-product-image" 
-          accept="image/*" 
-          multiple
-          style="display: none"
-        />
+
+        <input type="file" id="edit-product-image" accept="image/*" multiple style="display: none" />
 
         <div class="image-preview-grid" id="edit-image-preview-grid">
           <div class="image-preview-slot" data-slot="0">
@@ -303,12 +284,7 @@
               <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
@@ -318,12 +294,7 @@
               <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
@@ -333,27 +304,17 @@
               <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
           <div class="image-preview-slot" data-slot="3">
             <div class="upload-placeholder slot-placeholder">
               <img src="assets/icons/upload.png" alt="Upload" class="upload-icon" />
-            <span class="upload-text">Tải ảnh lên</span>
+              <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
@@ -363,15 +324,11 @@
 
     <div class="modal-footer">
       <button type="button" class="btn-danger" id="btn-delete-product">
-        <span class="btn-icon"
-          ><img src="assets/icons/delete3.png" alt="" style="width: 18px; height: 18px"
-        /></span>
+        <span class="btn-icon"><img src="assets/icons/delete3.png" alt="" style="width: 18px; height: 18px" /></span>
         <span>Xóa</span>
       </button>
       <button type="submit" form="form-edit-product" class="btn-primary">
-        <span class="btn-icon"
-          ><img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px"
-        /></span>
+        <span class="btn-icon"><img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px" /></span>
         <span>Lưu</span>
       </button>
     </div>
@@ -379,49 +336,62 @@
 </div>
 
 <!-- Modal xác nhận xóa sản phẩm -->
-<div
-  id="modal-delete-confirm"
-  class="modal"
-  style="display: none"
-  role="dialog"
-  aria-labelledby="delete-title"
-  aria-modal="true"
->
+<div id="modal-delete-confirm" class="modal" style="display: none" role="dialog" aria-labelledby="delete-title"
+  aria-modal="true">
   <div class="modal-overlay" data-close-delete></div>
-  <div class="modal-container modal-confirm">
-    
+  <div class="modal-container modal-confirm modal-delete-container">
+
     <div class="modal-body modal-confirm-body">
-      <div class="modal-confirm-header">
-        <div class="confirm-icon">
-          <span class="icon-question">?</span>
-        </div>
-        <div class="confirm-text">
-          <h2 id="delete-title" class="confirm-title">XÁC NHẬN XÓA SẢN PHẨM</h2>
-          <p class="confirm-message">Sau khi xóa, bạn sẽ không thể khôi phục sản phẩm.</p>
+      <!-- Icon thùng rác -->
+      <div class="delete-modal-icon-wrap">
+        <div class="delete-modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
         </div>
       </div>
-      
+
+      <!-- Nội dung -->
+      <div class="delete-modal-content">
+        <h2 id="delete-title" class="delete-modal-title">Xác nhận xóa sản phẩm</h2>
+        <p class="delete-modal-subtitle">
+          Sản phẩm <strong id="delete-product-name" class="delete-product-name"></strong> sẽ bị xóa vĩnh viễn.
+        </p>
+        <p class="delete-modal-subtitle"> Bạn sẽ không thể khôi phục lại.</p>
+      </div>
+
+      <!-- Hành động -->
       <div class="confirm-actions">
-        <button type="button" class="btn btn-cancel" data-close-delete>
-          <img
-            src="assets/icons/delete3.png"
-            alt=""
-            style="width: 18px; height: 18px; margin-right: 6px"
-          />
+        <!-- Hủy: neutral ghost -->
+        <button type="button" class="btn btn-cancel-ghost" data-close-delete>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
           Hủy
         </button>
-        <button type="button" class="btn btn-confirm" id="btn-confirm-delete">
-          <img
-            src="assets/icons/tick2.png"
-            alt=""
-            style="width: 18px; height: 18px; margin-right: 6px"
-          />
-          Xoá sản phẩm
+
+        <!-- Xóa: đỏ danger -->
+        <button type="button" class="btn btn-danger-solid" id="btn-confirm-delete">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+          Xóa sản phẩm
         </button>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Modal chi tiết đơn hàng -->
 <div id="modal-order-detail" class="modal" style="display: none" role="dialog" aria-modal="true">
@@ -485,9 +455,7 @@
             </div>
             <div class="info-row full-width">
               <span class="info-label">Địa chỉ:</span>
-              <span class="info-value" id="customer-address"
-                >Bcons plaza, Thống Nhất, Dĩ An Bình Dương</span
-              >
+              <span class="info-value" id="customer-address">Bcons plaza, Thống Nhất, Dĩ An Bình Dương</span>
             </div>
           </div>
         </div>
@@ -502,25 +470,17 @@
         <div class="order-items-list" id="order-items">
           <!-- Item 1 -->
           <div class="order-item">
-            <img
-              src="/assets/images/products/hong-tra-dai-loan.jpg"
-              alt="Product"
-              class="item-image"
-            />
+            <img src="/assets/images/products/hong-tra-dai-loan.jpg" alt="Product" class="item-image" />
             <div class="item-details">
               <h4 class="item-name">Hồng trà đài loan</h4>
               <p class="item-specs">Kích cỡ: L, Độ ngọt: Vừa, 2x Thạch dừa nguyên vị</p>
             </div>
             <div class="item-price">25.000đ</div>
           </div>
-          
+
           <!-- Item 2 -->
           <div class="order-item">
-            <img
-              src="/assets/images/products/tra-sua-dai-loan.jpg"
-              alt="Product"
-              class="item-image"
-            />
+            <img src="/assets/images/products/tra-sua-dai-loan.jpg" alt="Product" class="item-image" />
             <div class="item-details">
               <h4 class="item-name">Trà sữa Đài Loan</h4>
               <p class="item-specs">
@@ -558,7 +518,7 @@
     <div class="modal-footer">
       <button type="button" class="btn-primary" id="btn-save-order">
         <span class="btn-icon">
-          <img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px; margin-right: 8px"/>
+          <img src="assets/icons/tick2.png" alt="" style="width: 18px; height: 18px; margin-right: 8px" />
         </span>
         <span>Lưu</span>
       </button>
@@ -582,7 +542,7 @@
           <label for="add-product-name">Tên sản phẩm</label>
           <input type="text" id="add-product-name" placeholder="Nhập tên sản phẩm" required />
         </div>
-        
+
         <div class="form-group">
           <label for="add-product-category">Loại</label>
           <select id="add-product-category" required>
@@ -636,11 +596,7 @@
       <!-- Row 4: Thông tin sản phẩm -->
       <div class="form-group">
         <label for="add-product-desc">Thông tin sản phẩm</label>
-        <textarea 
-          id="add-product-desc" 
-          rows="4"
-          placeholder="Nhập thông tin sản phẩm..."
-        ></textarea>
+        <textarea id="add-product-desc" rows="4" placeholder="Nhập thông tin sản phẩm..."></textarea>
       </div>
 
       <!-- Row 5: Mô tả sản phẩm -->
@@ -662,12 +618,7 @@
               <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
@@ -677,12 +628,7 @@
               <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
@@ -692,27 +638,17 @@
               <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
           <div class="image-preview-slot" data-slot="3">
             <div class="upload-placeholder slot-placeholder">
               <img src="assets/icons/upload.png" alt="Upload" class="upload-icon" />
-            <span class="upload-text">Tải ảnh lên</span>
+              <span class="upload-text">Tải ảnh lên</span>
             </div>
             <img src="" alt="Preview" class="slot-preview-img" style="display: none" />
-            <button
-              type="button"
-              class="slot-remove-btn"
-              aria-label="Xóa ảnh"
-              style="display: none"
-            >
+            <button type="button" class="slot-remove-btn" aria-label="Xóa ảnh" style="display: none">
               &times;
             </button>
           </div>
@@ -722,9 +658,7 @@
 
     <div class="modal-footer">
       <button type="button" class="btn-danger" data-close-add-modal>
-        <span class="btn-icon"
-          ><img src="assets/icons/delete3.png" alt="" style="width: 18px; height: 18px"
-        /></span>
+        <span class="btn-icon"><img src="assets/icons/delete3.png" alt="" style="width: 18px; height: 18px" /></span>
         <span>Hủy bỏ</span>
       </button>
       <button type="submit" form="form-add-product" class="btn-primary">
@@ -736,14 +670,8 @@
 </div>
 
 <!-- Modal thành công -->
-<div
-  id="modal-success"
-  class="modal"
-  style="display: none"
-  role="dialog"
-  aria-labelledby="success-message"
-  aria-modal="true"
->
+<div id="modal-success" class="modal" style="display: none" role="dialog" aria-labelledby="success-message"
+  aria-modal="true">
   <div class="modal-overlay" data-close-success></div>
   <div class="modal-container modal-confirm modal-success-container">
     <div class="modal-body modal-confirm-body">
@@ -760,25 +688,20 @@
         <button type="button" class="btn btn-confirm" id="btn-close-success">
           <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
           Đóng
-      </button>
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Modal thông báo (giống cart alert) -->
-<div
-  id="modal-alert"
-  class="modal alert-overlay"
-  style="display: none"
-  role="dialog"
-  aria-labelledby="alert-title"
-  aria-modal="true"
->
+<div id="modal-alert" class="modal alert-overlay" style="display: none" role="dialog" aria-labelledby="alert-title"
+  aria-modal="true">
   <div class="alert-overlay-backdrop" data-close-alert></div>
   <div class="alert-dialog alert-info">
     <div class="alert-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <path d="M9 12l2 2 4-4"></path>
       </svg>
@@ -793,4 +716,3 @@
 
 <!-- ===== Toast Notifications ===== -->
 <div class="toast-wrap" id="admin-toast-wrap"></div>
-

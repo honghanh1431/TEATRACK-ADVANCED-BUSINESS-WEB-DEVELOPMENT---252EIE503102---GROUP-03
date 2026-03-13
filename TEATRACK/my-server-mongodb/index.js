@@ -8,8 +8,8 @@ const morgan = require("morgan");
 app.use(morgan("combined"));
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 const cors = require("cors");
 app.use(cors());
@@ -85,6 +85,11 @@ app.use('/api/orders', orderRoutes);
 
 const cartRoutes = require('./routes/cartRoutes');
 app.use('/api/cart', cartRoutes);
+
+const agencyRoutes = require('./routes/agencyRoutes');
+agencyRoutes.init(database);
+app.use('/api/agencies', agencyRoutes.router);
+
 
 app.listen(port, () => {
   console.log(`My Server listening on port ${port}`);

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { Payment } from '../payment/payment';
 import { CartService } from '../../cart.service';
 import { OrderService } from '../../order.service';
@@ -68,6 +69,7 @@ export class Cart implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private cartService: CartService,
     private orderService: OrderService,
+    private http: HttpClient,
   ) { }
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
@@ -202,6 +204,11 @@ export class Cart implements OnInit, OnDestroy {
     // Xử lý đường dẫn ảnh
     return '/' + imagePath.replace(/^\//, '');
   }
+
+  // Agency (chi nhánh giao hàng)
+  agencies: { _id: string; name: string }[] = [];
+  selectedAgency = '';
+  private readonly API_BASE = 'http://localhost:3002';
 
   // State variables
   cartItems: CartItem[] = [];
@@ -338,11 +345,9 @@ export class Cart implements OnInit, OnDestroy {
     this.updateShippingFields();
     this.setupStorageListener();
     this.startScanTimerIfNeeded();
-    // Đồng bộ giỏ hàng từ server khi trang load (nếu user đã đăng nhập)
     this.syncCartFromServer();
-    // Lắng nghe sự kiện đăng nhập để load giỏ từ server
+    this.loadAgencies();
     window.addEventListener('user-login', this.handleUserLogin);
-    // Lắng nghe khi user cập nhật profile → đồng bộ thông tin giao hàng
     window.addEventListener('user:updated', this.handleUserUpdated);
   }
 
@@ -478,6 +483,17 @@ export class Cart implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => console.error('Failed to fetch cart from server', err)
+    });
+  }
+
+  /** Load danh sách chi nhánh từ API */
+  private loadAgencies(): void {
+    this.http.get<{ _id: string; name: string }[]>(`${this.API_BASE}/api/agencies`).subscribe({
+      next: (data) => {
+        this.agencies = data || [];
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.warn('Cannot load agencies:', err)
     });
   }
 
@@ -955,6 +971,7 @@ export class Cart implements OnInit, OnDestroy {
       customerName: this.shippingInfo.receiver || (user ? user.username : 'Khách hàng'),
       customerPhone: this.shippingInfo.phone || '0123456789',
       customerAddress: this.shippingInfo.address || '',
+      deliveryAgency: this.selectedAgency || '',
       paymentMethod: paymentLabel,
       status,
       subtotal: this.totals.subtotal,

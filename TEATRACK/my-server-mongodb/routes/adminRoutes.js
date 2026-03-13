@@ -129,4 +129,32 @@ router.put('/orders/:id/status', async (req, res) => {
   }
 });
 
-module.exports = router;
+// @desc    Thống kê đơn hàng và doanh thu theo chi nhánh (admin)
+// @route   GET /api/admin/orders/agency-stats
+router.get('/orders/agency-stats', async (req, res) => {
+  try {
+    const stats = await Order.collection().aggregate([
+      {
+        $group: {
+          _id: '$deliveryAgency',
+          count: { $sum: 1 },
+          revenue: { $sum: '$total' }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]).toArray();
+
+    // Chuẩn hóa: null / undefined → "Chưa xác định"
+    const normalized = stats.map(s => ({
+      agency: s._id || 'Chưa xác định',
+      count: s.count,
+      revenue: s.revenue || 0
+    }));
+
+    res.json(normalized);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+module.exports = router;

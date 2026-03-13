@@ -29,6 +29,23 @@
               </button>
             </div>
           </ng-container>
+
+          <!-- Chi nhánh giao hàng -->
+          <div class="shipping-row">
+            <div class="row-body">
+              <dt>Chi nhánh giao hàng</dt>
+              <dd>
+                <select
+                  name="deliveryAgency"
+                  [(ngModel)]="selectedAgency"
+                  style="width:100%; padding: 6px 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px;"
+                >
+                  <option value="">-- Chọn chi nhánh --</option>
+                  <option *ngFor="let ag of agencies" [value]="ag.name">{{ ag.name }}</option>
+                </select>
+              </dd>
+            </div>
+          </div>
         </dl>
       </article>
 
