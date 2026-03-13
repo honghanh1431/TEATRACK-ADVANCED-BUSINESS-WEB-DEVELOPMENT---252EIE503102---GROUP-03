@@ -406,7 +406,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     if (!filtered.length) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" style="text-align:center;padding:40px;color:#fffff;">Không có đơn hàng nào</td>
+          <td colspan="9" style="text-align:center;padding:40px;color:#fffff;">Không có đơn hàng nào</td>
         </tr>
       `;
       return;

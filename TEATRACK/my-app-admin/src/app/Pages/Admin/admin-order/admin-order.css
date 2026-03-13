@@ -103,19 +103,20 @@
   .order-stats {
     display: flex;
     gap: 0;
-    margin: 0 -24px;
+    margin: 10px -24px 0;
+    margin-bottom: 0;
+    padding: 0;
     background: transparent;
     border-radius: 0;
     overflow: visible;
     box-shadow: none;
-    padding: 10px 24px 0;
     position: relative;
   }
   
   .stat-card {
     background: #0088ff;
     border-radius: 16px 16px 0 0;
-    padding: 16px 20px;
+    padding: 16px 24px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -177,7 +178,6 @@
     color: white;
   }
   
-  /* Override hover for inactive tabs */
   .stat-card:not(.active):hover {
     background: #1d4ed8;
     transform: translateY(4px);
@@ -195,7 +195,7 @@
   }
   
   .stat-label {
-    font-size: 18px;
+    font-size: 17px;
     color: #1f2937;
     font-weight: 800;
     margin-bottom: 4px;
@@ -227,11 +227,11 @@
     color: rgba(255,255,255,0.9);
   }
   
-  /* Bộ lọc */
   .order-filters {
+    margin: 0 -24px;
     background: #fff;
-    border-radius: 20px;
-    padding: 16px 20px 20px;
+    margin-top: -10px;
+    padding: 30px 20px 20px;
     margin-bottom: 0;
     display: flex;
     flex-direction: column;
@@ -293,7 +293,13 @@
   .filter-input-round:focus {
     border-color: #0088ff;
   }
-  
+
+  #filter-order-id {
+    width: 200px;
+    max-width: 200px;
+    flex-shrink: 0;
+  }
+
   /* Search box container */
   #search-order {
     padding-right: 40px;
@@ -338,7 +344,7 @@
   .card.table {
     background: #fff;
     border: none;
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 0;
     box-shadow: 0 4px 24px rgba(0, 136, 255, 0.08);
     margin: 0;
@@ -352,7 +358,7 @@
     background: #fff;
     border: none;
     box-shadow: 0 4px 24px rgba(0, 136, 255, 0.08);
-    border-radius: 20px;
+    border-radius: 16px;
     margin: 0;
     overflow: hidden;
   }
@@ -475,8 +481,12 @@
   }
   #orders table th:nth-child(8),
   #orders table td:nth-child(8) {
-    min-width: 52px;
-    width: 1%;
+    min-width: 100px;
+    text-align: center;
+  }
+  #orders table th:nth-child(9),
+  #orders table td:nth-child(9) {
+    min-width: 80px;
     text-align: center;
   }
   #orders table thead th:nth-child(1),
