@@ -62,6 +62,8 @@ export class Profile implements OnInit, OnDestroy {
   showLogoutModal = false;
   showAvatarModal = false;
   showSavedModal = false;
+  showErrorModal = false;
+  errorModalMessage = '';
 
   // Thêm biến loading để tránh double click
   isSaving = false;
@@ -232,8 +234,9 @@ export class Profile implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Lỗi cập nhật:', err);
         this.isSaving = false;
-        // Hiển thị lỗi (bạn có thể dùng một biến errorMessage để hiển thị trên giao diện)
-        alert('Cập nhật thất bại: ' + (err.error?.message || 'Lỗi không xác định'));
+        this.errorModalMessage = err.error?.message || 'Lỗi không xác định';
+        this.showErrorModal = true;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -490,6 +493,11 @@ export class Profile implements OnInit, OnDestroy {
 
   closeSavedModal(): void {
     this.showSavedModal = false;
+  }
+
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+    this.errorModalMessage = '';
   }
 
   // Password visibility toggle methods
