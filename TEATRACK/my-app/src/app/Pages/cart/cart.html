@@ -38,9 +38,9 @@
                 <select
                   name="deliveryAgency"
                   [(ngModel)]="selectedAgency"
-                  style="width:100%; padding: 6px 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px;"
+                  class="shipping-select"
                 >
-                  <option value="">-- Chọn chi nhánh --</option>
+                  <option value="">Chọn chi nhánh</option>
                   <option *ngFor="let ag of agencies" [value]="ag.name">{{ ag.name }}</option>
                 </select>
               </dd>
