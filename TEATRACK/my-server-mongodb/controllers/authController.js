@@ -63,6 +63,8 @@ const login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    await User.recordLogin(user._id);
+
     const { password: _, ...userWithoutPassword } = user;
     res.json({ message: 'Login successful', token, user: userWithoutPassword });
   } catch (error) {
@@ -231,6 +233,8 @@ const adminLogin = async (req, res) => {
       JWT_SECRET,
       { expiresIn: '7d' }
     );
+
+    await User.recordLogin(user._id);
 
     const { password: _, ...userWithoutPassword } = user;
     res.json({

@@ -1,7 +1,8 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 export interface Account {
-  id: number;
+  id: string | number;
   name: string;
   username: string;
   email: string;
@@ -11,6 +12,7 @@ export interface Account {
   address: string;
   createdAt: string;
   avatar?: string;
+  loginHistory?: string[];
 }
 
 const AVATAR_COLORS: [string, string, string][] = [
@@ -41,9 +43,9 @@ const MOCK_ACCOUNTS: Account[] = [
   styleUrl: './admin-account.css',
 })
 export class AdminAccount implements OnInit {
-  accounts: Account[] = [...MOCK_ACCOUNTS];
+  accounts: Account[] = [];
   filteredAccounts: Account[] = [];
-  selectedIds = new Set<number>();
+  selectedIds = new Set<string | number>();
 
   searchQuery = '';
   roleFilter = '';
@@ -56,7 +58,7 @@ export class AdminAccount implements OnInit {
   showAlert = false;
   alertMessage = '';
 
-  targetId: number | null = null;
+  targetId: string | number | null = null;
   lockAction: 'lock' | 'unlock' = 'lock';
 
   editModalTitle = 'Chỉnh sửa tài khoản';
@@ -91,10 +93,98 @@ export class AdminAccount implements OnInit {
     error: 'assets/icons/lock.png',
   };
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.filterTable();
+    this.fetchUsers();
+  }
+
+  get newAccountsThisMonth(): number {
+    const now = new Date();
+    return this.accounts.filter(a => {
+      if (!a.createdAt) return false;
+      const d = new Date(a.createdAt);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+  }
+
+  get newVipsThisWeek(): number {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    return this.accounts.filter(a => {
+      if (a.role !== 'vip customer' || !a.createdAt) return false;
+      const d = new Date(a.createdAt);
+      return d >= oneWeekAgo;
+    }).length;
+  }
+
+  get loginsToday(): number {
+    const now = new Date();
+    return this.accounts.reduce((sum, a) => {
+      if (!a.loginHistory) return sum;
+      return sum + a.loginHistory.filter(dStr => {
+        const d = new Date(dStr);
+        return !isNaN(d.getTime()) && d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }).length;
+    }, 0);
+  }
+
+  get loginsYesterday(): number {
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    return this.accounts.reduce((sum, a) => {
+      if (!a.loginHistory) return sum;
+      return sum + a.loginHistory.filter(dStr => {
+        const d = new Date(dStr);
+        return !isNaN(d.getTime()) && d.getDate() === yesterday.getDate() && d.getMonth() === yesterday.getMonth() && d.getFullYear() === yesterday.getFullYear();
+      }).length;
+    }, 0);
+  }
+
+  get loginsGrowthPercentage(): string {
+    const today = this.loginsToday;
+    const yesterday = this.loginsYesterday;
+    if (yesterday === 0) return today > 0 ? '+100' : '0';
+    const growth = ((today - yesterday) / yesterday) * 100;
+    return (growth > 0 ? '+' : '') + Math.round(growth);
+  }
+
+  fetchUsers(): void {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.accounts = [...MOCK_ACCOUNTS];
+      this.filterTable();
+      return;
+    }
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    this.http.get<{users: any[]}>('http://localhost:3002/api/admin/users', { headers }).subscribe({
+      next: (res) => {
+        if (res.users && Array.isArray(res.users)) {
+          this.accounts = res.users.map(u => ({
+            id: u._id || u.id,
+            name: u.name || u.username,
+            username: u.username,
+            email: u.email,
+            role: u.role || 'normal customer',
+            status: u.status || 'active',
+            phone: u.phone || '',
+            address: u.address || '',
+            createdAt: u.createdAt || new Date().toISOString(),
+            avatar: u.avatar || '',
+            loginHistory: u.loginHistory || []
+          }));
+        } else {
+          this.accounts = [...MOCK_ACCOUNTS];
+        }
+        this.filterTable();
+      },
+      error: (err) => {
+        console.error('Failed to load real users data, fallback to mock', err);
+        this.accounts = [...MOCK_ACCOUNTS];
+        this.filterTable();
+      }
+    });
   }
 
   getInitials(acc: Account): string {
@@ -128,7 +218,7 @@ export class AdminAccount implements OnInit {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
-  isSelected(id: number): boolean {
+  isSelected(id: string | number): boolean {
     return this.selectedIds.has(id);
   }
 
@@ -147,7 +237,7 @@ export class AdminAccount implements OnInit {
     this.cdr.detectChanges();
   }
 
-  toggleRow(id: number, checked: boolean): void {
+  toggleRow(id: string | number, checked: boolean): void {
     if (checked) this.selectedIds.add(id);
     else this.selectedIds.delete(id);
     this.cdr.detectChanges();
@@ -232,10 +322,28 @@ export class AdminAccount implements OnInit {
       acc.phone = this.editPhone.trim();
       acc.address = this.editAddress.trim();
       acc.role = this.editRole;
-      if (this.editAvatarPreview) acc.avatar = this.editAvatarPreview;
-      else delete acc.avatar;
+      const payload = {
+        name,
+        username: acc.username,
+        email: acc.email,
+        phone: acc.phone,
+        address: acc.address,
+        role: acc.role,
+        ...(this.editAvatarPreview ? { avatar: this.editAvatarPreview } : {})
+      };
+      
+      const token = localStorage.getItem('token');
+      if (token) {
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+        this.http.put(`http://localhost:3002/api/admin/users/${this.targetId}`, payload, { headers }).subscribe({
+          next: () => console.log('User saved to DB'),
+          error: (err) => console.error('Failed saving user', err)
+        });
+      }
+
       this.showToastWithBold('success', [{ text: 'Đã cập nhật tài khoản ' }, { text: `"${this.editName}" (@${this.editUsername})`, bold: true }, { text: ' thành công' }]);
     } else {
+      // Create is handled in another way or not implemented in backend, we'll keep local behavior
       this.accounts.unshift({
         id: Date.now(),
         name,
@@ -249,6 +357,7 @@ export class AdminAccount implements OnInit {
         ...(this.editAvatarPreview ? { avatar: this.editAvatarPreview } : {}),
       });
       this.showToast('success', 'Đã tạo tài khoản mới');
+      // For a real app, we should POST to backend.
     }
     this.closeEditModal();
     this.filterTable();
@@ -279,6 +388,17 @@ export class AdminAccount implements OnInit {
     const name = this.deleteTargetName;
     this.accounts = this.accounts.filter((a) => a.id !== this.targetId);
     this.selectedIds.delete(this.targetId);
+    
+    // Sync with backend
+    const token = localStorage.getItem('token');
+    if (token && this.targetId) {
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      this.http.delete(`http://localhost:3002/api/admin/users/${this.targetId}`, { headers }).subscribe({
+        next: () => console.log('User deleted from DB'),
+        error: (err) => console.error('Failed to delete user', err)
+      });
+    }
+
     this.showDeleteModal = false;
     this.targetId = null;
     this.filterTable();
@@ -306,7 +426,18 @@ export class AdminAccount implements OnInit {
     if (this.targetId == null) return;
     const name = this.lockTargetName;
     const acc = this.accounts.find((a) => a.id === this.targetId)!;
+    
+    // Attempt local update
     acc.status = this.lockAction === 'lock' ? 'locked' : 'active';
+    
+    // In real app, call PUT /api/admin/users/:id
+    const token = localStorage.getItem('token');
+    if (token && this.targetId) {
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      // Using generic update since status isn't individually exposed, but depends on backend support
+      this.http.put(`http://localhost:3002/api/admin/users/${this.targetId}`, { status: acc.status }, { headers }).subscribe();
+    }
+    
     this.showLockModal = false;
     this.targetId = null;
     this.filterTable();
@@ -330,6 +461,16 @@ export class AdminAccount implements OnInit {
     if (this.targetId == null) return;
     const acc = this.accounts.find((a) => a.id === this.targetId)!;
     acc.role = 'vip customer';
+    // Sync with backend
+    const token = localStorage.getItem('token');
+    if (token && typeof this.targetId === 'string') {
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      this.http.put(`http://localhost:3002/api/admin/users/${this.targetId}/role`, { role: 'vip customer' }, { headers }).subscribe({
+        next: () => console.log('Role updated on server'),
+        error: (err) => console.error('Failed to update role on server', err)
+      });
+    }
+
     this.showVipModal = false;
     this.targetId = null;
     this.filterTable();
@@ -347,10 +488,20 @@ export class AdminAccount implements OnInit {
   }
 
   bulkVip(): void {
+    const token = localStorage.getItem('token');
+    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
+    
     this.selectedIds.forEach((id) => {
       const a = this.accounts.find((x) => x.id === id);
-      if (a) a.role = 'vip customer';
+      if (a) {
+        a.role = 'vip customer';
+        // Sync with backend
+        if (headers && typeof id === 'string') {
+          this.http.put(`http://localhost:3002/api/admin/users/${id}/role`, { role: 'vip customer' }, { headers }).subscribe();
+        }
+      }
     });
+    
     const n = this.selectedIds.size;
     this.selectedIds.clear();
     this.filterTable();
@@ -362,10 +513,20 @@ export class AdminAccount implements OnInit {
   }
 
   bulkLock(): void {
+    const token = localStorage.getItem('token');
+    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
+
     this.selectedIds.forEach((id) => {
       const a = this.accounts.find((x) => x.id === id);
-      if (a) a.status = 'locked';
+      if (a) {
+        a.status = 'locked';
+        // Sync with backend
+        if (headers && id) {
+          this.http.put(`http://localhost:3002/api/admin/users/${id}`, { status: 'locked' }, { headers }).subscribe();
+        }
+      }
     });
+
     const n = this.selectedIds.size;
     this.selectedIds.clear();
     this.filterTable();
@@ -377,6 +538,17 @@ export class AdminAccount implements OnInit {
   }
 
   bulkDelete(): void {
+    const token = localStorage.getItem('token');
+    const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
+
+    if (headers) {
+      this.selectedIds.forEach((id) => {
+        if (id) {
+          this.http.delete(`http://localhost:3002/api/admin/users/${id}`, { headers }).subscribe();
+        }
+      });
+    }
+
     const count = this.selectedIds.size;
     this.accounts = this.accounts.filter((a) => !this.selectedIds.has(a.id));
     this.selectedIds.clear();

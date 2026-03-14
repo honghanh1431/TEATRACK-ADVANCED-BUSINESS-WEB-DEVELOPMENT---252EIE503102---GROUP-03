@@ -177,7 +177,7 @@
     <div class="modal-container modal-add-product" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2 class="modal-title">{{ editing ? 'CHỈNH SỬA BÀI VIẾT' : 'THÊM BÀI VIẾT' }}</h2>
-        <button type="button" class="modal-close" (click)="closeModal()" aria-label="Đóng">&times;</button>
+        <button type="button" class="modal-close" (click)="tryCloseModal()" aria-label="Đóng">&times;</button>
         <p class="modal-subtitle">{{ editing ? 'Cập nhật thông tin bài viết.' : 'Thêm bài viết mới vào diễn đàn.' }}</p>
       </div>
 
@@ -269,7 +269,7 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-danger" type="button" (click)="closeModal()">Hủy bỏ</button>
+          <button class="btn-danger" type="button" (click)="tryCloseModal()">Hủy bỏ</button>
           <button class="btn-primary" type="submit">{{ editing ? 'Lưu' : 'Thêm' }}</button>
         </div>
       </form>

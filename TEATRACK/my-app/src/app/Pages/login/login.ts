@@ -101,7 +101,7 @@ export class Login implements OnInit {
       next: (res) => {
         this.isLoading = false;
 
-        if (res.user.role !== 'customer') {
+        if (res.user.role === 'admin') {
           this.showError(this.currentLang === 'vi'
             ? 'Vui lòng đăng nhập tại trang quản lý.'
             : 'Please login at the admin page.');

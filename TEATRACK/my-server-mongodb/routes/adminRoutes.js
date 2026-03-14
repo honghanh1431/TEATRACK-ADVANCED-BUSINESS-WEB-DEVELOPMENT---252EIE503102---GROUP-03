@@ -58,7 +58,7 @@ router.delete('/products/:id', async (req, res) => {
 // @route   GET /api/admin/users
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.findUsersByRole('customer'); // Chỉ lấy customer
+    const users = await User.collection().find({}).toArray(); // Lấy tất cả user
     const usersWithoutPassword = users.map(user => {
       const { password, ...userWithoutPassword } = user;
       return userWithoutPassword;
@@ -74,7 +74,7 @@ router.get('/users', async (req, res) => {
 router.put('/users/:id/role', async (req, res) => {
   try {
     const { role } = req.body;
-    if (!['customer', 'admin'].includes(role)) {
+    if (!['customer', 'admin', 'vip customer', 'normal customer'].includes(role)) {
       return res.status(400).json({ message: 'Invalid role' });
     }
 
@@ -89,12 +89,30 @@ router.put('/users/:id/role', async (req, res) => {
   }
 });
 
+// @desc    Update user details (admin)
+// @route   PUT /api/admin/users/:id
+router.put('/users/:id', async (req, res) => {
+  try {
+    const updated = await User.updateUserById(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // @desc    Delete user (admin)
 // @route   DELETE /api/admin/users/:id
 router.delete('/users/:id', async (req, res) => {
   try {
-    // TODO: Implement delete user (soft delete recommended)
-    res.json({ message: 'Delete user - TODO' });
+    const { ObjectId } = require('mongodb');
+    const result = await User.collection().deleteOne({ _id: new ObjectId(req.params.id) });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -115,15 +133,28 @@ router.get('/orders', async (req, res) => {
 // @route   PUT /api/admin/orders/:id/status
 router.put('/orders/:id/status', async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, deliveryAgency } = req.body;
     const orderId = req.params.id; // Có thể là _id hoặc id custom
 
-    const updated = await Order.updateOrderStatus(orderId, status);
-    if (!updated) {
+    const { ObjectId } = require('mongodb');
+    let filter;
+    try {
+      filter = { _id: new ObjectId(orderId) };
+    } catch (e) {
+      filter = { id: orderId };
+    }
+
+    let updateFields = { updatedAt: new Date() };
+    if (status !== undefined) updateFields.status = status;
+    if (deliveryAgency !== undefined) updateFields.deliveryAgency = deliveryAgency;
+
+    const result = await Order.collection().updateOne(filter, { $set: updateFields });
+
+    if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    res.json({ message: 'Order status updated successfully' });
+    res.json({ message: 'Order details updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

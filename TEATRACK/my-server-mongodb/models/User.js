@@ -39,7 +39,7 @@ const createUser = async (userData) => {
 const updateUserById = async (id, updateData) => {
   const users = collection();
   // Loại bỏ các trường không được phép sửa
-  const allowed = ['name', 'email', 'phone', 'address', 'dob', 'gender', 'avatar', 'username', 'password'];
+  const allowed = ['name', 'email', 'phone', 'address', 'dob', 'gender', 'avatar', 'username', 'password', 'role', 'status'];
   const update = {};
   for (let key of allowed) {
     if (updateData[key] !== undefined) update[key] = updateData[key];
@@ -89,6 +89,21 @@ const updatePassword = async (email, hashedPassword) => {
   return await users.updateOne({ email }, { $set: { password: hashedPassword } });
 };
 
+const recordLogin = async (id) => {
+  const users = collection();
+  try {
+    await users.updateOne(
+      { _id: new ObjectId(id) },
+      { 
+        $set: { lastLogin: new Date() },
+        $push: { loginHistory: new Date() }
+      }
+    );
+  } catch (err) {
+    console.error('Lỗi khi recordLogin:', err);
+  }
+};
+
 module.exports = {
   init,
   createUser,
@@ -99,5 +114,6 @@ module.exports = {
   findUsersByRole,
   updateUserById,
   updatePassword,
+  recordLogin,
   collection
 };

@@ -16,7 +16,7 @@
       <div class="stat-desc">
         <span class="stat-desc-left">
           <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
-          <span>+12</span>
+          <span>+{{ newAccountsThisMonth }}</span>
         </span>
         <span class="stat-desc-right">so với tháng trước</span>
       </div>
@@ -32,7 +32,7 @@
       <div class="stat-desc">
         <span class="stat-desc-left">
           <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
-          <span>+5</span>
+          <span>+{{ newVipsThisWeek }}</span>
         </span>
         <span class="stat-desc-right">tuần này</span>
       </div>
@@ -46,7 +46,7 @@
       </div>
       <div class="stat-value">{{ accounts.filter(a => a.status === 'locked').length }}</div>
       <div class="stat-desc">
-        <span class="stat-desc-left">3 yêu cầu mở khoá</span>
+        <span class="stat-desc-left">{{ accounts.filter(a => a.status === 'locked').length }} yêu cầu mở khoá</span>
       </div>
     </div>
     <div class="card stat stat-activity">
@@ -56,11 +56,11 @@
         </span>
         <span>HOẠT ĐỘNG HÔM NAY</span>
       </div>
-      <div class="stat-value">341</div>
+      <div class="stat-value">{{ loginsToday }}</div>
       <div class="stat-desc">
-        <span class="stat-desc-left">
-          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
-          <span>+18%</span>
+        <span class="stat-desc-left" [style.color]="loginsGrowthPercentage.startsWith('-') ? '#ff4f6a' : '#4fffb0'">
+          <img *ngIf="!loginsGrowthPercentage.startsWith('-')" src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>{{ loginsGrowthPercentage }}%</span>
         </span>
         <span class="stat-desc-right">so với hôm qua</span>
       </div>

@@ -41,6 +41,7 @@ interface Order {
   subtotal?: number;
   shippingFee?: number;
   discount?: number;
+  deliveryAgency?: string;
 }
 
 interface Product {
@@ -512,83 +513,110 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyDashboardFilter(): void {
-    if (!this.dashboardData?.data) return;
-    const branch =
-      typeof localStorage !== 'undefined' ? localStorage.getItem('admin_branch') || 'all' : 'all';
+    const branch = typeof localStorage !== 'undefined' ? localStorage.getItem('admin_branch') || 'all' : 'all';
     let month = typeof localStorage !== 'undefined' ? localStorage.getItem('admin_month') : '';
     if (!month) {
       const now = new Date();
       month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }
-    const byBranch = this.dashboardData.data[branch];
-    const byMonth = byBranch?.[month];
-    const slice = byMonth ?? this.dashboardData.data['all']?.[month];
-    const fallbackMonth = Object.keys(this.dashboardData.data['all'] || {})[0] || month;
-    const s =
-      slice ??
-      this.dashboardData.data[branch]?.[fallbackMonth] ??
-      this.dashboardData.data['all']?.[fallbackMonth];
-    if (!s) return;
 
-    const fmtDelta = (delta: number) => `${delta >= 0 ? '+' : ''}${delta}%`;
-    const fmtRevenueAbs = (diff: number) => {
-      const abs = Math.abs(diff);
-      if (abs >= 1e6) return (diff >= 0 ? '+' : '-') + (abs / 1e6).toFixed(1) + ' tr';
-      if (abs >= 1000) return (diff >= 0 ? '+' : '-') + (abs / 1000).toFixed(1) + 'k';
-      return (diff >= 0 ? '+' : '') + diff;
+    const branchMap: Record<string, string> = {
+      all: 'all',
+      '1': '244 đường số 8 - H071',
+      '2': '60 đường Nguyễn An Ninh - H246',
+      '3': '24 đường Lý Thường Kiệt - H033',
     };
-    const setDeltaColor = (el: Element | null, delta: number) => {
-      if (el) (el as HTMLElement).style.color = delta >= 0 ? 'rgba(255,255,255,0.95)' : '#ffc9c9';
+    const targetAgency = branchMap[branch] || 'all';
+
+    const agencyOrders = this.ORDERS_ALL.filter(o => 
+      targetAgency === 'all' || o.deliveryAgency === targetAgency
+    );
+
+    const parsed = month.split('-').map(Number);
+    const selYear = parsed[0];
+    const selMonth = parsed[1];
+
+    const monthlyRevenue = new Array(12).fill(0);
+    const monthlyCost = new Array(12).fill(0);
+    const categoryRevenue: Record<string, number> = {};
+    let totalPieRev = 0;
+
+    const getProductCategory = (id: string, name: string) => {
+      const p = this.PRODUCTS_ALL.find(x => x.id === id);
+      if (p && p.category) return p.category;
+      if (p && p.type) return p.type;
+      const nm = name.toLowerCase();
+      if (nm.includes('sữa')) return 'Loại Trà Sữa';
+      if (nm.includes('latte')) return 'Loại Trà Latte';
+      if (nm.includes('trái cây')) return 'Loại Trà Trái Cây';
+      if (nm.includes('hot')) return 'Thức Uống Hot';
+      if (nm.includes('mới')) return 'Thức Uống Mới';
+      return 'Loại Thuần Trà';
     };
 
-    const el = (id: string) => document.getElementById(id);
-    if (el('sRevenue')) el('sRevenue')!.textContent = this.fmtMoney(s.revenue);
-    if (el('sOrders')) el('sOrders')!.textContent = String(s.ordersCount) + ' ĐƠN';
-    if (el('sCustomers')) el('sCustomers')!.textContent = String(s.productsSold) + ' SẢN PHẨM';
-    if (el('sRevenueDelta')) {
-      el('sRevenueDelta')!.textContent = fmtDelta(s.revenueDelta);
-      setDeltaColor(el('sRevenueDelta'), s.revenueDelta);
-    }
-    if (el('sRevenueDeltaAbs'))
-      el('sRevenueDeltaAbs')!.textContent = fmtRevenueAbs(s.revenueDiff) + ' tuần này';
-    if (el('sOrdersDelta')) {
-      el('sOrdersDelta')!.textContent = fmtDelta(s.ordersDelta);
-      setDeltaColor(el('sOrdersDelta'), s.ordersDelta);
-    }
-    if (el('sOrdersDeltaAbs'))
-      el('sOrdersDeltaAbs')!.textContent =
-        (s.ordersDiff >= 0 ? '+' : '') + s.ordersDiff + ' tuần này';
-    if (el('sCustomersDelta')) {
-      el('sCustomersDelta')!.textContent = fmtDelta(s.productsSoldDelta);
-      setDeltaColor(el('sCustomersDelta'), s.productsSoldDelta);
-    }
-    if (el('sCustomersDeltaAbs')) {
-      const absStr =
-        Math.abs(s.productsSoldDiff) >= 1000
-          ? (s.productsSoldDiff >= 0 ? '+' : '-') +
-          (Math.abs(s.productsSoldDiff) / 1000).toFixed(1) +
-          'k'
-          : (s.productsSoldDiff >= 0 ? '+' : '') + s.productsSoldDiff;
-      el('sCustomersDeltaAbs')!.textContent = absStr + ' tuần này';
-    }
+    agencyOrders.forEach(o => {
+      if (o.status === 'cancelled') return; // Không tính doanh thu cho đơn hủy
+      const d = new Date(o.date || o.createdAt || 0);
+      const y = d.getFullYear();
+      const m = d.getMonth();
+      const rev = Number(o.total) || Number((o as any).totalAmount) || 0;
+      
+      if (y === selYear) {
+        monthlyRevenue[m] += rev;
+        monthlyCost[m] += rev * 0.7; // Giả lập chi phí 70%
+        
+        if (m + 1 === selMonth) {
+          (o.items || []).forEach((item: any) => {
+             const cat = getProductCategory(item.productId || item.id, item.name || item.productName || '');
+             const qty = item.qty ?? item.quantity ?? 1;
+             const price = item.price || 0;
+             const itemRev = qty * price;
+             categoryRevenue[cat] = (categoryRevenue[cat] || 0) + itemRev;
+             totalPieRev += itemRev;
+          });
+        }
+      }
+    });
 
     const lineChart = this.chartInstances[0];
-    if (lineChart && s.lineChart) {
-      lineChart.data.labels = s.lineChart.labels;
-      lineChart.data.datasets[0].data = s.lineChart.revenue;
-      lineChart.data.datasets[1].data = s.lineChart.cost;
+    if (lineChart) {
+      lineChart.data.datasets[0].data = monthlyRevenue.map(v => v / 1000000);
+      lineChart.data.datasets[1].data = monthlyCost.map(v => v / 1000000);
       lineChart.update();
     }
+
     const pieChart = this.chartInstances[1];
-    if (pieChart && s.doughnut) {
-      pieChart.data.datasets[0].data = s.doughnut.data;
-      if (pieChart.options)
-        (pieChart.options as any).centerDisplay = {
-          value: s.doughnut.centerValue,
-          unit: s.doughnut.centerUnit,
-        };
+    if (pieChart) {
+      const labels = Object.keys(categoryRevenue);
+      const dataValues = Object.values(categoryRevenue);
+      if (labels.length === 0) {
+        pieChart.data.labels = ['Chưa có dữ liệu'];
+        pieChart.data.datasets[0].data = [1];
+        pieChart.data.datasets[0].backgroundColor = ['#ccc'];
+      } else {
+        pieChart.data.labels = labels;
+        pieChart.data.datasets[0].data = dataValues;
+        const colors = ['#0088ff', '#1e5a9e', '#e8e8e8', '#1596D5', '#72D5EC', '#ffffff'];
+        pieChart.data.datasets[0].backgroundColor = labels.map((_, i) => colors[i % colors.length]);
+      }
+      
+      let formatTotal = totalPieRev.toString();
+      let unit = 'VND';
+      if (totalPieRev >= 1000000) {
+          formatTotal = (totalPieRev/1000000).toFixed(1);
+          unit = 'Tr VND';
+      } else if (totalPieRev >= 1000) {
+          formatTotal = (totalPieRev/1000).toFixed(1);
+          unit = 'K VND';
+      }
+
+      if (pieChart.options) {
+        (pieChart.options as any).centerDisplay = { value: formatTotal, unit: unit };
+      }
       pieChart.update();
     }
+    
+    this.updateOrdersStats(agencyOrders, selYear, selMonth);
   }
 
   fetchOrders(): void {
@@ -764,65 +792,119 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       .join('');
   }
 
-  updateOrdersStats(): void {
-    const today = new Date();
-    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const dayOfWeek = today.getDay();
-    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    const weekStart = new Date(todayMidnight);
-    weekStart.setDate(weekStart.getDate() - daysToMonday);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-    const weekOrders = this.ORDERS_ALL.filter((o) => {
+  updateOrdersStats(agencyOrders?: Order[], selYear?: number, selMonth?: number): void {
+    if (!agencyOrders || !selYear || !selMonth) {
+      const branch = typeof localStorage !== 'undefined' ? localStorage.getItem('admin_branch') || 'all' : 'all';
+      let month = typeof localStorage !== 'undefined' ? localStorage.getItem('admin_month') : '';
+      if (!month) {
+        const now = new Date();
+        month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      }
+      const branchMap: Record<string, string> = {
+        all: 'all',
+        '1': '244 đường số 8 - H071',
+        '2': '60 đường Nguyễn An Ninh - H246',
+        '3': '24 đường Lý Thường Kiệt - H033',
+      };
+      const targetAgency = branchMap[branch] || 'all';
+      agencyOrders = this.ORDERS_ALL.filter(o => targetAgency === 'all' || o.deliveryAgency === targetAgency);
+      const parsed = month.split('-').map(Number);
+      selYear = parsed[0];
+      selMonth = parsed[1];
+    }
+
+    const currentMonthOrders = agencyOrders.filter((o) => {
       const d = new Date(o.date || o.createdAt || 0);
-      return d >= weekStart && d <= weekEnd;
+      return d.getFullYear() === selYear && d.getMonth() + 1 === selMonth;
     });
-    const lastWeekStart = new Date(weekStart);
-    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-    const lastWeekEnd = new Date(weekEnd);
-    lastWeekEnd.setDate(lastWeekEnd.getDate() - 7);
-    const lastWeekOrders = this.ORDERS_ALL.filter((o) => {
+
+    let lastMonthYear = selYear;
+    let lastMonthVal = selMonth - 1;
+    if (lastMonthVal === 0) {
+       lastMonthVal = 12;
+       lastMonthYear--;
+    }
+    const prevMonthOrders = agencyOrders.filter((o) => {
       const d = new Date(o.date || o.createdAt || 0);
-      return d >= lastWeekStart && d <= lastWeekEnd;
+      return d.getFullYear() === lastMonthYear && d.getMonth() + 1 === lastMonthVal;
     });
-    const weekRevenue = weekOrders.reduce(
-      (sum, o) => sum + (Number(o.total) || Number(o.totalAmount) || 0),
+
+    const currentRevenue = currentMonthOrders.filter(o => o.status !== 'cancelled').reduce(
+      (sum, o) => sum + (Number(o.total) || Number((o as any).totalAmount) || 0),
       0,
     );
-    const lastWeekRevenue = lastWeekOrders.reduce(
-      (sum, o) => sum + (Number(o.total) || Number(o.totalAmount) || 0),
+    const prevRevenue = prevMonthOrders.filter(o => o.status !== 'cancelled').reduce(
+      (sum, o) => sum + (Number(o.total) || Number((o as any).totalAmount) || 0),
       0,
     );
-    const revenueDiff = weekRevenue - lastWeekRevenue;
-    let revenueDelta =
-      lastWeekRevenue > 0
-        ? Math.round((revenueDiff / lastWeekRevenue) * 100)
-        : weekRevenue > 0
-          ? 100
-          : 0;
-    const ordersDiff = weekOrders.length - lastWeekOrders.length;
-    let ordersDelta =
-      lastWeekOrders.length > 0
-        ? Math.round((ordersDiff / lastWeekOrders.length) * 100)
-        : weekOrders.length > 0
-          ? 100
-          : 0;
+    const revenueDiff = currentRevenue - prevRevenue;
+    let revenueDelta = prevRevenue > 0 ? Math.round((revenueDiff / prevRevenue) * 100) : (currentRevenue > 0 ? 100 : 0);
+
+    const ordersDiff = currentMonthOrders.length - prevMonthOrders.length;
+    let ordersDelta = prevMonthOrders.length > 0 ? Math.round((ordersDiff / prevMonthOrders.length) * 100) : (currentMonthOrders.length > 0 ? 100 : 0);
+
     const countItems = (orders: Order[]) =>
       orders.reduce(
         (sum, o) =>
           sum + (o.items || []).reduce((s, i) => s + (i.qty ?? (i as any).quantity ?? 1), 0),
         0,
       );
-    const weekProductsSold = countItems(weekOrders);
-    const lastWeekProductsSold = countItems(lastWeekOrders);
-    const productsSoldDiff = weekProductsSold - lastWeekProductsSold;
-    let productsSoldDelta =
-      lastWeekProductsSold > 0
-        ? Math.round((productsSoldDiff / lastWeekProductsSold) * 100)
-        : weekProductsSold > 0
-          ? 100
-          : 0;
+    const currentProductsSold = countItems(currentMonthOrders);
+    const prevProductsSold = countItems(prevMonthOrders);
+    const productsSoldDiff = currentProductsSold - prevProductsSold;
+    let productsSoldDelta = prevProductsSold > 0 ? Math.round((productsSoldDiff / prevProductsSold) * 100) : (currentProductsSold > 0 ? 100 : 0);
+
+    const fmtDelta = (delta: number) => `${delta >= 0 ? '+' : ''}${delta}%`;
+    const setDeltaColor = (el: HTMLElement | null, delta: number) => {
+      if (el) el.style.color = delta >= 0 ? 'rgba(255,255,255,0.95)' : '#ffc9c9';
+    };
+    const fmtRevenueAbs = (diff: number) => {
+      const abs = Math.abs(diff);
+      if (abs >= 1e6) return (diff >= 0 ? '+' : '-') + (abs / 1e6).toFixed(1) + ' tr';
+      if (abs >= 1000) return (diff >= 0 ? '+' : '-') + (abs / 1000).toFixed(1) + 'k';
+      return (diff >= 0 ? '+' : '') + diff;
+    };
+
+    const sRevenue = document.getElementById('sRevenue');
+    if (sRevenue) sRevenue.textContent = this.fmtMoney(currentRevenue);
+    
+    const sRevenueDeltaEl = document.getElementById('sRevenueDelta');
+    if (sRevenueDeltaEl) {
+      sRevenueDeltaEl.textContent = fmtDelta(revenueDelta);
+      setDeltaColor(sRevenueDeltaEl, revenueDelta);
+    }
+    
+    const sRevenueDeltaAbs = document.getElementById('sRevenueDeltaAbs');
+    if (sRevenueDeltaAbs) sRevenueDeltaAbs.textContent = fmtRevenueAbs(revenueDiff) + ' tháng này';
+
+    const sOrders = document.getElementById('sOrders');
+    if (sOrders) sOrders.textContent = currentMonthOrders.length + ' ĐƠN';
+    
+    const sOrdersDeltaEl = document.getElementById('sOrdersDelta');
+    if (sOrdersDeltaEl) {
+      sOrdersDeltaEl.textContent = fmtDelta(ordersDelta);
+      setDeltaColor(sOrdersDeltaEl, ordersDelta);
+    }
+    
+    const sOrdersDeltaAbs = document.getElementById('sOrdersDeltaAbs');
+    if (sOrdersDeltaAbs) sOrdersDeltaAbs.textContent = (ordersDiff >= 0 ? '+' : '') + ordersDiff + ' tháng này';
+
+    const sCustomers = document.getElementById('sCustomers');
+    if (sCustomers) sCustomers.textContent = currentProductsSold + ' SẢN PHẨM';
+    
+    const sCustomersDeltaEl = document.getElementById('sCustomersDelta');
+    if (sCustomersDeltaEl) {
+      sCustomersDeltaEl.textContent = fmtDelta(productsSoldDelta);
+      setDeltaColor(sCustomersDeltaEl, productsSoldDelta);
+    }
+    
+    const sCustomersDeltaAbs = document.getElementById('sCustomersDeltaAbs');
+    if (sCustomersDeltaAbs) {
+      const absStr = Math.abs(productsSoldDiff) >= 1000
+          ? (productsSoldDiff >= 0 ? '+' : '-') + (Math.abs(productsSoldDiff) / 1000).toFixed(1) + 'k'
+          : (productsSoldDiff >= 0 ? '+' : '') + productsSoldDiff;
+      sCustomersDeltaAbs.textContent = absStr + ' tháng này';
+    }
   }
 
   fetchProducts(): void {
@@ -999,7 +1081,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           }
           try {
             localStorage.setItem('products', JSON.stringify(this.PRODUCTS_ALL));
-          } catch (e) {}
+          } catch (e) { }
           this.showNotification(checked ? 'Đã bật hiển thị' : 'Đã tắt hiển thị', 'success');
         };
 
@@ -1011,7 +1093,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
               const idx = this.PRODUCTS_ALL.findIndex(p => p.id === prodId);
               if (idx !== -1) this.PRODUCTS_ALL[idx].visible = checked;
             }
-            try { localStorage.setItem('products', JSON.stringify(this.PRODUCTS_ALL)); } catch(e){}
+            try { localStorage.setItem('products', JSON.stringify(this.PRODUCTS_ALL)); } catch (e) { }
             // Render lại nếu cần, nhưng chỉ cần hiện thông báo là đủ vì DOM state đã là checked
             this.showNotification(
               checked ? 'Đã bật hiển thị' : 'Đã tắt hiển thị',
@@ -1194,6 +1276,28 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       statusSelect.value = dropdownVal;
       statusSelect.dataset['orderId'] = order.id || order.orderId || '';
       statusSelect.dataset['originalStatus'] = st;
+    }
+    const agencyDropdown = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
+    if (agencyDropdown) {
+      const agencies = Array.from(new Set(this.ORDERS_ALL.map(o => o.deliveryAgency).filter(Boolean)));
+      let optionsHtml = '<option value="">Chưa chọn chi nhánh</option>';
+      if (agencies.length === 0) {
+        ['Trung Dũng, Biên Hòa', 'Chi nhánh Tân Phú', 'Chi nhánh Bình Thạnh', 'Chi nhánh Dĩ An'].forEach(agency => {
+          optionsHtml += `<option value="${agency}">${agency}</option>`;
+        });
+      } else {
+        agencies.forEach(agency => {
+          optionsHtml += `<option value="${agency}">${agency}</option>`;
+        });
+      }
+      agencyDropdown.innerHTML = optionsHtml;
+
+      // If the order has an agency but it's not in the list, add it
+      if (order.deliveryAgency && !agencies.includes(order.deliveryAgency) && agencies.length > 0) {
+        agencyDropdown.innerHTML += `<option value="${order.deliveryAgency}">${order.deliveryAgency}</option>`;
+      }
+
+      agencyDropdown.value = order.deliveryAgency || '';
     }
     const itemsContainer = document.getElementById('order-items');
     if (itemsContainer && order.items) {
@@ -1825,10 +1929,13 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const statusDropdown = document.getElementById(
           'order-status-dropdown',
         ) as HTMLSelectElement;
+        const agencyDropdown = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
         const orderId = document.getElementById('order-id')?.textContent?.trim();
         if (!statusDropdown || !orderId) return;
 
         const newStatus = statusDropdown.value;
+        const newAgency = agencyDropdown ? agencyDropdown.value : undefined;
+
         const order = this.ORDERS_ALL.find((o) => (o.id || o.orderId) == orderId);
         if (!order) return;
 
@@ -1836,18 +1943,24 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         if (order._id) {
           const token = localStorage.getItem('token');
           const headers = { Authorization: `Bearer ${token}` };
+
+          const payload: any = { status: newStatus };
+          if (newAgency !== undefined) payload.deliveryAgency = newAgency;
+
           this.http
             .put(
               `${this.API_BASE}/api/admin/orders/${order._id}/status`,
-              { status: newStatus },
+              payload,
               { headers },
             )
             .subscribe({
               next: () => {
                 order.status = newStatus;
+                if (newAgency !== undefined) order.deliveryAgency = newAgency;
                 this.sortOrdersByDateDesc();
                 localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
                 this.renderOrdersTable(this.ORDERS_ALL);
+                this.fetchAgencyStats();
                 this.showSuccess('CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG THÀNH CÔNG');
               },
               error: (err) => {
@@ -1858,9 +1971,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         } else {
           // Đơn hàng local/json
           order.status = newStatus;
+          if (newAgency !== undefined) order.deliveryAgency = newAgency;
           this.sortOrdersByDateDesc();
           localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
           this.renderOrdersTable(this.ORDERS_ALL);
+          this.fetchAgencyStats();
           this.showSuccess('CẬP NHẬT ĐƠN HÀNG THÀNH CÔNG');
         }
 

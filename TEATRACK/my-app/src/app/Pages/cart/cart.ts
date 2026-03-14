@@ -259,7 +259,8 @@ export class Cart implements OnInit, OnDestroy {
     const phone = (s.phone || '').trim();
     const date = (s.deliveryDate || '').trim();
     const time = (s.deliveryTime || '').trim();
-    return addr.length > 0 && receiver.length > 0 && phone.length > 0 && date.length > 0 && time.length > 0;
+    const agency = (this.selectedAgency || '').trim();
+    return addr.length > 0 && receiver.length > 0 && phone.length > 0 && date.length > 0 && time.length > 0 && agency.length > 0;
   }
 
   /** Disable nút "Kiểm tra đơn hàng" khi: giỏ trống, thiếu shipping, chưa tick điều khoản, hoặc chọn MoMo/ZaloPay/Payoo. */
@@ -935,7 +936,7 @@ export class Cart implements OnInit, OnDestroy {
       await this.showAlertModal(
         'warning',
         'Thiếu thông tin giao hàng',
-        'Vui lòng điền đủ các mục bắt buộc (địa chỉ, người nhận, Số điện thoại, thời gian giao hàng) trước khi thanh toán.',
+        'Vui lòng điền đủ các mục bắt buộc (địa chỉ, người nhận, số điện thoại, thời gian giao hàng, chi nhánh) trước khi thanh toán.',
         false,
       );
       return;

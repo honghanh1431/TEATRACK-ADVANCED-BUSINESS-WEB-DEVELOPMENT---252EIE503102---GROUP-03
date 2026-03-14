@@ -33,7 +33,7 @@
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sRevenueDelta">+0%</span>
             </span>
-            <span class="stat-desc-right" id="sRevenueDeltaAbs">+0 tuần này</span>
+            <span class="stat-desc-right" id="sRevenueDeltaAbs">+0 tháng này</span>
           </div>
         </div>
 
@@ -42,7 +42,7 @@
             <span class="stat-title-icon-wrap">
               <img src="assets/icons/order.png" alt="Order icon" class="stat-title-icon" />
             </span>
-            <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG TUẦN NÀY</span>
+            <span data-i18n="admin.dashboard.ordersToday">ĐƠN HÀNG THÁNG NÀY</span>
           </div>
           <div class="stat-value" id="sOrders">0</div>
           <div class="stat-desc">
@@ -50,7 +50,7 @@
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sOrdersDelta">+0%</span>
             </span>
-            <span class="stat-desc-right" id="sOrdersDeltaAbs">+0 tuần này</span>
+            <span class="stat-desc-right" id="sOrdersDeltaAbs">+0 tháng này</span>
           </div>
         </div>
 
@@ -67,7 +67,7 @@
               <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
               <span id="sCustomersDelta">+0%</span>
             </span>
-            <span class="stat-desc-right" id="sCustomersDeltaAbs">+0 tuần này</span>
+            <span class="stat-desc-right" id="sCustomersDeltaAbs">+0 tháng này</span>
           </div>
         </div>
 
@@ -429,6 +429,14 @@
                 <option value="shipping">Đang giao hàng</option>
                 <option value="completed">Giao thành công</option>
                 <option value="cancelled">Đã hủy</option>
+              </select>
+            </div>
+          </div>
+          <div class="info-row" style="grid-column: 1 / -1;">
+            <span class="info-label">Chi nhánh giao hàng:</span>
+            <div style="display: flex; gap: 12px; align-items: center">
+              <select id="order-agency-dropdown" class="status-dropdown" style="width: 100%">
+                <option value="">Chưa chọn chi nhánh</option>
               </select>
             </div>
           </div>

@@ -523,6 +523,26 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
       statusSelect.dataset['originalStatus'] = st;
     }
 
+    const agencyDropdown = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
+    if (agencyDropdown) {
+      const agencies = Array.from(new Set(this.ORDERS_ALL.map(o => o.deliveryAgency).filter(Boolean)));
+      let optionsHtml = '<option value="">Chưa chọn chi nhánh</option>';
+      if (agencies.length === 0) {
+        ['Trung Dũng, Biên Hòa', 'Chi nhánh Tân Phú', 'Chi nhánh Bình Thạnh', 'Chi nhánh Dĩ An'].forEach(agency => {
+          optionsHtml += `<option value="${agency}">${agency}</option>`;
+        });
+      } else {
+        agencies.forEach(agency => {
+          optionsHtml += `<option value="${agency}">${agency}</option>`;
+        });
+      }
+      agencyDropdown.innerHTML = optionsHtml;
+      if (order.deliveryAgency && !agencies.includes(order.deliveryAgency) && agencies.length > 0) {
+          agencyDropdown.innerHTML += `<option value="${order.deliveryAgency}">${order.deliveryAgency}</option>`;
+      }
+      agencyDropdown.value = order.deliveryAgency || '';
+    }
+
     const itemsContainer = document.getElementById('order-items');
     if (itemsContainer && order.items) {
       itemsContainer.innerHTML = (order.items || [])
@@ -570,17 +590,12 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
 
   saveOrderChanges(): void {
     const statusSelect = document.getElementById('order-status-dropdown') as HTMLSelectElement | null;
+    const agencyDropdown = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
     if (!statusSelect) return;
 
     const orderId = statusSelect.dataset['orderId'] ?? '';
-    const originalStatus = statusSelect.dataset['originalStatus'] ?? '';
     const newStatus = statusSelect.value;
-
-    if (originalStatus === newStatus) {
-      this.showSuccess('KHÔNG CÓ THAY ĐỔI');
-      this.closeOrderDetailModal();
-      return;
-    }
+    const newAgency = agencyDropdown ? agencyDropdown.value : undefined;
 
     const order = this.ORDERS_ALL.find((o) => (o.id || o.orderId) == orderId);
     if (!order) return;
@@ -589,9 +604,14 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     if (order._id) {
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
-      this.http.put(`${this.API_BASE}/api/admin/orders/${order._id}/status`, { status: newStatus }, { headers }).subscribe({
+      
+      const payload: any = { status: newStatus };
+      if (newAgency !== undefined) payload.deliveryAgency = newAgency;
+
+      this.http.put(`${this.API_BASE}/api/admin/orders/${order._id}/status`, payload, { headers }).subscribe({
         next: () => {
           order.status = newStatus;
+          if (newAgency !== undefined) order.deliveryAgency = newAgency;
           this.sortOrdersByDateDesc();
           localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));
           this.updateOrdersStats();
@@ -606,6 +626,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
       });
     } else {
       order.status = newStatus;
+      if (newAgency !== undefined) order.deliveryAgency = newAgency;
       this.sortOrdersByDateDesc();
       try {
         localStorage.setItem('orders', JSON.stringify(this.ORDERS_ALL));

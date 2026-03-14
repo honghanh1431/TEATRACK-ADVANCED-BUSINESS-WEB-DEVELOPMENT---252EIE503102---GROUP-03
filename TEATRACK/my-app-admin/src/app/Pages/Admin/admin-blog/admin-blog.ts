@@ -71,6 +71,10 @@ export class AdminBlog implements OnInit, AfterViewInit {
   formImages: string[] = [];
   formThumbnail: string | null = null;
 
+  initialFormValue: any = null;
+  initialImages: string[] = [];
+  initialThumbnail: string | null = null;
+
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
   @ViewChild('thumbInput') thumbInput?: ElementRef<HTMLInputElement>;
 
@@ -290,6 +294,11 @@ export class AdminBlog implements OnInit, AfterViewInit {
     this.formImages = [];
     this.formThumbnail = null;
     this.modalOpen = true;
+
+    this.initialFormValue = this.form.value;
+    this.initialImages = [...this.formImages];
+    this.initialThumbnail = this.formThumbnail;
+
     this.cdr.detectChanges();
   }
 
@@ -307,6 +316,11 @@ export class AdminBlog implements OnInit, AfterViewInit {
     this.formImages = [...(p.images || [])];
     this.formThumbnail = p.thumbnailImage || null;
     this.modalOpen = true;
+
+    this.initialFormValue = this.form.value;
+    this.initialImages = [...this.formImages];
+    this.initialThumbnail = this.formThumbnail;
+
     this.cdr.detectChanges();
   }
 
@@ -323,17 +337,50 @@ export class AdminBlog implements OnInit, AfterViewInit {
     }
   }
 
+  hasChanges(): boolean {
+    if (!this.initialFormValue) return false;
+    
+    // Check form changes
+    const currentForm = this.form.value;
+    for (const key of Object.keys(this.initialFormValue)) {
+      if (currentForm[key] !== this.initialFormValue[key]) return true;
+    }
+    
+    // Check thumbnail changes
+    if (this.formThumbnail !== this.initialThumbnail) return true;
+    
+    // Check images array changes
+    if (this.formImages.length !== this.initialImages.length) return true;
+    for (let i = 0; i < this.formImages.length; i++) {
+      if (this.formImages[i] !== this.initialImages[i]) return true;
+    }
+    
+    return false;
+  }
+
+  tryCloseModal(): void {
+    if (this.hasChanges()) {
+      if (confirm('Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn hủy?')) {
+        this.closeModal();
+      }
+    } else {
+      this.closeModal();
+    }
+  }
+
   closeModal(): void {
     this.modalOpen = false;
     this.editing = false;
     this.editingId = null;
+    this.initialFormValue = null;
     this.clearFileInput();
     this.clearThumbInput();
   }
 
   backdropClose(ev: MouseEvent): void {
-    if ((ev.target as HTMLElement)?.classList.contains('modal')) {
-      this.closeModal();
+    const target = ev.target as HTMLElement;
+    if (target?.classList.contains('account-modal-overlay') || target?.classList.contains('modal')) {
+      this.tryCloseModal();
     }
   }
 
@@ -347,6 +394,7 @@ export class AdminBlog implements OnInit, AfterViewInit {
       this.formImages.push(b64);
     }
     this.clearFileInput();
+    this.cdr.detectChanges();
   }
 
   async onThumbFile(ev: Event): Promise<void> {
@@ -355,14 +403,17 @@ export class AdminBlog implements OnInit, AfterViewInit {
     if (!file) return;
     this.formThumbnail = await this.fileToBase64(file);
     this.clearThumbInput();
+    this.cdr.detectChanges();
   }
 
   removeThumb(): void {
     this.formThumbnail = null;
+    this.cdr.detectChanges();
   }
 
   removeImg(i: number): void {
     this.formImages.splice(i, 1);
+    this.cdr.detectChanges();
   }
 
   save(): void {
