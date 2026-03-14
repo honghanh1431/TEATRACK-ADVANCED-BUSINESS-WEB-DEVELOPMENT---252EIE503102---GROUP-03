@@ -2119,7 +2119,9 @@ body {
   transition: all 0.2s ease;
   flex: 1;
   justify-content: center;
-  max-width: 160px;
+  min-width: 160px;
+  max-width: 220px;
+  white-space: nowrap;
 }
 
 .btn-danger-solid:hover {
