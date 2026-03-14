@@ -68,13 +68,17 @@ export class OrderTracking implements OnInit, OnDestroy {
     localStorage.removeItem('cart_items');
   }
 
-  /** Cuộn tới fragment (order-status) và/hoặc mở modal đánh giá khi có openReview=1 (từ order-history). */
+  /** Cuộn tới fragment (order-status, order-items-section) và/hoặc mở modal đánh giá khi có openReview=1 (từ order-history). */
   private applyFragmentAndOpenReview(): void {
     setTimeout(() => {
       const fragment = this.route.snapshot.fragment;
       const openReview = this.route.snapshot.queryParamMap.get('openReview');
       if (fragment === 'order-status') {
         const el = document.getElementById('order-status');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (fragment === 'order-items-section') {
+        const el = document.getElementById('order-items-section');
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       if (openReview === '1') {
@@ -114,6 +118,12 @@ export class OrderTracking implements OnInit, OnDestroy {
               }
             } catch (e) { }
             this.cdr.detectChanges();
+            if (this.route.snapshot.fragment === 'order-items-section') {
+              setTimeout(() => {
+                const el = document.getElementById('order-items-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 150);
+            }
           } else {
             this.loadFromFallback();
           }
