@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { ROUTE_TITLES, APP_TITLE_SUFFIX, getRouteTitle } from './route-titles';
 import { CartService } from './cart.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -59,6 +60,7 @@ export class App implements OnInit, OnDestroy {
     private titleService: Title,
     private cartService: CartService,
     private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -90,6 +92,7 @@ export class App implements OnInit, OnDestroy {
     this.showLayout = !this.hideLayoutPaths.includes(path);
     this.updateHeaderMode();
     this.updateTitle(path || '/');
+    this.refreshUserProfile();
     if (typeof window !== 'undefined') {
       window.addEventListener('user:logout', this.logoutHandler);
     }
@@ -110,6 +113,28 @@ export class App implements OnInit, OnDestroy {
         this.toastVisible = false;
         this.toastPre = this.toastName = this.toastPost = '';
       }, 3200);
+    });
+  }
+
+  private refreshUserProfile(): void {
+    if (typeof localStorage === 'undefined') return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    this.http.get<{ user: any }>('http://localhost:3002/api/auth/profile', {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: (res) => {
+        if (res && res.user) {
+          localStorage.setItem('ngogia_user', JSON.stringify(res.user));
+          this.updateHeaderMode();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('user:updated'));
+          }
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {}
     });
   }
 

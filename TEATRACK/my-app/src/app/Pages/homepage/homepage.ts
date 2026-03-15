@@ -94,6 +94,14 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     return !localStorage.getItem('ngogia_user') && !localStorage.getItem('authAdmin');
   }
 
+  get isVip(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    try {
+      const u = JSON.parse(localStorage.getItem('ngogia_user') || '{}');
+      return u?.role === 'vip customer';
+    } catch { return false; }
+  }
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient,
@@ -120,7 +128,14 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
           setTimeout(() => this.initHeroSwiper(), 0);
         }
       });
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('user:updated', this.handleUserUpdated);
+    }
   }
+
+  private handleUserUpdated = () => {
+    this.cdr.detectChanges();
+  };
 
   ngAfterViewInit(): void {
     setTimeout(() => this.initHeroSwiper(), 0);
@@ -152,6 +167,9 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     this.heroSwiper = null;
     this.drinksSwiper = null;
     document.body.style.overflow = '';
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('user:updated', this.handleUserUpdated);
+    }
   }
 
   private async ensureProducts(): Promise<void> {
@@ -305,10 +323,12 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     if (!(window as any).NGCart) return;
+    const basePrice = Number(p.price) || 0;
+    const finalPrice = this.isVip ? this.vipPrice(basePrice) : basePrice;
     (window as any).NGCart.addItem({
       id: p.id ?? '',
       name: p.name ?? '',
-      price: Number(p.price) || 0,
+      price: finalPrice,
       image: p.image ?? '',
       size: 'M',
       qty: 1,

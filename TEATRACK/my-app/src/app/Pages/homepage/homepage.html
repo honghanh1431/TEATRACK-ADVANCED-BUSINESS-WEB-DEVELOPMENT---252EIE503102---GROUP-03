@@ -129,21 +129,21 @@
               <h3 class="product-name">{{ p.name }}</h3>
               <div class="price-row">
                 <div class="price-col">
-                  <div class="line size-line">
+                  <div class="line size-line" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">
                     <span class="label">M</span>
                     <span class="value">{{ priceVN(p.price || 0) }}đ</span>
                   </div>
-                  <div class="line vip-line">
+                  <div class="line vip-line" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">
                     <span class="label vip">VIP</span>
                     <span class="value">{{ priceVN(vipPrice(p.price || 0)) }}đ</span>
                   </div>
                 </div>
                 <div class="price-col">
-                  <div class="line size-line">
+                  <div class="line size-line" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">
                     <span class="label">L</span>
                     <span class="value">{{ priceVN((p.price || 0) + 3000) }}đ</span>
                   </div>
-                  <div class="line vip-line">
+                  <div class="line vip-line" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">
                     <span class="label vip">VIP</span>
                     <span class="value">{{ priceVN(vipPrice((p.price || 0) + 3000)) }}đ</span>
                   </div>
