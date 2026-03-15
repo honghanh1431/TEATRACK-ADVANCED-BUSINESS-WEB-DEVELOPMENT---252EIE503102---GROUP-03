@@ -1,63 +1,68 @@
+<header class="topbar">
+  <div class="topbar-title">
+    <h1>QUẢN LÍ CHI NHÁNH</h1>
+  </div>
+</header>
 <div class="agency-page">
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-title">
-      <h1>QUẢN LÍ CHI NHÁNH</h1>
-    </div>
-    <div class="topbar-actions">
-      <button type="button" class="btn btn-ghost" (click)="exportCSV()">Xuất CSV</button>
-      <button type="button" class="btn btn-primary" (click)="openCreate()">+ Thêm chi nhánh</button>
-    </div>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat-card stat-card--blue">
-      <div class="stat-label">Tổng chi nhánh</div>
+  <section class="cards stats">
+    <div class="card stat stat-posts">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/tongbaiviet.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TỔNG CHI NHÁNH</span>
+      </div>
       <div class="stat-value">{{ agencies.length }}</div>
-      <div class="stat-change"><span>+2</span> so với tháng trước</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>↗</span>
+        </span>
+        <span class="stat-desc-right">Tháng này</span>
+      </div>
     </div>
-    <div class="stat-card stat-card--green">
-      <div class="stat-label">Đang hoạt động</div>
+    <div class="card stat stat-views">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/luotxem.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>ĐANG HOẠT ĐỘNG</span>
+      </div>
       <div class="stat-value">{{ agencies.filter(a => a.status === 'active').length }}</div>
-      <div class="stat-change"><span>+1</span> tuần này</div>
+      <div class="stat-desc">
+        <span class="stat-desc-left">
+          <img src="assets/icons/grow.png" alt="" class="stat-desc-icon" />
+          <span>↗</span>
+        </span>
+        <span class="stat-desc-right">Tuần này</span>
+      </div>
     </div>
-    <div class="stat-card stat-card--orange">
-      <div class="stat-label">Tạm ngưng</div>
+    <div class="card stat stat-published">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/daxuatban.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TẠM NGƯNG</span>
+      </div>
       <div class="stat-value">{{ agencies.filter(a => a.status === 'inactive').length }}</div>
-      <div class="stat-change">0 yêu cầu mở lại</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">0 yêu cầu mở lại</span>
+      </div>
     </div>
-    <div class="stat-card stat-card--purple">
-      <div class="stat-label">Tỉnh / Thành phố</div>
+    <div class="card stat stat-draft">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/bannhap.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TỈNH / THÀNH PHỐ</span>
+      </div>
       <div class="stat-value">{{ cityCount }}</div>
-      <div class="stat-change">Thủ Đức &amp; Bình Dương</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Thủ Đức &amp; Bình Dương</span>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- TOOLBAR -->
-  <div class="toolbar">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input
-        type="text"
-        placeholder="Tìm theo tên, địa chỉ, mã chi nhánh..."
-        [(ngModel)]="searchQuery"
-        (input)="filterTable()"
-      />
-    </div>
-    <select class="filter-select" [(ngModel)]="cityFilter" (change)="filterTable()">
-      <option value="">Tất cả khu vực</option>
-      <option value="thu-duc">Thủ Đức</option>
-      <option value="binh-duong">Bình Dương</option>
-    </select>
-    <select class="filter-select" [(ngModel)]="statusFilter" (change)="filterTable()">
-      <option value="">Tất cả trạng thái</option>
-      <option value="active">Hoạt động</option>
-      <option value="inactive">Tạm ngưng</option>
-    </select>
-  </div>
-
-  <!-- BULK BAR -->
   <div class="bulk-bar" *ngIf="selectedIds.size > 0">
     <span class="bulk-count">{{ selectedIds.size }}</span>
     <span class="bulk-label">chi nhánh được chọn</span>
@@ -71,9 +76,52 @@
     </div>
   </div>
 
-  <!-- TABLE -->
   <section class="card table" id="agencies">
     <div class="card-title">Danh sách chi nhánh</div>
+    <div class="card-header-block">
+      <div class="card-actions-row">
+        <button type="button" class="btn btn-add" (click)="openCreate()">
+          <span class="btn-icon">+</span>
+          <span>Thêm chi nhánh</span>
+        </button>
+        <div class="search-box">
+          <input
+            type="search"
+            placeholder="Tìm theo tên, địa chỉ, mã chi nhánh..."
+            [value]="searchQuery"
+            (input)="onSearchInput($any($event.target).value)"
+            aria-label="Tìm kiếm chi nhánh"
+          />
+          <button type="button" class="search-btn" aria-label="Tìm kiếm">
+            <img src="assets/icons/search.png" alt="Search" />
+          </button>
+        </div>
+        <div class="card-actions-filters">
+          <select
+            class="category-filter"
+            [value]="cityFilter"
+            (change)="onCityFilter($any($event.target).value)"
+            aria-label="Lọc theo khu vực"
+          >
+            <option value="">Tất cả khu vực</option>
+            <option value="thu-duc">Thủ Đức</option>
+            <option value="binh-duong">Bình Dương</option>
+          </select>
+          <select
+            class="category-filter"
+            [value]="statusFilter"
+            (change)="onStatusFilter($any($event.target).value)"
+            aria-label="Lọc theo trạng thái"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="active">Hoạt động</option>
+            <option value="inactive">Tạm ngưng</option>
+          </select>
+        </div>
+        <button type="button" class="export-btn" (click)="exportExcel()">Xuất Excel</button>
+      </div>
+    </div>
+
     <div class="table-scroll">
       <table>
         <thead>
@@ -85,22 +133,21 @@
                 (change)="toggleAll($any($event.target).checked)"
               />
             </th>
+            <th>Ảnh</th>
             <th>Chi nhánh</th>
-            <th>Mã CN</th>
-            <th>Địa chỉ</th>
             <th>Số điện thoại</th>
+            <th>Mã chi nhánh</th>
             <th>Khu vực</th>
             <th>Trạng thái</th>
-            <th>Ngày tạo</th>
-            <th>Thao tác</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="filteredAgencies.length === 0">
-            <td colspan="9" class="empty-row">Không tìm thấy chi nhánh nào</td>
+            <td colspan="8" class="empty-row">Không tìm thấy chi nhánh nào</td>
           </tr>
           <tr
-            *ngFor="let agency of getPagedAgencies(); let i = index"
+            *ngFor="let agency of filteredAgencies; let i = index"
             [class.selected]="isSelected(agency._id)"
             (click)="openDetail(agency)"
           >
@@ -111,25 +158,24 @@
                 (change)="toggleRow(agency._id, $any($event.target).checked)"
               />
             </td>
-            <td>
-              <div class="agency-cell">
-                <div
-                  class="agency-thumb"
-                  [style.backgroundImage]="'url(' + (agency.image || '/assets/icons/chi_nhanh1.png') + ')'"
-                ></div>
-                <div class="agency-name">{{ getAgencyDisplayName(agency) }}</div>
-              </div>
+            <td class="avatar-cell">
+              <div
+                class="agency-thumb"
+                [style.backgroundImage]="
+                  'url(' + (agency.image || '/assets/icons/chi_nhanh1.png') + ')'
+                "
+              ></div>
             </td>
             <td>
-              <span class="code-badge">{{ getCode(agency.name) }}</span>
-            </td>
-            <td class="address-cell">
-              <span class="address-text">{{ agency.address }}</span>
+              <div class="agency-name">{{ getAgencyDisplayName(agency) }}</div>
             </td>
             <td class="phone-cell">
               <a [href]="'tel:' + agency.phone" (click)="$event.stopPropagation()">{{
                 agency.phone
               }}</a>
+            </td>
+            <td>
+              <span class="code-badge">{{ getCode(agency.name) }}</span>
             </td>
             <td>
               <span class="badge" [ngClass]="getCityBadgeClass(agency.address)">
@@ -144,7 +190,6 @@
                 {{ agency.status === 'active' ? '✓ Hoạt động' : '⏸ Tạm ngưng' }}
               </span>
             </td>
-            <td class="date-cell">{{ agency.createdAt | date: 'dd/MM/yyyy' }}</td>
             <td (click)="$event.stopPropagation()">
               <div class="actions">
                 <button
@@ -153,7 +198,39 @@
                   title="Xem bản đồ"
                   (click)="openMap(agency)"
                 >
-                  🗺️
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 6L9 3L15 6L21 3V18L15 21L9 18L3 21V6Z"
+                      stroke="#1596D5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <line
+                      x1="9"
+                      y1="3"
+                      x2="9"
+                      y2="18"
+                      stroke="#1596D5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <line
+                      x1="15"
+                      y1="6"
+                      x2="15"
+                      y2="21"
+                      stroke="#1596D5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
                 </button>
                 <button
                   type="button"
@@ -161,7 +238,7 @@
                   title="Chỉnh sửa"
                   (click)="openEdit(agency)"
                 >
-                  ✏️
+                  <img src="/assets/icons/edit2.png" alt="Chỉnh sửa" />
                 </button>
                 <button
                   type="button"
@@ -169,7 +246,52 @@
                   [title]="agency.status === 'active' ? 'Tạm ngưng' : 'Kích hoạt'"
                   (click)="toggleStatus(agency)"
                 >
-                  {{ agency.status === 'active' ? '⏸' : '▶️' }}
+                  <ng-container *ngIf="agency.status === 'active'; else playIcon">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <line
+                        x1="8"
+                        y1="5"
+                        x2="8"
+                        y2="19"
+                        stroke="#1596D5"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                      <line
+                        x1="16"
+                        y1="5"
+                        x2="16"
+                        y2="19"
+                        stroke="#1596D5"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </ng-container>
+
+                  <ng-template #playIcon>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <polygon
+                        points="8,5 19,12 8,19"
+                        stroke="#1596D5"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </ng-template>
                 </button>
                 <button
                   type="button"
@@ -177,7 +299,7 @@
                   title="Xoá"
                   (click)="openDelete(agency)"
                 >
-                  🗑
+                  <img src="/assets/icons/delete2.png" alt="Xoá" />
                 </button>
               </div>
             </td>
@@ -185,108 +307,117 @@
         </tbody>
       </table>
     </div>
-    <div class="pagination">
-      <span>{{ paginationInfo }}</span>
-      <div class="page-btns">
-        <button type="button" class="page-btn" [disabled]="currentPage === 1" (click)="prevPage()">
-          ‹
-        </button>
-        <button
-          *ngFor="let p of pages"
-          type="button"
-          class="page-btn"
-          [class.active]="p === currentPage"
-          (click)="goToPage(p)"
-        >
-          {{ p }}
-        </button>
-        <button
-          type="button"
-          class="page-btn"
-          [disabled]="currentPage === totalPages"
-          (click)="nextPage()"
-        >
-          ›
-        </button>
-      </div>
-    </div>
   </section>
 </div>
 
-<!-- ===== EDIT / CREATE MODAL ===== -->
+<!-- ===== EDIT / CREATE MODAL (giống admin-blog) ===== -->
 <div
-  class="agency-modal-overlay"
+  class="agency-modal-overlay agency-edit-modal-overlay"
   *ngIf="showEditModal"
   (click)="closeEditModal()"
   role="dialog"
   aria-modal="true"
 >
-  <div class="agency-modal" (click)="$event.stopPropagation()">
-    <div class="agency-modal__header">
-      <div>
-        <h3 class="agency-modal__title">{{ editModalTitle }}</h3>
-        <p class="agency-modal__subtitle">{{ editModalSub }}</p>
-      </div>
-      <button type="button" class="agency-modal__close" (click)="closeEditModal()">×</button>
+  <div class="modal-container modal-add-product" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ editModalTitle }}</h2>
+      <button type="button" class="modal-close" (click)="closeEditModal()" aria-label="Đóng">
+        &times;
+      </button>
+      <p class="modal-subtitle">{{ editModalSub }}</p>
     </div>
-    <div class="agency-modal__form">
-      <div class="form-grid">
-        <label class="form-group form-group--full">
-          <span class="form-label">TÊN CHI NHÁNH</span>
+
+    <div class="modal-body">
+      <div class="form-row-equal">
+        <div class="form-group">
+          <label>Tên chi nhánh <span class="req">*</span></label>
           <input
             type="text"
-            class="form-input"
             [(ngModel)]="editName"
+            name="editName"
             placeholder="244 đường số 8 - H071"
           />
-        </label>
-        <label class="form-group form-group--full">
-          <span class="form-label">ĐỊA CHỈ</span>
+        </div>
+        <div class="form-group">
+          <label>Số điện thoại</label>
           <input
             type="text"
-            class="form-input"
-            [(ngModel)]="editAddress"
-            placeholder="244 Đường Số 8, Linh Xuân, Thủ Đức"
-          />
-        </label>
-        <label class="form-group">
-          <span class="form-label">SỐ ĐIỆN THOẠI</span>
-          <input
-            type="text"
-            class="form-input"
             [(ngModel)]="editPhone"
+            name="editPhone"
             placeholder="0999.888.777"
           />
-        </label>
-        <label class="form-group">
-          <span class="form-label">TRẠNG THÁI</span>
-          <select class="form-input" [(ngModel)]="editStatus">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Địa chỉ</label>
+        <input
+          type="text"
+          [(ngModel)]="editAddress"
+          name="editAddress"
+          placeholder="244 Đường Số 8, Linh Xuân, Thủ Đức"
+        />
+      </div>
+
+      <div class="form-row-equal">
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select [(ngModel)]="editStatus" name="editStatus">
             <option value="active">Hoạt động</option>
             <option value="inactive">Tạm ngưng</option>
           </select>
-        </label>
-        <label class="form-group form-group--full">
-          <span class="form-label">LINK GOOGLE MAPS EMBED</span>
+        </div>
+        <div class="form-group">
+          <label>Link Google Maps embed</label>
           <input
             type="text"
-            class="form-input"
             [(ngModel)]="editMapEmbed"
+            name="editMapEmbed"
             placeholder="https://www.google.com/maps/embed?..."
           />
-        </label>
-        <label class="form-group form-group--full">
-          <span class="form-label">HÌNH ẢNH (URL hoặc đường dẫn)</span>
+        </div>
+      </div>
+
+      <div class="image-upload-section">
+        <label>Hình ảnh chi nhánh</label>
+        <input
+          #agencyImageInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onAgencyImageFile($event)"
+        />
+        <div class="gallery">
+          <div class="img-item" *ngIf="editImage">
+            <img [src]="editImage" alt="Ảnh chi nhánh" (error)="onAgencyImageError()" />
+            <button type="button" class="img-remove" (click)="clearAgencyImage()">×</button>
+            <div class="img-cap">Ảnh chi nhánh</div>
+          </div>
+          <button
+            type="button"
+            class="upload-box"
+            (click)="agencyImageInput.click()"
+          >
+            <div class="upload-circle">
+              <img src="/assets/icons/upload.png" alt="upload" />
+            </div>
+            <div class="upload-text">Tải ảnh lên</div>
+          </button>
+        </div>
+        <div class="form-group url-anh-field">
+          <label>URL ảnh (nếu có)</label>
           <input
             type="text"
-            class="form-input"
             [(ngModel)]="editImage"
-            placeholder="assets/icons/chi_nhanh1.png"
+            name="editImageUrl"
+            placeholder="assets/icons/chi_nhanh1.png hoặc URL đầy đủ"
           />
-        </label>
+        </div>
       </div>
-      <div class="agency-modal__actions">
-        <button type="button" class="btn btn-ghost" (click)="closeEditModal()">Huỷ</button>
-        <button type="button" class="btn btn-primary" (click)="saveEdit()">💾 Lưu thay đổi</button>
+
+      <div class="modal-footer">
+        <button class="btn-danger" type="button" (click)="closeEditModal()">Hủy bỏ</button>
+        <button class="btn-primary" type="button" (click)="saveEdit()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
@@ -303,7 +434,42 @@
   <div class="agency-modal agency-modal--map" (click)="$event.stopPropagation()">
     <div class="agency-modal__header">
       <div>
-        <h3 class="agency-modal__title">🗺️ {{ mapTarget?.name }}</h3>
+        <h3 class="agency-modal__title">
+          <svg
+            width="24"
+            height="243"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M3 6L9 3L15 6L21 3V18L15 21L9 18L3 21V6Z"
+              stroke="#1596D5"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <line
+              x1="9"
+              y1="3"
+              x2="9"
+              y2="18"
+              stroke="#0088ff"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <line
+              x1="15"
+              y1="6"
+              x2="15"
+              y2="21"
+              stroke="#0088ff"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          {{ mapTarget?.name }}
+        </h3>
         <p class="agency-modal__subtitle">{{ mapTarget?.address }}</p>
       </div>
       <button type="button" class="agency-modal__close" (click)="closeMapModal()">×</button>
@@ -321,7 +487,16 @@
     </div>
     <div class="map-footer">
       <div class="map-info">
-        <span class="map-phone">📞 {{ mapTarget?.phone }}</span>
+        <span class="map-phone">
+          <svg width="20" height="20" viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M21 16.5V19.5C21 20.33 20.33 21 19.5 21C9.84 21 3 14.16 3 4.5C3 3.67 3.67 3 4.5 3H7.5C8.05 3 8.53 3.37 8.66 3.9L9.56 7.29C9.66 7.66 9.56 8.05 9.3 8.31L7.9 9.71C9.01 12.04 10.96 13.99 13.29 15.1L14.69 13.7C14.95 13.44 15.34 13.34 15.71 13.44L19.1 14.34C19.63 14.47 20 14.95 20 15.5C20 15.5 21 16.5 21 16.5Z"
+              fill="#0088ff"
+            />
+          </svg>
+          {{ mapTarget?.phone }}</span
+        >
       </div>
       <button type="button" class="btn btn-ghost" (click)="closeMapModal()">Đóng</button>
     </div>
@@ -330,42 +505,134 @@
 
 <!-- ===== DELETE CONFIRM MODAL ===== -->
 <div
-  class="agency-modal-overlay"
+  class="agency-modal-overlay agency-delete-modal-overlay"
   *ngIf="showDeleteModal"
   (click)="closeDeleteModal()"
   role="dialog"
   aria-modal="true"
 >
-  <div class="agency-modal agency-modal--sm" (click)="$event.stopPropagation()">
-    <button
-      type="button"
-      class="agency-modal__close agency-modal__close--dark"
-      (click)="closeDeleteModal()"
-    >
-      ×
-    </button>
-    <div class="confirm-icon confirm-icon--danger">🗑</div>
-    <h3 class="confirm-title">Xoá chi nhánh?</h3>
-    <p class="confirm-subtitle">Hành động này không thể hoàn tác.</p>
-    <p class="confirm-text">
-      Bạn đang xoá chi nhánh <strong class="confirm-name">{{ deleteTargetName }}</strong
-      >. Toàn bộ dữ liệu liên quan sẽ bị xoá vĩnh viễn khỏi hệ thống.
-    </p>
-    <div class="agency-modal__actions agency-modal__actions--center">
-      <button type="button" class="btn btn-ghost" (click)="closeDeleteModal()">Huỷ</button>
-      <button type="button" class="btn btn-danger" (click)="confirmDelete()">
-        🗑 Xác nhận xoá
+  <div
+    class="modal-container modal-confirm modal-delete-container"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-body modal-confirm-body">
+      <div class="delete-modal-icon-wrap">
+        <div class="delete-modal-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+        </div>
+      </div>
+      <div class="delete-modal-content">
+        <h2 id="delete-agency-title" class="delete-modal-title">Xác nhận xóa chi nhánh</h2>
+        <p class="delete-modal-subtitle">
+          Chi nhánh <strong class="delete-product-name">{{ deleteTargetName }}</strong> sẽ bị xóa
+          vĩnh viễn.
+        </p>
+        <p class="delete-modal-subtitle">Bạn sẽ không thể khôi phục lại.</p>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-cancel-ghost" (click)="closeDeleteModal()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Hủy
+        </button>
+        <button type="button" class="btn btn-danger-solid" (click)="confirmDelete()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+          Xóa chi nhánh
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ALERT MODAL (giống admin-account) ===== -->
+<div
+  *ngIf="showAlert"
+  class="alert-overlay show"
+  role="dialog"
+  aria-modal="true"
+  (click)="closeAlertOnOverlay($event)"
+>
+  <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
+    <div class="alert-icon">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9 12l2 2 4-4"></path>
+      </svg>
+    </div>
+    <h3 class="alert-title">Thông báo</h3>
+    <p class="alert-message">{{ alertMessage }}</p>
+    <div class="alert-actions">
+      <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">
+        OK
       </button>
     </div>
   </div>
 </div>
 
 <!-- ===== TOASTS ===== -->
-<div class="toasts">
-  <div *ngFor="let t of toasts" class="toast" [ngClass]="'toast--' + t.type">
-    <span class="toast-icon">{{
-      t.type === 'success' ? '✓' : t.type === 'error' ? '✕' : '⚠'
-    }}</span>
-    <span>{{ t.message }}</span>
+<div class="toast-wrap" id="admin-agency-toast-wrap">
+  <div
+    class="toast"
+    *ngFor="let t of toasts; trackBy: trackToast"
+    [class.success]="t.type === 'success'"
+    [class.error]="t.type === 'error'"
+    [class.warn]="t.type === 'warn'"
+  >
+    <div class="toast-ico">
+      <img *ngIf="t.type === 'success'" src="/assets/icons/tick.png" alt="" />
+      <img *ngIf="t.type === 'error'" src="/assets/icons/delete2.png" alt="" />
+      <img *ngIf="t.type === 'warn'" src="/assets/icons/delete2.png" alt="" />
+    </div>
+    <div class="toast-text">
+      <div class="toast-title">{{ t.message }}</div>
+    </div>
+    <button class="toast-x" type="button" (click)="removeToast(t)">×</button>
   </div>
 </div>

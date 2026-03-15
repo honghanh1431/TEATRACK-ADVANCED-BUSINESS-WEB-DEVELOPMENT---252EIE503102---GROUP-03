@@ -275,6 +275,8 @@
   border-collapse: collapse;
   min-width: 700px;
   table-layout: auto;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 #vouchers-table thead th {
@@ -499,7 +501,7 @@
 
 .account-edit-modal-overlay .form-group label {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   font-weight: 700;
   color: #0088ff !important;
   font-size: 13px;

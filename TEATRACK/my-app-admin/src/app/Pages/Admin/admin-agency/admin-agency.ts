@@ -74,6 +74,8 @@ export class AdminAgency implements OnInit {
   }
 
   toasts: { type: string; message: string }[] = [];
+  showAlert = false;
+  alertMessage = '';
 
   constructor(
     private http: HttpClient,
@@ -159,6 +161,21 @@ export class AdminAgency implements OnInit {
 
   private persist(): void {
     localStorage.setItem(this.LS_KEY, JSON.stringify(this.agencies));
+  }
+
+  onSearchInput(value: string): void {
+    this.searchQuery = value ?? '';
+    this.filterTable();
+  }
+
+  onCityFilter(value: string): void {
+    this.cityFilter = value ?? '';
+    this.filterTable();
+  }
+
+  onStatusFilter(value: string): void {
+    this.statusFilter = value ?? '';
+    this.filterTable();
   }
 
   filterTable(): void {
@@ -284,6 +301,29 @@ export class AdminAgency implements OnInit {
     this.cdr.detectChanges();
   }
 
+  onAgencyImageFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.editImage = reader.result as string;
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  clearAgencyImage(): void {
+    this.editImage = '';
+    this.cdr.detectChanges();
+  }
+
+  onAgencyImageError(): void {
+    this.editImage = '/assets/icons/chi_nhanh1.png';
+    this.cdr.detectChanges();
+  }
+
   saveEdit(): void {
     const name = this.editName.trim();
     if (!name) {
@@ -392,25 +432,70 @@ export class AdminAgency implements OnInit {
     return this.filteredAgencies.slice(start, start + this.pageSize);
   }
 
-  exportCSV(): void {
-    const headers = ['Tên', 'Mã CN', 'Địa chỉ', 'Số điện thoại', 'Khu vực', 'Trạng thái'];
-    const rows = this.filteredAgencies.map((a) => [
-      a.name,
-      this.getCode(a.name),
-      a.address,
-      a.phone,
-      this.getCityLabel(a.address),
-      a.status === 'active' ? 'Hoạt động' : 'Tạm ngưng',
-    ]);
-    const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `chi-nhanh-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    this.toast('success', 'Đã xuất CSV.');
+  async exportExcel(): Promise<void> {
+    if (!this.filteredAgencies.length) {
+      this.showAlertModal('Không có chi nhánh để xuất!');
+      return;
+    }
+    const ExcelJSLib = (window as any).ExcelJS;
+    const saveAsLib = (window as any).saveAs;
+    if (!ExcelJSLib || !saveAsLib) {
+      this.showAlertModal('Thư viện xuất Excel chưa tải xong. Vui lòng tải lại trang.');
+      this.cdr.detectChanges();
+      return;
+    }
+    const workbook = new ExcelJSLib.Workbook();
+    const sheet = workbook.addWorksheet('Danh sách chi nhánh', {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    });
+    const headerStyle = {
+      font: { bold: true, color: { argb: 'FFFFFFFF' } },
+      fill: { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FF0088FF' } },
+      alignment: { horizontal: 'center' as const },
+    };
+    sheet.columns = [
+      { header: 'Tên', key: 'name', width: 22 },
+      { header: 'Mã CN', key: 'code', width: 12 },
+      { header: 'Địa chỉ', key: 'address', width: 28 },
+      { header: 'Số điện thoại', key: 'phone', width: 14 },
+      { header: 'Khu vực', key: 'city', width: 14 },
+      { header: 'Trạng thái', key: 'status', width: 14 },
+    ];
+    sheet.getRow(1).eachCell((cell: any) => {
+      cell.font = headerStyle.font;
+      cell.fill = headerStyle.fill;
+      cell.alignment = headerStyle.alignment;
+    });
+    for (const a of this.filteredAgencies) {
+      sheet.addRow({
+        name: a.name || '',
+        code: this.getCode(a.name),
+        address: a.address || '',
+        phone: a.phone || '',
+        city: this.getCityLabel(a.address),
+        status: a.status === 'active' ? 'Hoạt động' : 'Tạm ngưng',
+      });
+    }
+    const buffer = await workbook.xlsx.writeBuffer();
+    const today = new Date().toISOString().split('T')[0];
+    saveAsLib(new Blob([buffer]), `Chi_nhanh_${today}.xlsx`);
+    this.showAlertModal('Đã xuất danh sách chi nhánh ra file Excel thành công.');
     this.cdr.detectChanges();
+  }
+
+  showAlertModal(message: string): void {
+    this.alertMessage = message;
+    this.showAlert = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAlertModal(): void {
+    this.showAlert = false;
+    this.cdr.detectChanges();
+  }
+
+  closeAlertOnOverlay(event: Event): void {
+    if ((event.target as HTMLElement).classList.contains('alert-overlay')) this.closeAlertModal();
   }
 
   toast(type: string, message: string): void {
@@ -420,5 +505,14 @@ export class AdminAgency implements OnInit {
       this.toasts = this.toasts.filter((t) => t.message !== message);
       this.cdr.detectChanges();
     }, 3000);
+  }
+
+  removeToast(t: { type: string; message: string }): void {
+    this.toasts = this.toasts.filter((x) => x !== t);
+    this.cdr.detectChanges();
+  }
+
+  trackToast(index: number, t: { type: string; message: string }): string {
+    return `${index}-${t.message}`;
   }
 }

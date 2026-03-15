@@ -177,8 +177,12 @@
     <div class="modal-container modal-add-product" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2 class="modal-title">{{ editing ? 'CHỈNH SỬA BÀI VIẾT' : 'THÊM BÀI VIẾT' }}</h2>
-        <button type="button" class="modal-close" (click)="tryCloseModal()" aria-label="Đóng">&times;</button>
-        <p class="modal-subtitle">{{ editing ? 'Cập nhật thông tin bài viết.' : 'Thêm bài viết mới vào diễn đàn.' }}</p>
+        <button type="button" class="modal-close" (click)="tryCloseModal()" aria-label="Đóng">
+          &times;
+        </button>
+        <p class="modal-subtitle">
+          {{ editing ? 'Cập nhật thông tin bài viết.' : 'Thêm bài viết mới vào diễn đàn.' }}
+        </p>
       </div>
 
       <form class="modal-body" [formGroup]="form" (ngSubmit)="save()">
@@ -191,7 +195,15 @@
               placeholder="Nhập tiêu đề"
               [class.is-invalid]="form.get('title')?.invalid && form.get('title')?.touched"
             />
-            <div class="error-text" *ngIf="form.get('title')?.invalid && (form.get('title')?.touched || form.get('title')?.dirty)">Vui lòng nhập tiêu đề trang</div>
+            <div
+              class="error-text"
+              *ngIf="
+                form.get('title')?.invalid &&
+                (form.get('title')?.touched || form.get('title')?.dirty)
+              "
+            >
+              Vui lòng nhập tiêu đề trang
+            </div>
           </div>
           <div class="form-group">
             <label>Tiêu đề nội dung chính (Heading) <span class="req">*</span></label>
@@ -201,15 +213,32 @@
               placeholder="Nhập tiêu đề hiển thị"
               [class.is-invalid]="form.get('heading')?.invalid && form.get('heading')?.touched"
             />
-            <div class="error-text" *ngIf="form.get('heading')?.invalid && (form.get('heading')?.touched || form.get('heading')?.dirty)">Vui lòng nhập tiêu đề chính</div>
+            <div
+              class="error-text"
+              *ngIf="
+                form.get('heading')?.invalid &&
+                (form.get('heading')?.touched || form.get('heading')?.dirty)
+              "
+            >
+              Vui lòng nhập tiêu đề chính
+            </div>
           </div>
         </div>
 
         <div class="form-group">
           <label>Màu chữ tiêu đề (Heading Color)</label>
           <div class="color-picker-wrapper">
-            <input [value]="form.get('headingColor')?.value" (input)="form.get('headingColor')?.setValue($any($event.target).value)" type="color" />
-            <input formControlName="headingColor" (input)="onColorInput($any($event.target).value)" type="text" placeholder="#000000" />
+            <input
+              [value]="form.get('headingColor')?.value"
+              (input)="form.get('headingColor')?.setValue($any($event.target).value)"
+              type="color"
+            />
+            <input
+              formControlName="headingColor"
+              (input)="onColorInput($any($event.target).value)"
+              type="text"
+              placeholder="#000000"
+            />
           </div>
         </div>
 
@@ -233,7 +262,15 @@
         <div class="form-group">
           <label>Nội dung bài viết <span class="req">*</span></label>
           <angular-editor formControlName="content" [config]="editorConfig"></angular-editor>
-          <div class="error-text" *ngIf="form.get('content')?.invalid && (form.get('content')?.touched || form.get('content')?.dirty)">Vui lòng nhập nội dung bài viết</div>
+          <div
+            class="error-text"
+            *ngIf="
+              form.get('content')?.invalid &&
+              (form.get('content')?.touched || form.get('content')?.dirty)
+            "
+          >
+            Vui lòng nhập nội dung bài viết
+          </div>
         </div>
 
         <div class="image-upload-section">
@@ -245,7 +282,12 @@
               <button type="button" class="img-remove" (click)="removeThumb()">×</button>
               <div class="img-cap">Thumbnail</div>
             </div>
-            <button type="button" class="upload-box" *ngIf="!formThumbnail" (click)="thumbInput.click()">
+            <button
+              type="button"
+              class="upload-box"
+              *ngIf="!formThumbnail"
+              (click)="thumbInput.click()"
+            >
               <div class="upload-circle"><img src="assets/icons/upload.png" alt="upload" /></div>
               <div class="upload-text">Tải ảnh đại diện</div>
             </button>
@@ -254,7 +296,14 @@
 
         <div class="image-upload-section">
           <label>Hình ảnh bài viết (Layout Single / Gallery)</label>
-          <input #fileInput type="file" accept="image/*" multiple hidden (change)="onFiles($event)" />
+          <input
+            #fileInput
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            (change)="onFiles($event)"
+          />
           <div class="gallery">
             <div class="img-item" *ngFor="let img of formImages; let i = index">
               <img [src]="img" alt="poster" (error)="imgFallback($event)" />
@@ -361,7 +410,14 @@
   </div>
 
   <!-- Modal Success -->
-  <div id="modal-success" class="modal" style="display: none" role="dialog" aria-labelledby="success-message" aria-modal="true">
+  <div
+    id="modal-success"
+    class="modal"
+    style="display: none"
+    role="dialog"
+    aria-labelledby="success-message"
+    aria-modal="true"
+  >
     <div class="modal-overlay" data-close-success></div>
     <div class="modal-container modal-confirm modal-success-container">
       <div class="modal-body modal-confirm-body">
@@ -376,7 +432,11 @@
         </div>
         <div class="confirm-actions">
           <button type="button" class="btn btn-confirm" id="btn-close-success">
-            <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
+            <img
+              src="assets/icons/tick2.png"
+              alt=""
+              style="width: 15px; height: 15px; margin-right: 6px"
+            />
             Đóng
           </button>
         </div>
@@ -394,7 +454,14 @@
   >
     <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
       <div class="alert-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M9 12l2 2 4-4"></path>
         </svg>
@@ -402,7 +469,9 @@
       <h3 class="alert-title">Thông báo</h3>
       <p class="alert-message">{{ alertMessage }}</p>
       <div class="alert-actions">
-        <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">OK</button>
+        <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">
+          OK
+        </button>
       </div>
     </div>
   </div>
