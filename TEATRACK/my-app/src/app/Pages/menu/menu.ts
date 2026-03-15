@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProductStateService } from '../../product-state.service';
@@ -51,7 +51,7 @@ interface MenuState {
   styleUrls: ['./menu.css', '../../../styles.css'],
   encapsulation: ViewEncapsulation.None, // Để không bị global CSS ảnh hưởng
 })
-export class Menu implements OnInit, AfterViewInit {
+export class Menu implements OnInit, AfterViewInit, OnDestroy {
   private static readonly STATIC_BASE = '/';
 
   // ─── State ────────────────────────────────────────────────────────────────
@@ -79,6 +79,14 @@ export class Menu implements OnInit, AfterViewInit {
     return !localStorage.getItem('ngogia_user') && !localStorage.getItem('authAdmin');
   }
 
+  get isVip(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    try {
+      const u = JSON.parse(localStorage.getItem('ngogia_user') || '{}');
+      return u?.role === 'vip customer';
+    } catch { return false; }
+  }
+
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
@@ -95,7 +103,21 @@ export class Menu implements OnInit, AfterViewInit {
       this.state.category = categoryFromUrl.trim();
     }
     this.fetchProducts();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('user:updated', this.handleUserUpdated);
+    }
   }
+
+  ngOnDestroy(): void {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('user:updated', this.handleUserUpdated);
+    }
+  }
+
+  private handleUserUpdated = () => {
+    this.cdr.detectChanges();
+  };
 
   ngAfterViewInit(): void {
     if (this.state.category && this.state.category !== 'all') {
@@ -342,10 +364,12 @@ export class Menu implements OnInit, AfterViewInit {
       return;
     }
     if (!window.NGCart) return;
+    const finalPrice = this.isVip ? this.getVipPriceM(product) : (Number(product.price) || 0);
+
     window.NGCart.addItem({
       id: product.id || '',
       name: product.name || '',
-      price: Number(product.price) || 0,
+      price: finalPrice,
       image: product.image || '',
       size: 'M',
       qty: 1,

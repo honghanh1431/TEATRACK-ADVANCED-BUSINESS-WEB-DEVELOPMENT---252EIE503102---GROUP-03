@@ -133,6 +133,14 @@ export class Product implements OnInit, OnDestroy {
     return !localStorage.getItem('ngogia_user') && !localStorage.getItem('authAdmin');
   }
 
+  get isVip(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    try {
+      const u = JSON.parse(localStorage.getItem('ngogia_user') || '{}');
+      return u?.role === 'vip customer';
+    } catch { return false; }
+  }
+
   reviews: ReviewItem[] = [
     { name: 'Hồng Hạnh', title: 'Tôi yêu HTVT!!!!!!!', content: 'HTVT là thức uống ngon nhất, tôi có thể uống mỗi ngày!', time: '2 ngày trước', rating: 5, createdAt: 0 },
     { name: 'Bảo Vy', title: 'So good, so yummy', content: 'HTVT rất ngon, tuyệt vời!', time: '3 ngày trước', rating: 5, createdAt: 0 },
@@ -174,10 +182,21 @@ export class Product implements OnInit, OnDestroy {
       })),
     ).subscribe(({ pid, name }) => this.loadProductWithParams(pid, name));
     this.subs.push(sub);
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('user:updated', this.handleUserUpdated);
+    }
   }
+
+  private handleUserUpdated = () => {
+    this.cdr.detectChanges();
+  };
 
   ngOnDestroy(): void {
     this.subs.forEach((s) => s?.unsubscribe());
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('user:updated', this.handleUserUpdated);
+    }
   }
 
   private loadProductWithParams(pid: string | null, name: string | null): void {
@@ -368,7 +387,12 @@ export class Product implements OnInit, OnDestroy {
 
   /** Giá gốc + tổng tiền topping (cho 1 phần) */
   private getTotalPriceWithToppings(): number {
-    const base = this.selectedSize === 'L' ? this.getPriceL(this.product!) : this.getPriceM(this.product!);
+    let base = 0;
+    if (this.selectedSize === 'L') {
+      base = this.isVip ? this.getVipPriceL(this.product!) : this.getPriceL(this.product!);
+    } else {
+      base = this.isVip ? this.getVipPriceM(this.product!) : this.getPriceM(this.product!);
+    }
     let add = 0;
     for (const key of Object.keys(this.toppingQtys)) {
       const q = this.toppingQtys[key] || 0;
@@ -626,7 +650,7 @@ export class Product implements OnInit, OnDestroy {
       return;
     }
     if (!window.NGCart) return;
-    const price = this.getPriceM(p);
+    const price = this.isVip ? this.getVipPriceM(p) : this.getPriceM(p);
     window.NGCart.addItem({
       id: String(p.id || ''),
       name: String(p.name || ''),
