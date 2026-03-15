@@ -82,12 +82,22 @@ export class BlogDetail implements OnInit {
   }
 
   private parseBlogDate(dateStr: string): Date | null {
-    const rangeMatch = dateStr.match(/^\d+-(\d+)\/(\d{1,2})\/(\d{4})$/);
+    if (!dateStr || typeof dateStr !== 'string') return null;
+    const s = dateStr.trim();
+    // Dạng "13-15/06/2025"
+    const rangeMatch = s.match(/^\d+-(\d+)\/(\d{1,2})\/(\d{4})$/);
     if (rangeMatch) {
       const [, day, month, year] = rangeMatch;
       return new Date(+year, +month - 1, +day);
     }
-    const singleMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    // Dạng "31/12/2025 – 01/01/2026" (khoảng ngày, lấy ngày đầu)
+    const rangeDashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*[–\-]\s*\d{1,2}\/\d{1,2}\/\d{4}$/);
+    if (rangeDashMatch) {
+      const [, day, month, year] = rangeDashMatch;
+      return new Date(+year, +month - 1, +day);
+    }
+    // Dạng "20/01/2026" hoặc "08/11/2025"
+    const singleMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (singleMatch) {
       const [, day, month, year] = singleMatch;
       return new Date(+year, +month - 1, +day);
@@ -137,19 +147,38 @@ export class BlogDetail implements OnInit {
     });
   }
 
+  private shuffleAndTake<T>(arr: T[], n: number): T[] {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, n);
+  }
+
+  /** Chuẩn hóa item từ API thành dạng có title, description, image, date cho related card */
+  private toRelatedItem(b: any): any {
+    return {
+      id: b.id,
+      title: b.title || b.heading || '',
+      image: b.thumbnailImage || b.image,
+      date: b.date || ''
+    };
+  }
+
   private loadRelated() {
     this.http.get<any[]>('http://localhost:3002/blog').subscribe({
       next: (data) => {
-        this.relatedBlogs = (data || [])
+        const others = (data || [])
           .filter(b => b.id !== this.blogId && b.visible !== false)
-          .slice(0, 6);
+          .map(b => this.toRelatedItem(b));
+        this.relatedBlogs = this.shuffleAndTake(others, 6);
         this.relatedIndex = 0;
         this.cdr.detectChanges();
       },
       error: () => {
-        this.relatedBlogs = RELATED_BLOGS
-          .filter(b => b.id !== this.blogId)
-          .slice(0, 6);
+        const others = RELATED_BLOGS.filter(b => b.id !== this.blogId);
+        this.relatedBlogs = this.shuffleAndTake(others, 6);
         this.relatedIndex = 0;
         this.cdr.detectChanges();
       }

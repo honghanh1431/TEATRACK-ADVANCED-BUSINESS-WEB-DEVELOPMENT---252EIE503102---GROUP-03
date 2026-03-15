@@ -648,7 +648,7 @@ export class AdminBlog implements OnInit, AfterViewInit {
   private hydrate(x: any): BlogRow {
     return {
       id: String(x.id || x._id || `blog_${Date.now()}`),
-      code: String(x.code || (x.id || x._id)?.toString().slice(-6).toUpperCase() || 'NG00000'),
+      code: String(x.code || (x.id || x._id)?.toString().toUpperCase() || 'NG00000'),
       title: String(x.title || x.heading || ''),
       heading: String(x.heading || x.title || ''),
       headingColor: String(x.headingColor || '#305C33'),

@@ -5,13 +5,9 @@
   <section class="breadcrumb-banner" *ngIf="blog">
     <h1 class="breadcrumb-title">{{ blog.title }}</h1>
     <p class="breadcrumb-path">
-      <a routerLink="/" (click)="scrollToTop()">
-        Trang chủ
-      </a>
-      / <a routerLink="/blog" (click)="scrollToTop()">
-        Diễn đàn
-      </a>
-      / <a [routerLink]="['/blog', blogId]">{{ blog.title }}</a>
+      <a routerLink="/" (click)="scrollToTop()"> Trang chủ </a>
+      / <a routerLink="/blog" (click)="scrollToTop()"> Diễn đàn </a> /
+      <a [routerLink]="['/blog', blogId]">{{ blog.title }}</a>
     </p>
   </section>
 
@@ -22,7 +18,11 @@
     </div>
 
     <!-- Tiêu đề (dùng innerHTML để <br/> xuống dòng) -->
-    <h1 id="blog-heading" [style.color]="blog.headingColor" [innerHTML]="blog.heading || blog.title"></h1>
+    <h1
+      id="blog-heading"
+      [style.color]="blog.headingColor"
+      [innerHTML]="blog.heading || blog.title"
+    ></h1>
 
     <!-- Subheading -->
     <h2 id="blog-subheading" *ngIf="blog.subheading" [style.color]="blog.headingColor">
@@ -60,16 +60,29 @@
   </div>
 
   <div class="related-carousel" *ngIf="relatedBlogs.length > 0">
-    <button type="button" class="related-arrow related-arrow-left" (click)="prevRelated()" [disabled]="!canPrevRelated"
-      [attr.aria-disabled]="!canPrevRelated" aria-label="Xem nhóm trước">
+    <button
+      type="button"
+      class="related-arrow related-arrow-left"
+      (click)="prevRelated()"
+      [disabled]="!canPrevRelated"
+      [attr.aria-disabled]="!canPrevRelated"
+      aria-label="Xem nhóm trước"
+    >
       <span class="related-arrow-icon" aria-hidden="true">←</span>
     </button>
     <div class="related-viewport">
-      <div class="related-track" [style.width.%]="(relatedBlogs.length / 3) * 100"
-        [style.transform]="'translateX(-' + (relatedIndex * 100 / relatedBlogs.length) + '%)'">
-        <div class="related-card" *ngFor="let b of relatedBlogs"
-          [style.flex]="'0 0 calc(100% / ' + relatedBlogs.length + ')'" (click)="openBlog(b.id)">
-          <img [src]="normSrc(b.image || b.thumbnailImage)" [alt]="b.title" class="related-img" />
+      <div
+        class="related-track"
+        [style.width.%]="(relatedBlogs.length / 3) * 100"
+        [style.transform]="'translateX(-' + (relatedIndex * 100) / relatedBlogs.length + '%)'"
+      >
+        <div
+          class="related-card"
+          *ngFor="let b of relatedBlogs"
+          [style.flex]="'0 0 calc(100% / ' + relatedBlogs.length + ')'"
+          (click)="openBlog(b.id)"
+        >
+          <img [src]="normSrc(b.thumbnailImage || b.image)" [alt]="b.title" class="related-img" />
           <p class="related-card-date">
             <span class="related-date-icon" aria-hidden="true">
               <img src="assets/icons/Vector (1).png" alt="" />
@@ -78,12 +91,20 @@
           </p>
           <h3>{{ b.title }}</h3>
           <p>{{ b.description }}</p>
-          <a class="related-link" (click)="openBlog(b.id); $event.stopPropagation()">Xem chi tiết</a>
+          <a class="related-link" (click)="openBlog(b.id); $event.stopPropagation()"
+            >Xem chi tiết</a
+          >
         </div>
       </div>
     </div>
-    <button type="button" class="related-arrow related-arrow-right" (click)="nextRelated()" [disabled]="!canNextRelated"
-      [attr.aria-disabled]="!canNextRelated" aria-label="Xem nhóm sau">
+    <button
+      type="button"
+      class="related-arrow related-arrow-right"
+      (click)="nextRelated()"
+      [disabled]="!canNextRelated"
+      [attr.aria-disabled]="!canNextRelated"
+      aria-label="Xem nhóm sau"
+    >
       <span class="related-arrow-icon" aria-hidden="true">→</span>
     </button>
   </div>

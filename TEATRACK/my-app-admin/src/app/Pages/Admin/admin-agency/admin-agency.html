@@ -1,1 +1,371 @@
-<p>admin-agency works!</p>
+<div class="agency-page">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">
+      <h1>QUẢN LÍ CHI NHÁNH</h1>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-ghost" (click)="exportCSV()">Xuất CSV</button>
+      <button type="button" class="btn btn-primary" (click)="openCreate()">+ Thêm chi nhánh</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card stat-card--blue">
+      <div class="stat-label">Tổng chi nhánh</div>
+      <div class="stat-value">{{ agencies.length }}</div>
+      <div class="stat-change"><span>+2</span> so với tháng trước</div>
+    </div>
+    <div class="stat-card stat-card--green">
+      <div class="stat-label">Đang hoạt động</div>
+      <div class="stat-value">{{ agencies.filter(a => a.status === 'active').length }}</div>
+      <div class="stat-change"><span>+1</span> tuần này</div>
+    </div>
+    <div class="stat-card stat-card--orange">
+      <div class="stat-label">Tạm ngưng</div>
+      <div class="stat-value">{{ agencies.filter(a => a.status === 'inactive').length }}</div>
+      <div class="stat-change">0 yêu cầu mở lại</div>
+    </div>
+    <div class="stat-card stat-card--purple">
+      <div class="stat-label">Tỉnh / Thành phố</div>
+      <div class="stat-value">{{ cityCount }}</div>
+      <div class="stat-change">Thủ Đức &amp; Bình Dương</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Tìm theo tên, địa chỉ, mã chi nhánh..."
+        [(ngModel)]="searchQuery"
+        (input)="filterTable()"
+      />
+    </div>
+    <select class="filter-select" [(ngModel)]="cityFilter" (change)="filterTable()">
+      <option value="">Tất cả khu vực</option>
+      <option value="thu-duc">Thủ Đức</option>
+      <option value="binh-duong">Bình Dương</option>
+    </select>
+    <select class="filter-select" [(ngModel)]="statusFilter" (change)="filterTable()">
+      <option value="">Tất cả trạng thái</option>
+      <option value="active">Hoạt động</option>
+      <option value="inactive">Tạm ngưng</option>
+    </select>
+  </div>
+
+  <!-- BULK BAR -->
+  <div class="bulk-bar" *ngIf="selectedIds.size > 0">
+    <span class="bulk-count">{{ selectedIds.size }}</span>
+    <span class="bulk-label">chi nhánh được chọn</span>
+    <div class="bulk-actions">
+      <button type="button" class="btn btn-sm btn-warn" (click)="bulkDeactivate()">
+        Tạm ngưng
+      </button>
+      <button type="button" class="btn btn-sm btn-danger" (click)="bulkDelete()">
+        Xoá hàng loạt
+      </button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <section class="card table" id="agencies">
+    <div class="card-title">Danh sách chi nhánh</div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="check">
+              <input
+                type="checkbox"
+                [checked]="allSelected"
+                (change)="toggleAll($any($event.target).checked)"
+              />
+            </th>
+            <th>Chi nhánh</th>
+            <th>Mã CN</th>
+            <th>Địa chỉ</th>
+            <th>Số điện thoại</th>
+            <th>Khu vực</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredAgencies.length === 0">
+            <td colspan="9" class="empty-row">Không tìm thấy chi nhánh nào</td>
+          </tr>
+          <tr
+            *ngFor="let agency of getPagedAgencies(); let i = index"
+            [class.selected]="isSelected(agency._id)"
+            (click)="openDetail(agency)"
+          >
+            <td (click)="$event.stopPropagation()">
+              <input
+                type="checkbox"
+                [checked]="isSelected(agency._id)"
+                (change)="toggleRow(agency._id, $any($event.target).checked)"
+              />
+            </td>
+            <td>
+              <div class="agency-cell">
+                <div
+                  class="agency-thumb"
+                  [style.backgroundImage]="'url(' + (agency.image || '/assets/icons/chi_nhanh1.png') + ')'"
+                ></div>
+                <div class="agency-name">{{ getAgencyDisplayName(agency) }}</div>
+              </div>
+            </td>
+            <td>
+              <span class="code-badge">{{ getCode(agency.name) }}</span>
+            </td>
+            <td class="address-cell">
+              <span class="address-text">{{ agency.address }}</span>
+            </td>
+            <td class="phone-cell">
+              <a [href]="'tel:' + agency.phone" (click)="$event.stopPropagation()">{{
+                agency.phone
+              }}</a>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getCityBadgeClass(agency.address)">
+                {{ getCityLabel(agency.address) }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="agency.status === 'active' ? 'badge-active' : 'badge-inactive'"
+              >
+                {{ agency.status === 'active' ? '✓ Hoạt động' : '⏸ Tạm ngưng' }}
+              </span>
+            </td>
+            <td class="date-cell">{{ agency.createdAt | date: 'dd/MM/yyyy' }}</td>
+            <td (click)="$event.stopPropagation()">
+              <div class="actions">
+                <button
+                  type="button"
+                  class="icon-btn map"
+                  title="Xem bản đồ"
+                  (click)="openMap(agency)"
+                >
+                  🗺️
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn edit"
+                  title="Chỉnh sửa"
+                  (click)="openEdit(agency)"
+                >
+                  ✏️
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn lock"
+                  [title]="agency.status === 'active' ? 'Tạm ngưng' : 'Kích hoạt'"
+                  (click)="toggleStatus(agency)"
+                >
+                  {{ agency.status === 'active' ? '⏸' : '▶️' }}
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn delete"
+                  title="Xoá"
+                  (click)="openDelete(agency)"
+                >
+                  🗑
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <span>{{ paginationInfo }}</span>
+      <div class="page-btns">
+        <button type="button" class="page-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+          ‹
+        </button>
+        <button
+          *ngFor="let p of pages"
+          type="button"
+          class="page-btn"
+          [class.active]="p === currentPage"
+          (click)="goToPage(p)"
+        >
+          {{ p }}
+        </button>
+        <button
+          type="button"
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== EDIT / CREATE MODAL ===== -->
+<div
+  class="agency-modal-overlay"
+  *ngIf="showEditModal"
+  (click)="closeEditModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="agency-modal" (click)="$event.stopPropagation()">
+    <div class="agency-modal__header">
+      <div>
+        <h3 class="agency-modal__title">{{ editModalTitle }}</h3>
+        <p class="agency-modal__subtitle">{{ editModalSub }}</p>
+      </div>
+      <button type="button" class="agency-modal__close" (click)="closeEditModal()">×</button>
+    </div>
+    <div class="agency-modal__form">
+      <div class="form-grid">
+        <label class="form-group form-group--full">
+          <span class="form-label">TÊN CHI NHÁNH</span>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="editName"
+            placeholder="244 đường số 8 - H071"
+          />
+        </label>
+        <label class="form-group form-group--full">
+          <span class="form-label">ĐỊA CHỈ</span>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="editAddress"
+            placeholder="244 Đường Số 8, Linh Xuân, Thủ Đức"
+          />
+        </label>
+        <label class="form-group">
+          <span class="form-label">SỐ ĐIỆN THOẠI</span>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="editPhone"
+            placeholder="0999.888.777"
+          />
+        </label>
+        <label class="form-group">
+          <span class="form-label">TRẠNG THÁI</span>
+          <select class="form-input" [(ngModel)]="editStatus">
+            <option value="active">Hoạt động</option>
+            <option value="inactive">Tạm ngưng</option>
+          </select>
+        </label>
+        <label class="form-group form-group--full">
+          <span class="form-label">LINK GOOGLE MAPS EMBED</span>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="editMapEmbed"
+            placeholder="https://www.google.com/maps/embed?..."
+          />
+        </label>
+        <label class="form-group form-group--full">
+          <span class="form-label">HÌNH ẢNH (URL hoặc đường dẫn)</span>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="editImage"
+            placeholder="assets/icons/chi_nhanh1.png"
+          />
+        </label>
+      </div>
+      <div class="agency-modal__actions">
+        <button type="button" class="btn btn-ghost" (click)="closeEditModal()">Huỷ</button>
+        <button type="button" class="btn btn-primary" (click)="saveEdit()">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAP MODAL ===== -->
+<div
+  class="agency-modal-overlay"
+  *ngIf="showMapModal"
+  (click)="closeMapModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="agency-modal agency-modal--map" (click)="$event.stopPropagation()">
+    <div class="agency-modal__header">
+      <div>
+        <h3 class="agency-modal__title">🗺️ {{ mapTarget?.name }}</h3>
+        <p class="agency-modal__subtitle">{{ mapTarget?.address }}</p>
+      </div>
+      <button type="button" class="agency-modal__close" (click)="closeMapModal()">×</button>
+    </div>
+    <div class="map-container">
+      <iframe
+        [src]="getSafeMapUrl(mapTarget?.mapEmbed)"
+        width="100%"
+        height="360"
+        style="border: 0; display: block"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+    <div class="map-footer">
+      <div class="map-info">
+        <span class="map-phone">📞 {{ mapTarget?.phone }}</span>
+      </div>
+      <button type="button" class="btn btn-ghost" (click)="closeMapModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE CONFIRM MODAL ===== -->
+<div
+  class="agency-modal-overlay"
+  *ngIf="showDeleteModal"
+  (click)="closeDeleteModal()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="agency-modal agency-modal--sm" (click)="$event.stopPropagation()">
+    <button
+      type="button"
+      class="agency-modal__close agency-modal__close--dark"
+      (click)="closeDeleteModal()"
+    >
+      ×
+    </button>
+    <div class="confirm-icon confirm-icon--danger">🗑</div>
+    <h3 class="confirm-title">Xoá chi nhánh?</h3>
+    <p class="confirm-subtitle">Hành động này không thể hoàn tác.</p>
+    <p class="confirm-text">
+      Bạn đang xoá chi nhánh <strong class="confirm-name">{{ deleteTargetName }}</strong
+      >. Toàn bộ dữ liệu liên quan sẽ bị xoá vĩnh viễn khỏi hệ thống.
+    </p>
+    <div class="agency-modal__actions agency-modal__actions--center">
+      <button type="button" class="btn btn-ghost" (click)="closeDeleteModal()">Huỷ</button>
+      <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+        🗑 Xác nhận xoá
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOASTS ===== -->
+<div class="toasts">
+  <div *ngFor="let t of toasts" class="toast" [ngClass]="'toast--' + t.type">
+    <span class="toast-icon">{{
+      t.type === 'success' ? '✓' : t.type === 'error' ? '✕' : '⚠'
+    }}</span>
+    <span>{{ t.message }}</span>
+  </div>
+</div>

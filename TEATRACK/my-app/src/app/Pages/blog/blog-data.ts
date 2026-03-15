@@ -230,5 +230,61 @@ export const RELATED_BLOGS = [
     title: 'Ngày của cha', 
     description: 'Mừng ngày của cha cùng Hồng Trà Ngô Gia', 
     link: '/src/Pages/Blog/blog-detail.html?id=blog_8' 
+  },
+  { 
+    id: 'blog_9', 
+    image: '/assets/images/blog_9.jpg', 
+    date: '10/02/2026', 
+    title: 'Nhân đôi ngọt ngào ngày Valentine', 
+    description: 'Combo 2 thức uống ngọt ngào – giá chỉ 42.000đ', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_9' 
+  },
+  { 
+    id: 'blog_10', 
+    image: '/assets/images/blog_10.jpg', 
+    date: '01/01/2026', 
+    title: 'Khởi vị đầu năm', 
+    description: 'Hóa đơn từ 33.000đ – tặng 1 ly Hồng Trà Đài Loan (M)', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_10' 
+  },
+  { 
+    id: 'blog_11', 
+    image: '/assets/images/blog_11.jpg', 
+    date: '01/01/2026', 
+    title: 'Khởi vị đầu năm cùng Hồng Trà Ngô Gia', 
+    description: 'Ưu đãi năm mới – tặng Hồng Trà Đài Loan', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_11' 
+  },
+  { 
+    id: 'blog_12', 
+    image: '/assets/images/blog_12.jpg', 
+    date: '08/11/2025', 
+    title: 'Dù nắng hay mưa – Ngô Gia luôn bên bạn', 
+    description: 'Tặng áo mưa tiện lợi cho hóa đơn từ 2 thức uống', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_12' 
+  },
+  { 
+    id: 'blog_13', 
+    image: '/assets/images/blog_13.jpg', 
+    date: '28/08/2025', 
+    title: 'Săn móc khóa Ngô Gia phiên bản siêu giới hạn', 
+    description: 'Hóa đơn từ 70.000đ – nhận ngay móc khóa cực đáng yêu', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_13' 
+  },
+  { 
+    id: 'blog_14', 
+    image: '/assets/images/blog_14.jpg', 
+    date: '26/07/2025', 
+    title: 'Rinh túi giữ nhiệt siêu cute', 
+    description: 'Hóa đơn từ 40K – túi 2 ly / từ 60K – túi 4 ly', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_14' 
+  },
+  { 
+    id: 'blog_15', 
+    image: '/assets/images/blog_15.png', 
+    date: '20/01/2026', 
+    title: 'Tuyển dụng nhân viên thiết kế', 
+    description: 'Graphic Designer – Mức lương từ 9.500.000 VNĐ/tháng', 
+    link: '/src/Pages/Blog/blog-detail.html?id=blog_15' 
   }
 ];

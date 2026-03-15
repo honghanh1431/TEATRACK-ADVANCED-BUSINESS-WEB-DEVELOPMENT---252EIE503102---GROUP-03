@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './page-header-admin.html',
   styleUrl: './page-header.css',
 })
-export class PageHeaderAdmin implements OnInit, OnDestroy {
+export class PageHeaderAdmin implements OnInit, OnDestroy, AfterViewInit {
   userMenuOpen = false;
   showLogoutModal = false;
   isOverviewNavActive = false;
@@ -20,6 +20,7 @@ export class PageHeaderAdmin implements OnInit, OnDestroy {
   private hashSub?: () => void;
 
   @ViewChild('userBox') userBoxRef?: ElementRef<HTMLElement>;
+  @ViewChild('navBar') navBarRef?: ElementRef<HTMLElement>;
 
   constructor(private router: Router) { }
 
@@ -30,15 +31,36 @@ export class PageHeaderAdmin implements OnInit, OnDestroy {
     this.isOverviewNavActive = onDashboard && hash !== '#products';
   }
 
+  scrollActiveNavIntoView(): void {
+    setTimeout(() => {
+      const nav = this.navBarRef?.nativeElement;
+      if (!nav) return;
+      const active = nav.querySelector('a.active');
+      if (active instanceof HTMLElement) {
+        active.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'auto' });
+      }
+    }, 0);
+  }
+
   ngOnInit(): void {
     this.updateProductsActive();
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(() => this.updateProductsActive());
+      .subscribe(() => {
+        this.updateProductsActive();
+        this.scrollActiveNavIntoView();
+      });
     if (typeof window !== 'undefined') {
-      this.hashSub = () => this.updateProductsActive();
+      this.hashSub = () => {
+        this.updateProductsActive();
+        this.scrollActiveNavIntoView();
+      };
       window.addEventListener('hashchange', this.hashSub);
     }
+  }
+
+  ngAfterViewInit(): void {
+    this.scrollActiveNavIntoView();
   }
 
   ngOnDestroy(): void {

@@ -4,11 +4,11 @@ const router = express.Router();
 let db;
 const init = (database) => { db = database; };
 
-// GET /api/agencies – Lấy danh sách chi nhánh (public, không cần auth)
+// GET /api/agencies – Lấy danh sách chi nhánh (public, đủ trường cho admin)
 router.get('/', async (req, res) => {
     try {
         const agencies = await db.collection('agencies')
-            .find({}, { projection: { name: 1, address: 1, phone: 1 } })
+            .find({})
             .sort({ name: 1 })
             .toArray();
         res.json(agencies);
