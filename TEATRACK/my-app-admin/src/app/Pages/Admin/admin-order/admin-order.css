@@ -779,6 +779,26 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
+  .order-info-grid.order-info-two-cols {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  }
+  .order-info-two-cols .order-info-col {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .order-info-col .info-control {
+    display: flex;
+    align-items: center;
+  }
+  .order-info-col .status-dropdown {
+    width: 100%;
+    min-width: 0;
+  }
   .info-row {
     display: flex;
     flex-direction: column;
