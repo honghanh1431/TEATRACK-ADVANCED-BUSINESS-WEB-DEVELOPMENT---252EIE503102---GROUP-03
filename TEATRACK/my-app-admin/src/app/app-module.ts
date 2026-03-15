@@ -10,13 +10,18 @@ import { PageHeaderAdmin } from './Components/page-header/page-header-admin';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { AdminAccount } from './Pages/Admin/admin-account/admin-account';
 import { AdminProfile } from './Pages/Admin/admin-profile/admin-profile';
+import { AdminPromotion } from './Pages/Admin/admin-promotion/admin-promotion';
+import { AdminAgency } from './Pages/Admin/admin-agency/admin-agency';
+import { AdminContact } from './Pages/Admin/admin-contact/admin-contact';
 
 @NgModule({
   declarations: [
     App,
     Pagenotfound,
     AdminAccount,
-    AdminProfile
+    AdminProfile,
+    AdminAgency,
+    AdminContact
   ],
   imports: [
     BrowserModule,
@@ -24,7 +29,8 @@ import { AdminProfile } from './Pages/Admin/admin-profile/admin-profile';
     HttpClientModule,
     CommonModule,
     FormsModule,
-    PageHeaderAdmin
+    PageHeaderAdmin,
+    AdminPromotion
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

@@ -1,0 +1,23 @@
+[
+  {
+    "code": "NGOGIAFS",
+    "type": "amount",
+    "value": 10000,
+    "minSubtotal": 50000,
+    "description": "Giảm 10.000đ cho đơn từ 50.000đ"
+  },
+  {
+    "code": "NGOVIP15",
+    "type": "percent",
+    "value": 15,
+    "minSubtotal": 80000,
+    "max": 40000,
+    "description": "Giảm 15% tối đa 40.000đ cho đơn từ 80.000đ"
+  },
+  {
+    "code": "123456789",
+    "type": "perItem",
+    "value": 3000,
+    "description": "Giảm 3.000đ trên mỗi món trong giỏ hàng"
+  }
+]

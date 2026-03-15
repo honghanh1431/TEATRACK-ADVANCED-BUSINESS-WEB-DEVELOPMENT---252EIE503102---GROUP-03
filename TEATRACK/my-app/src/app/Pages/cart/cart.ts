@@ -76,30 +76,10 @@ export class Cart implements OnInit, OnDestroy {
   private readonly COUPON_KEY = 'ngogia_coupon';
   private readonly SHIPPING_KEY = 'ngogia_shipping';
   private readonly USER_KEY = 'ngogia_user';
+  private readonly VOUCHER_STORAGE_KEY = 'ngogia_vouchers';
 
-  // Coupon rules
-  private readonly couponRules: Record<string, CouponRule> = {
-    NGOGIAFS: {
-      type: 'amount',
-      value: 10000,
-      minSubtotal: 50000,
-      description: 'Giảm 10.000d cho đơn từ 50.000d',
-    },
-    NGOVIP15: {
-      type: 'percent',
-      value: 15,
-      minSubtotal: 80000,
-      max: 40000,
-      description: 'Giảm 15% tối đa 40.000d cho đơn từ 80.000d',
-    },
-    123456789: {
-      type: 'perItem',
-      value: 3000,
-      description: 'Giảm 3.000đ trên mỗi món trong giỏ hàng',
-    },
-  };
+  private couponRules: Record<string, CouponRule> = {};
 
-  /** Giờ hiện tại dạng "HH:mm" (24h, 60 phút) */
   getCurrentTimeString(): string {
     const d = new Date();
     const h = d.getHours();
@@ -348,8 +328,59 @@ export class Cart implements OnInit, OnDestroy {
     this.startScanTimerIfNeeded();
     this.syncCartFromServer();
     this.loadAgencies();
+    this.loadVoucherRules();
     window.addEventListener('user-login', this.handleUserLogin);
     window.addEventListener('user:updated', this.handleUserUpdated);
+  }
+
+  private loadVoucherRules(): void {
+    const buildRules = (list: Array<{ code: string; type: string; value: number; minSubtotal?: number; max?: number; description: string }>): Record<string, CouponRule> => {
+      const out: Record<string, CouponRule> = {};
+      for (const v of list || []) {
+        const code = String(v?.code || '').trim().toUpperCase();
+        if (!code) continue;
+        const type = v.type === 'percent' ? 'percent' : v.type === 'perItem' ? 'perItem' : 'amount';
+        out[code] = {
+          type,
+          value: Number(v.value) || 0,
+          minSubtotal: v.minSubtotal != null ? Number(v.minSubtotal) : undefined,
+          max: v.max != null ? Number(v.max) : undefined,
+          description: String(v.description || '').trim() || `Mã ${code}`,
+        };
+      }
+      return out;
+    };
+    this.http.get<Array<{ code: string; type: string; value: number; minSubtotal?: number; max?: number; description: string }>>('/data/vouchers.json').subscribe({
+      next: (data) => {
+        let list = Array.isArray(data) ? data : [];
+        try {
+          const stored = localStorage.getItem(this.VOUCHER_STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length) list = parsed;
+          }
+        } catch (_) {}
+        this.couponRules = buildRules(list);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        try {
+          const stored = localStorage.getItem(this.VOUCHER_STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) this.couponRules = buildRules(parsed);
+          }
+        } catch (_) {}
+        if (Object.keys(this.couponRules).length === 0) {
+          this.couponRules = buildRules([
+            { code: 'NGOGIAFS', type: 'amount', value: 10000, minSubtotal: 50000, description: 'Giảm 10.000đ cho đơn từ 50.000đ' },
+            { code: 'NGOVIP15', type: 'percent', value: 15, minSubtotal: 80000, max: 40000, description: 'Giảm 15% tối đa 40.000đ cho đơn từ 80.000đ' },
+            { code: '123456789', type: 'perItem', value: 3000, description: 'Giảm 3.000đ trên mỗi món trong giỏ hàng' },
+          ]);
+        }
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   ngOnDestroy(): void {

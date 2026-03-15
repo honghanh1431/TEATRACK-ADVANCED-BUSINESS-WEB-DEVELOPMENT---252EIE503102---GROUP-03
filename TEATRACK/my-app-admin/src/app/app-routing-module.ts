@@ -8,6 +8,9 @@ import { AdminOrder } from './Pages/Admin/admin-order/admin-order';
 import { Pagenotfound } from './Pages/pagenotfound/pagenotfound';
 import { AdminAccount } from './Pages/Admin/admin-account/admin-account';
 import { AdminProfile } from './Pages/Admin/admin-profile/admin-profile';
+import { AdminAgency } from './Pages/Admin/admin-agency/admin-agency';
+import { AdminContact } from './Pages/Admin/admin-contact/admin-contact';
+import { AdminPromotion } from './Pages/Admin/admin-promotion/admin-promotion';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,6 +20,9 @@ const routes: Routes = [
   { path: 'admin-order', component: AdminOrder },
   { path: 'admin-account', component: AdminAccount },
   { path: 'admin-profile', component: AdminProfile },
+  { path: 'admin-agency', component: AdminAgency },
+  { path: 'admin-contact', component: AdminContact },
+  { path: 'admin-promotion', component: AdminPromotion },
   { path: '404', component: Pagenotfound },
   
   { path: '**', redirectTo: '404', pathMatch: 'full' },

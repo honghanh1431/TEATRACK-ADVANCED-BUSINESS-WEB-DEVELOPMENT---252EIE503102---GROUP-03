@@ -1,0 +1,447 @@
+<header class="topbar">
+  <div class="topbar-title">
+    <h1>QUẢN LÍ VOUCHER</h1>
+  </div>
+</header>
+<div class="account-page">
+  <section class="cards stats">
+    <div class="card stat stat-total">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/tongbaiviet.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TỔNG VOUCHER</span>
+      </div>
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Mã giảm giá</span>
+      </div>
+    </div>
+    <div class="card stat stat-amount">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/grow.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>GIẢM THEO SỐ TIỀN</span>
+      </div>
+      <div class="stat-value">{{ stats.amount }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Loại amount</span>
+      </div>
+    </div>
+    <div class="card stat stat-percent">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/luotxem.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>GIẢM THEO %</span>
+      </div>
+      <div class="stat-value">{{ stats.percent }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Loại percent</span>
+      </div>
+    </div>
+    <div class="card stat stat-peritem">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/daxuatban.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>GIẢM THEO MÓN</span>
+      </div>
+      <div class="stat-value">{{ stats.perItem }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Loại perItem</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card table" id="vouchers-table">
+    <div class="card-title">Danh sách voucher</div>
+    <div class="card-header-block">
+      <div class="card-actions-row">
+        <button type="button" class="btn btn-add" (click)="openAdd()">
+          <span class="btn-icon">+</span>
+          <span>Thêm voucher</span>
+        </button>
+        <div class="search-box">
+          <input
+            type="search"
+            placeholder="Tìm kiếm mã hoặc mô tả..."
+            [value]="q"
+            (input)="onSearch($any($event.target).value)"
+            aria-label="Tìm kiếm voucher"
+          />
+          <button type="button" class="search-btn" aria-label="Tìm kiếm">
+            <img src="assets/icons/search.png" alt="Search" />
+          </button>
+        </div>
+        <div class="card-actions-filters">
+          <select
+            class="category-filter"
+            [value]="typeFilter"
+            (change)="onTypeFilter($any($event.target).value)"
+            aria-label="Lọc theo loại"
+          >
+            <option value="">Tất cả loại</option>
+            <option value="amount">Giảm theo số tiền</option>
+            <option value="percent">Giảm theo %</option>
+            <option value="perItem">Giảm theo món</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="posts vouchers-table">
+        <thead>
+          <tr>
+            <th class="col-code">Mã</th>
+            <th class="col-type">Loại</th>
+            <th class="col-value">Giá trị</th>
+            <th class="col-min">Đơn tối thiểu</th>
+            <th class="col-max">Tối đa</th>
+            <th class="col-desc">Mô tả</th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of pagedList; let i = index" [class.alt]="i % 2 === 0">
+            <td class="col-code">
+              <strong>{{ v.code }}</strong>
+            </td>
+            <td class="col-type">{{ typeLabel(v.type) }}</td>
+            <td class="col-value">{{ formatValue(v) }}</td>
+            <td class="col-min">
+              {{ v.minSubtotal != null ? formatNumberWithDot(v.minSubtotal) + 'đ' : '—' }}
+            </td>
+            <td class="col-max">{{ v.max != null ? formatNumberWithDot(v.max) + 'đ' : '—' }}</td>
+            <td class="col-desc">{{ v.description }}</td>
+            <td class="col-actions">
+              <button class="icon-btn" type="button" (click)="openEdit(v)" title="Sửa">
+                <img src="/assets/icons/edit2.png" alt="edit" />
+              </button>
+              <button class="icon-btn" type="button" (click)="openDelete(v)" title="Xóa">
+                <img src="/assets/icons/delete2.png" alt="delete" />
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="pagedList.length === 0">
+            <td colspan="7" class="empty-row">Không có voucher</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-wrap" *ngIf="totalPages > 1">
+      <button type="button" class="page-btn" [disabled]="page <= 1" (click)="goPage(page - 1)">
+        Trước
+      </button>
+      <span class="page-info">Trang {{ page }} / {{ totalPages }}</span>
+      <button
+        type="button"
+        class="page-btn"
+        [disabled]="page >= totalPages"
+        (click)="goPage(page + 1)"
+      >
+        Sau
+      </button>
+    </div>
+  </section>
+
+  <!-- Modal Thêm / Sửa voucher -->
+  <div
+    class="account-modal-overlay account-edit-modal-overlay"
+    [style.display]="modalOpen ? 'flex' : 'none'"
+    (click)="backdropClose($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal-container modal-add-product" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ editing ? 'CHỈNH SỬA VOUCHER' : 'THÊM VOUCHER' }}</h2>
+        <button type="button" class="modal-close" (click)="tryCloseModal()" aria-label="Đóng">
+          &times;
+        </button>
+        <p class="modal-subtitle">
+          {{ editing ? 'Cập nhật thông tin mã giảm giá.' : 'Thêm mã voucher mới.' }}
+        </p>
+      </div>
+
+      <form class="modal-body" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-row-equal">
+          <div class="form-group">
+            <label>Mã voucher <span class="req">*</span></label>
+            <input
+              formControlName="code"
+              type="text"
+              placeholder="VD: NGOGIA10"
+              style="color: #0088ff"
+              [class.is-invalid]="form.get('code')?.invalid && form.get('code')?.touched"
+            />
+            <div
+              class="error-text"
+              *ngIf="
+                form.get('code')?.invalid && (form.get('code')?.touched || form.get('code')?.dirty)
+              "
+            >
+              Vui lòng nhập mã (không khoảng trắng)
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Loại giảm giá <span class="req">*</span></label>
+            <select formControlName="type" style="color: #0088ff">
+              <option value="amount">Giảm theo số tiền</option>
+              <option value="percent">Giảm theo %</option>
+              <option value="perItem">Giảm theo món</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-equal">
+          <div class="form-group">
+            <label>Giá trị (số tiền / % / tiền mỗi món) <span class="req">*</span></label>
+            <input
+              formControlName="value"
+              type="number"
+              min="1"
+              placeholder="VD: 10000 hoặc 15"
+              style="color: #0088ff"
+              [class.is-invalid]="form.get('value')?.invalid && form.get('value')?.touched"
+            />
+            <div
+              class="error-text"
+              *ngIf="
+                form.get('value')?.invalid &&
+                (form.get('value')?.touched || form.get('value')?.dirty)
+              "
+            >
+              Vui lòng nhập giá trị &gt; 0
+            </div>
+          </div>
+          <div
+            class="form-group"
+            *ngIf="form.get('type')?.value === 'amount' || form.get('type')?.value === 'percent'"
+          >
+            <label>Đơn tối thiểu (đ)</label>
+            <input
+              formControlName="minSubtotal"
+              type="number"
+              min="0"
+              placeholder="Bỏ trống = không yêu cầu"
+              style="color: #0088ff"
+            />
+          </div>
+          <div class="form-group" *ngIf="form.get('type')?.value === 'percent'">
+            <label>Giảm tối đa (đ)</label>
+            <input
+              formControlName="max"
+              type="number"
+              min="0"
+              placeholder="Bỏ trống = không giới hạn"
+              style="color: #0088ff"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả <span class="req">*</span></label>
+          <input
+            formControlName="description"
+            type="text"
+            placeholder="VD: Giảm 10.000đ cho đơn từ 50.000đ"
+            style="color: #0088ff"
+            [class.is-invalid]="
+              form.get('description')?.invalid && form.get('description')?.touched
+            "
+          />
+          <div
+            class="error-text"
+            *ngIf="
+              form.get('description')?.invalid &&
+              (form.get('description')?.touched || form.get('description')?.dirty)
+            "
+          >
+            Vui lòng nhập mô tả
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-danger" type="button" (click)="tryCloseModal()">Hủy bỏ</button>
+          <button class="btn-primary" type="submit">{{ editing ? 'Lưu' : 'Thêm' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div
+    class="account-modal-overlay account-delete-modal-overlay"
+    [style.display]="deleteOpen ? 'flex' : 'none'"
+    (click)="backdropCloseDelete($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="modal-container modal-confirm modal-delete-container"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-body modal-confirm-body">
+        <div class="delete-modal-icon-wrap">
+          <div class="delete-modal-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+          </div>
+        </div>
+        <div class="delete-modal-content">
+          <h2 class="delete-modal-title">Xác nhận xóa voucher</h2>
+          <p class="delete-modal-subtitle">
+            Mã Voucher <strong class="delete-product-name">"{{ deleteTarget?.code }}"</strong> sẽ bị
+            xóa vĩnh viễn.
+          </p>
+          <p class="delete-modal-subtitle">Bạn sẽ không thể khôi phục lại.</p>
+        </div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-cancel-ghost" (click)="closeDelete()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            Hủy
+          </button>
+          <button type="button" class="btn btn-danger-solid" (click)="confirmDelete()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+            Xóa voucher
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Success -->
+  <div
+    id="modal-success-promotion"
+    class="modal"
+    style="display: none"
+    role="dialog"
+    aria-labelledby="success-message-promotion"
+    aria-modal="true"
+  >
+    <div class="modal-overlay" (click)="hideSuccess()"></div>
+    <div class="modal-container modal-confirm modal-success-container">
+      <div class="modal-body modal-confirm-body">
+        <div class="modal-confirm-header">
+          <div class="confirm-icon success-icon">
+            <img src="assets/icons/tick2.png" alt="Success" style="width: 24px; height: 24px" />
+          </div>
+          <div class="confirm-text">
+            <h2 id="success-message-promotion" class="confirm-title">THÀNH CÔNG</h2>
+            <p class="confirm-message">Thao tác đã được thực hiện thành công.</p>
+          </div>
+        </div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-confirm" id="btn-close-success-promotion" (click)="hideSuccess()">
+            <img src="assets/icons/tick2.png" alt="" style="width: 15px; height: 15px; margin-right: 6px" />
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert modal -->
+  <div
+    *ngIf="showAlert"
+    class="alert-overlay show"
+    role="dialog"
+    aria-modal="true"
+    (click)="closeAlertOnOverlay($event)"
+  >
+    <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
+      <div class="alert-icon">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+      </div>
+      <h3 class="alert-title">Thông báo</h3>
+      <p class="alert-message">{{ alertMessage }}</p>
+      <div class="alert-actions">
+        <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toasts" id="admin-promotion-toast-wrap">
+    <div
+      class="toast"
+      *ngFor="let t of toasts; trackBy: trackToast"
+      [ngClass]="t.type === 'ok' ? 'toast--success' : 'toast--error'"
+      [class.toast--hiding]="t.closing"
+      role="status"
+      aria-live="polite"
+    >
+      <img
+        *ngIf="t.type === 'ok'"
+        src="assets/icons/tick.png"
+        alt=""
+        class="toast-icon-img"
+      />
+      <img
+        *ngIf="t.type === 'err'"
+        src="assets/icons/delete2.png"
+        alt=""
+        class="toast-icon-img"
+      />
+      <span class="toast-message">
+        <span class="toast-bold">{{ t.title }}</span>
+        <span *ngIf="t.sub"> – {{ t.sub }}</span>
+      </span>
+      <button class="toast-x" type="button" (click)="removeToast(t.id)" aria-label="Đóng">×</button>
+    </div>
+  </div>
+</div>
