@@ -1,1 +1,246 @@
-<p>admin-contact works!</p>
+<header class="topbar">
+  <div class="topbar-title">
+    <h1>QUẢN LÍ PHẢN HỒI</h1>
+  </div>
+</header>
+<div class="contact-page">
+  <section class="cards stats">
+    <div class="card stat stat-feedback-total">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/account.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>TỔNG PHẢN HỒI</span>
+      </div>
+      <div class="stat-value">{{ feedbacks.length }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Tất cả phản hồi</span>
+      </div>
+    </div>
+    <div class="card stat stat-feedback-unread">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/order.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>CHƯA ĐỌC</span>
+      </div>
+      <div class="stat-value">{{ unreadCount }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Cần xử lý</span>
+      </div>
+    </div>
+    <div class="card stat stat-feedback-processing">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/lock.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>ĐANG XỬ LÝ</span>
+      </div>
+      <div class="stat-value">{{ countByStatus(1) }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Đang xử lý</span>
+      </div>
+    </div>
+    <div class="card stat stat-feedback-done">
+      <div class="stat-title">
+        <span class="stat-title-icon-wrap">
+          <img src="assets/icons/grow.png" alt="" class="stat-title-icon" />
+        </span>
+        <span>ĐÃ HOÀN THÀNH</span>
+      </div>
+      <div class="stat-value">{{ countByStatus(2) }}</div>
+      <div class="stat-desc">
+        <span class="stat-desc-right">Đã xử lý xong</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card table" id="contacts">
+    <div class="card-title-row">
+      <h2 class="card-title">Danh sách phản hồi</h2>
+      <span class="card-title-badge" *ngIf="unreadCount > 0">{{ unreadCount }} phản hồi chưa đọc</span>
+    </div>
+    <div class="card-header-block">
+      <div class="card-actions-row">
+        <div class="search-box">
+          <input
+            type="search"
+            placeholder="Tìm theo tên, nội dung..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearch()"
+            aria-label="Tìm kiếm phản hồi"
+          />
+          <button type="button" class="search-btn" aria-label="Tìm kiếm">
+            <img src="assets/icons/search.png" alt="Search" />
+          </button>
+        </div>
+        <div class="card-actions-filters">
+          <select
+            class="category-filter"
+            [(ngModel)]="activeFilter"
+            (ngModelChange)="setFilter(activeFilter)"
+            aria-label="Lọc theo chủ đề"
+          >
+            <option value="all">Tất cả chủ đề</option>
+            <option value="complain">Than phiền</option>
+            <option value="praise">Khen ngợi</option>
+            <option value="issued">Đề xuất</option>
+            <option value="other">Khác</option>
+          </select>
+        </div>
+        <button type="button" class="export-btn" (click)="exportExcel()">Xuất Excel</button>
+      </div>
+    </div>
+
+    <div class="contact-body">
+      <div class="contact-list">
+        <div class="contact-list__scroll">
+          <ng-container *ngIf="filteredFeedbacks.length > 0; else emptyList">
+            <div
+              class="contact-feed-item"
+              *ngFor="let fb of filteredFeedbacks"
+              [class.contact-feed-item--selected]="selectedFeedback?.id === fb.id"
+              [class.contact-feed-item--unread]="!fb.read"
+              (click)="selectFeedback(fb)"
+            >
+              <div class="contact-feed-item__dot" *ngIf="!fb.read"></div>
+              <div class="contact-feed-item__head">
+                <span class="contact-feed-item__name">{{ fb.fullname }}</span>
+                <span class="contact-feed-item__time">{{ fb.time }}</span>
+              </div>
+              <span class="badge badge-topic badge-topic--{{ fb.topic }}">
+                {{ topicLabel[fb.topic] }}
+              </span>
+              <p class="contact-feed-item__preview">{{ fb.content }}</p>
+            </div>
+          </ng-container>
+          <ng-template #emptyList>
+            <div class="contact-list__empty">Không có phản hồi nào phù hợp</div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="contact-detail">
+        <div class="contact-detail__empty" *ngIf="!selectedFeedback">
+          <svg width="60" height="60" viewBox="0 0 40 40" fill="none">
+            <rect
+              x="6"
+              y="8"
+              width="28"
+              height="24"
+              rx="4"
+              stroke="currentColor"
+              stroke-width="1.5"
+              opacity=".3"
+            />
+            <path
+              d="M13 16h14M13 22h8"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              opacity=".3"
+            />
+          </svg>
+          <span>Chọn một phản hồi để xem chi tiết</span>
+        </div>
+
+        <ng-container *ngIf="selectedFeedback as fb">
+          <div class="contact-detail-cards">
+            <div class="contact-card">
+              <div class="contact-card__header">
+                <div class="user-avatar contact-card__avatar">{{ getInitials(fb.fullname) }}</div>
+                <div class="contact-card__info">
+                  <div class="contact-card__name">{{ fb.fullname }}</div>
+                  <div class="contact-card__meta">{{ fb.email }} · {{ fb.time }}</div>
+                </div>
+                <div class="contact-card__actions">
+                  <span class="badge badge-topic badge-topic--{{ fb.topic }}">{{
+                    topicLabel[fb.topic]
+                  }}</span>
+                  <select
+                    class="category-filter contact-status-select"
+                    [(ngModel)]="fb.status"
+                    (ngModelChange)="onStatusChange(fb)"
+                  >
+                    <option [value]="0">Chờ xử lý</option>
+                    <option [value]="1">Đang xử lý</option>
+                    <option [value]="2">Đã xử lý</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="contact-info-grid">
+                <div class="contact-info-cell">
+                  <div class="contact-info-cell__label">Số điện thoại</div>
+                  <div class="contact-info-cell__value">{{ fb.phone }}</div>
+                </div>
+                <div class="contact-info-cell">
+                  <div class="contact-info-cell__label">Chi nhánh</div>
+                  <div class="contact-info-cell__value contact-info-cell__value--sm">{{ fb.branch }}</div>
+                </div>
+              </div>
+
+              <div class="contact-section-label">Nội dung phản hồi</div>
+              <div class="contact-content-box">{{ fb.content }}</div>
+
+              <div class="contact-note-row">
+                <textarea
+                  class="contact-note-input"
+                  rows="2"
+                  placeholder="Ghi chú nội bộ về phản hồi này..."
+                  [(ngModel)]="fb.note"
+                ></textarea>
+                <button type="button" class="btn btn-primary" (click)="saveNote(fb)">Lưu ghi chú</button>
+              </div>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-section-label">Nhật ký hoạt động</div>
+              <div class="contact-log">
+                <div class="contact-log__item" *ngFor="let log of getActivityLog(fb)">
+                  <div class="contact-log__dot"></div>
+                  <div>
+                    <div class="contact-log__text" [innerHTML]="log.text"></div>
+                    <div class="contact-log__time">{{ log.time }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Alert modal (theo mẫu admin-account) -->
+<div
+  *ngIf="showAlert"
+  class="alert-overlay show"
+  role="dialog"
+  aria-modal="true"
+  (click)="closeAlertOnOverlay($event)"
+>
+  <div class="alert-dialog alert-info" (click)="$event.stopPropagation()">
+    <div class="alert-icon">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9 12l2 2 4-4"></path>
+      </svg>
+    </div>
+    <h3 class="alert-title">Thông báo</h3>
+    <p class="alert-message">{{ alertMessage }}</p>
+    <div class="alert-actions">
+      <button type="button" class="alert-btn alert-btn-primary" (click)="closeAlertModal()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
