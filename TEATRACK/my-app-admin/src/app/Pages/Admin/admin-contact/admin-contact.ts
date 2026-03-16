@@ -30,7 +30,7 @@ export class AdminContact implements OnInit {
   feedbacks: Feedback[] = [];
   private readonly dataUrl = '/data/contact-mail.json';
 
-  // ─── State ───
+  //   State 
   filteredFeedbacks: Feedback[] = [];
   selectedFeedback: Feedback | null = null;
   activeFilter: string = 'all';
@@ -52,7 +52,7 @@ export class AdminContact implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  // ─── Lifecycle ───
+  //   Lifecycle  
   ngOnInit(): void {
     this.http.get<Omit<Feedback, 'id'>[]>(this.dataUrl).subscribe({
       next: (data) => {
@@ -70,7 +70,7 @@ export class AdminContact implements OnInit {
     });
   }
 
-  // ─── Computed ───
+  //   Computed  
   get unreadCount(): number {
     return this.feedbacks.filter((f) => !f.read).length;
   }
@@ -79,7 +79,7 @@ export class AdminContact implements OnInit {
     return this.feedbacks.filter((f) => f.status === status).length;
   }
 
-  // ─── Filter & search ───
+  //   Filter & search  
   setFilter(topic: string): void {
     this.activeFilter = topic;
     this.applyFilter();
@@ -105,25 +105,25 @@ export class AdminContact implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // ─── Select ───
+  //   Select  
   selectFeedback(fb: Feedback): void {
     fb.read = true;
     this.selectedFeedback = fb;
   }
 
-  // ─── Status change ───
+  //   Status change  
   onStatusChange(fb: Feedback): void {
     // TODO: gọi API cập nhật trạng thái
     console.log(`Cập nhật trạng thái feedback #${fb.id} → ${this.statusLabel[fb.status]}`);
   }
 
-  // ─── Save note ───
+  //   Save note  
   saveNote(fb: Feedback): void {
     // TODO: gọi API lưu ghi chú
     console.log(`Lưu ghi chú feedback #${fb.id}:`, fb.note);
   }
 
-  // ─── Helpers ───
+  //   Helpers  
   getInitials(name: string): string {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -138,19 +138,28 @@ export class AdminContact implements OnInit {
     if (fb.status >= 1) {
       logs.push({
         text: 'Trạng thái chuyển sang <strong>Đang xử lý</strong>',
-        time: 'Đã cập nhật',
+        time: fb.time,
       });
     }
     if (fb.status === 2) {
-      logs.push({ text: 'Trạng thái chuyển sang <strong>Đã xử lý</strong>', time: 'Đã cập nhật' });
+      logs.push({ text: 'Trạng thái chuyển sang <strong>Đã xử lý</strong>', time: fb.time });
     }
     if (fb.note) {
-      logs.push({ text: `Ghi chú: ${fb.note}`, time: 'Admin' });
+      logs.push({
+        text: `Ghi chú: ${fb.note}`,
+        time: new Date().toLocaleString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        }).replace(',', ''),
+      });
     }
     return logs.reverse();
   }
 
-  // ─── Export Excel (theo mẫu admin-account) ───
+  //  Export Excel 
   async exportExcel(): Promise<void> {
     const data = this.filteredFeedbacks.length ? this.filteredFeedbacks : this.feedbacks;
     if (!data.length) {
