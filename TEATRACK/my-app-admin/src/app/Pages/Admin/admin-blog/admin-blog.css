@@ -1760,7 +1760,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
-  margin-bottom: 16px;
 }
 
 .account-edit-modal-overlay .form-group {

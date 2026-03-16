@@ -1192,7 +1192,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
-  margin-bottom: 18px;
 }
 
 .form-group {
@@ -1226,7 +1225,6 @@ body {
     box-shadow 0.2s;
 }
 
-/* Cùng chiều cao cho input và select (tên sản phẩm / loại) */
 .form-group input[type="text"],
 .form-group input:not([type="checkbox"]):not([type="file"]),
 .form-group select {
@@ -1257,7 +1255,8 @@ body {
   display: flex;
   align-items: center;
   gap: 18px;
-  margin-bottom: 18px;
+  margin-top: 12px;
+  margin-bottom: 25px;
 }
 
 .form-group-status>label {

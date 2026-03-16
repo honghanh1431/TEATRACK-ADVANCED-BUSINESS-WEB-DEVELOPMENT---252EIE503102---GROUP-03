@@ -276,7 +276,7 @@ export class AdminAgency implements OnInit {
     this.editPhone = '';
     this.editStatus = 'active';
     this.editMapEmbed = '';
-    this.editImage = '/assets/icons/chi_nhanh1.png';
+    this.editImage = '';
     this.showEditModal = true;
     this.cdr.detectChanges();
   }

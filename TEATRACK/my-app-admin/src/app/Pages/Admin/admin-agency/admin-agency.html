@@ -310,7 +310,7 @@
   </section>
 </div>
 
-<!-- ===== EDIT / CREATE MODAL (giống admin-blog) ===== -->
+<!-- ===== EDIT / CREATE MODAL ===== -->
 <div
   class="agency-modal-overlay agency-edit-modal-overlay"
   *ngIf="showEditModal"
@@ -335,7 +335,7 @@
             type="text"
             [(ngModel)]="editName"
             name="editName"
-            placeholder="244 đường số 8 - H071"
+            placeholder="Nhập tên chi nhánh"
           />
         </div>
         <div class="form-group">
@@ -344,7 +344,7 @@
             type="text"
             [(ngModel)]="editPhone"
             name="editPhone"
-            placeholder="0999.888.777"
+            placeholder="Nhập số điện thoại"
           />
         </div>
       </div>
@@ -355,7 +355,7 @@
           type="text"
           [(ngModel)]="editAddress"
           name="editAddress"
-          placeholder="244 Đường Số 8, Linh Xuân, Thủ Đức"
+          placeholder="Nhập địa chỉ chi nhánh"
         />
       </div>
 
@@ -373,7 +373,7 @@
             type="text"
             [(ngModel)]="editMapEmbed"
             name="editMapEmbed"
-            placeholder="https://www.google.com/maps/embed?..."
+            placeholder="Dán link embed Google Maps (tùy chọn)"
           />
         </div>
       </div>
@@ -410,7 +410,7 @@
             type="text"
             [(ngModel)]="editImage"
             name="editImageUrl"
-            placeholder="assets/icons/chi_nhanh1.png hoặc URL đầy đủ"
+            placeholder="URL ảnh hoặc để trống"
           />
         </div>
       </div>
@@ -425,54 +425,19 @@
 
 <!-- ===== MAP MODAL ===== -->
 <div
-  class="agency-modal-overlay"
+  class="agency-modal-overlay agency-map-modal-overlay"
   *ngIf="showMapModal"
   (click)="closeMapModal()"
   role="dialog"
   aria-modal="true"
 >
-  <div class="agency-modal agency-modal--map" (click)="$event.stopPropagation()">
-    <div class="agency-modal__header">
-      <div>
-        <h3 class="agency-modal__title">
-          <svg
-            width="24"
-            height="243"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M3 6L9 3L15 6L21 3V18L15 21L9 18L3 21V6Z"
-              stroke="#1596D5"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <line
-              x1="9"
-              y1="3"
-              x2="9"
-              y2="18"
-              stroke="#0088ff"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <line
-              x1="15"
-              y1="6"
-              x2="15"
-              y2="21"
-              stroke="#0088ff"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-          {{ mapTarget?.name }}
-        </h3>
-        <p class="agency-modal__subtitle">{{ mapTarget?.address }}</p>
-      </div>
-      <button type="button" class="agency-modal__close" (click)="closeMapModal()">×</button>
+  <div class="modal-container agency-modal--map" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ mapTarget?.name }}</h2>
+      <button type="button" class="modal-close" (click)="closeMapModal()" aria-label="Đóng">
+        &times;
+      </button>
+      <p class="modal-subtitle">{{ mapTarget?.address }}</p>
     </div>
     <div class="map-container">
       <iframe
@@ -485,20 +450,18 @@
         referrerpolicy="no-referrer-when-downgrade"
       ></iframe>
     </div>
-    <div class="map-footer">
+    <div class="modal-footer map-modal-footer">
       <div class="map-info">
         <span class="map-phone">
-          <svg width="20" height="20" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M21 16.5V19.5C21 20.33 20.33 21 19.5 21C9.84 21 3 14.16 3 4.5C3 3.67 3.67 3 4.5 3H7.5C8.05 3 8.53 3.37 8.66 3.9L9.56 7.29C9.66 7.66 9.56 8.05 9.3 8.31L7.9 9.71C9.01 12.04 10.96 13.99 13.29 15.1L14.69 13.7C14.95 13.44 15.34 13.34 15.71 13.44L19.1 14.34C19.63 14.47 20 14.95 20 15.5C20 15.5 21 16.5 21 16.5Z"
               fill="#0088ff"
             />
           </svg>
-          {{ mapTarget?.phone }}</span
-        >
+          {{ mapTarget?.phone }}
+        </span>
       </div>
-      <button type="button" class="btn btn-ghost" (click)="closeMapModal()">Đóng</button>
     </div>
   </div>
 </div>
@@ -584,7 +547,7 @@
   </div>
 </div>
 
-<!-- ===== ALERT MODAL (giống admin-account) ===== -->
+<!-- ===== ALERT MODAL ===== -->
 <div
   *ngIf="showAlert"
   class="alert-overlay show"
