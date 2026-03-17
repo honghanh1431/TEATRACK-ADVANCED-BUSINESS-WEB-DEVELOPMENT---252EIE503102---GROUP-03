@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Title } from '@angular/platform-browser';
 import { combineLatest } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { io, Socket } from 'socket.io-client';
 import { ROUTE_TITLES } from '../../route-titles';
 import { ProductStateService } from '../../product-state.service';
 import { ReviewCountService } from '../../review-count.service';
@@ -149,6 +150,7 @@ export class Product implements OnInit, OnDestroy {
     { name: 'Thanh Thanh', title: 'Recommend', content: 'Bạn bè giới thiệu, uống xong ghiền.', time: '1 tuần trước', rating: 4, createdAt: 0 },
     { name: 'Thế Hưng', title: 'Tạm được', content: 'Giá hơi cao nhưng chất lượng ổn.', time: '2 tuần trước', rating: 3, createdAt: 0 },
   ];
+  private socket: Socket | undefined;
   private subs: any[] = [];
 
   constructor(
@@ -159,7 +161,20 @@ export class Product implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private productState: ProductStateService,
     private reviewCountService: ReviewCountService,
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('productUpdated', () => {
+      // Reload product data if ID matches
+      const pid = this.route.snapshot.paramMap.get('id') ?? this.route.snapshot.queryParamMap.get('pid');
+      const name = this.route.snapshot.paramMap.get('name') ?? this.route.snapshot.queryParamMap.get('name');
+      this.loadProductWithParams(pid, name);
+    });
+    this.socket.on('reviewUpdated', (data: any) => {
+      if (this.product?.id && (data?.productId === String(this.product.id) || !data?.productId)) {
+        this.loadReviewsForProduct(String(this.product.id));
+      }
+    });
+  }
 
   ngOnInit(): void {
     document.body.style.overflow = '';
@@ -196,6 +211,9 @@ export class Product implements OnInit, OnDestroy {
     this.subs.forEach((s) => s?.unsubscribe());
     if (typeof window !== 'undefined') {
       window.removeEventListener('user:updated', this.handleUserUpdated);
+    }
+    if (this.socket) {
+      this.socket.disconnect();
     }
   }
 

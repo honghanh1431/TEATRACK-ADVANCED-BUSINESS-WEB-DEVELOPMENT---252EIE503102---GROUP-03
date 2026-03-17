@@ -7,11 +7,13 @@ import {
   ViewChild,
   ChangeDetectorRef,
   NgZone,
+  OnDestroy,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
+import { io, Socket } from 'socket.io-client';
 type PostStatus = 'published' | 'draft';
 interface ToastItem {
   id: string;
@@ -45,8 +47,9 @@ interface BlogRow {
   templateUrl: './admin-blog.html',
   styleUrls: ['./admin-blog.css'],
 })
-export class AdminBlog implements OnInit, AfterViewInit {
+export class AdminBlog implements OnInit, AfterViewInit, OnDestroy {
   currentUserName = 'Nguyễn Ba Đù';
+  private socket: Socket | undefined;
   stats = {
     total: 0,
     views: 0,
@@ -117,7 +120,23 @@ export class AdminBlog implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
     private zone: NgZone,
-  ) {}
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('blogUpdated', (data: any) => {
+      // Nếu là sự kiện cập nhật lượt xem, ta cập nhật trực tiếp để tránh load lại toàn bộ danh sách
+      if (data && data.action === 'view' && data.id) {
+        const post = this.postsAll.find(p => p.id === data.id || p.code === data.id);
+        if (post) {
+          post.views = data.views;
+          this.computeStats();
+          this.cdr.detectChanges();
+          return;
+        }
+      }
+      // Các trường hợp khác (thêm/xóa/sửa nội dung) thì load lại bài viết
+      this.load();
+    });
+  }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -132,6 +151,12 @@ export class AdminBlog implements OnInit, AfterViewInit {
     this.load();
     this.applyFilters();
     this.cdr.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 
   ngAfterViewInit(): void {

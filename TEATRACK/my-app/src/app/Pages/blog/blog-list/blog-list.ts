@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { io, Socket } from 'socket.io-client';
 import { BLOG_DATA } from '../blog-data';
 import { APP_TITLE_SUFFIX } from '../../../route-titles';
 
@@ -17,18 +18,24 @@ const PAGINATION_VISIBLE = 5;
   templateUrl: './blog-list.html',
   styleUrls: ['../blog.css', '../../../../styles.css'],
 })
-export class BlogList implements OnInit {
+export class BlogList implements OnInit, OnDestroy {
   blogsArray: any[] = [];
   displayedBlogs: any[] = [];
   currentPage = 1;
   totalPages = 1;
+  private socket: Socket | undefined;
 
   constructor(
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private titleService: Title
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('blogUpdated', () => {
+      this.loadBlogs();
+    });
+  }
 
   /** Chỉ hiển thị tối đa 5 số trang, trượt theo currentPage. */
   get visiblePageNumbers(): number[] {
@@ -56,6 +63,16 @@ export class BlogList implements OnInit {
 
   ngOnInit() {
     this.titleService.setTitle(`Diễn đàn | ${APP_TITLE_SUFFIX}`);
+    this.loadBlogs();
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
+
+  loadBlogs(): void {
     this.http.get<any[]>('http://localhost:3002/blog').subscribe({
       next: (data) => {
         this.blogsArray = (data || []).filter(b => b.visible !== false);

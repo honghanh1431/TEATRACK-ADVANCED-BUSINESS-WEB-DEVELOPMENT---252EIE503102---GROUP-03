@@ -83,6 +83,10 @@ router.put('/users/:id/role', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Notify clients
+    console.log('Admin: Emitting userUpdated for userId:', req.params.id, 'with role:', role);
+    req.app.get('io').emit('userUpdated', { userId: req.params.id, role });
+
     res.json({ message: 'User role updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -97,6 +101,11 @@ router.put('/users/:id', async (req, res) => {
     if (!updated) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Notify clients
+    console.log('Admin: Emitting userUpdated for userId (generic):', req.params.id);
+    req.app.get('io').emit('userUpdated', { userId: req.params.id });
+
     res.json({ message: 'User updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -112,6 +121,10 @@ router.delete('/users/:id', async (req, res) => {
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Notify clients
+    req.app.get('io').emit('userUpdated', { userId: req.params.id, action: 'delete' });
+
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -153,6 +166,9 @@ router.put('/orders/:id/status', async (req, res) => {
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'Order not found' });
     }
+
+    // Notify clients (specifically the customer whose order was updated)
+    req.app.get('io').emit('orderUpdated', { orderId, status, deliveryAgency, by: 'admin' });
 
     res.json({ message: 'Order details updated successfully' });
   } catch (error) {

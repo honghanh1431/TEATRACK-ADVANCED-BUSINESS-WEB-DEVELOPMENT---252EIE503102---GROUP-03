@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { io, Socket } from 'socket.io-client';
 import { OrderService } from '../../order.service';
 import { MapTracking } from './map-tracking/map-tracking';
 
@@ -47,19 +48,25 @@ export class OrderTracking implements OnInit, OnDestroy {
 
 
   // Auto refresh interval
-  private refreshInterval: any;
+  private socket: Socket | undefined;
 
   constructor(
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private orderService: OrderService,
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('orderUpdated', (data: any) => {
+      if (this.orderId && (data?.id === this.orderId || !data?.id)) {
+        this.loadOrderData();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.orderId = this.route.snapshot.queryParamMap.get('orderId');
     if (this.orderId) {
       this.loadOrderData();
-      this.startAutoRefresh();
       this.applyFragmentAndOpenReview();
     } else {
       this.showError('Không tìm thấy thông tin đơn hàng');
@@ -92,8 +99,8 @@ export class OrderTracking implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
+    if (this.socket) {
+      this.socket.disconnect();
     }
   }
   scrollToTop(): void {
@@ -178,40 +185,6 @@ export class OrderTracking implements OnInit, OnDestroy {
     }
   }
 
-  private startAutoRefresh(): void {
-    this.refreshInterval = setInterval(() => {
-      const token = localStorage.getItem('token');
-      if (token && this.orderId) {
-        this.orderService.getOrderById(this.orderId).subscribe({
-          next: (res) => {
-            if (res.order && res.order.status !== this.order?.status) {
-              this.order = res.order;
-              this.updateTimeline(res.order.status, true);
-
-              // Cập nhật lại localStorage để các trang khác (OrderHistory) cũng thấy status mới
-              try {
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                const idx = orders.findIndex((o: any) => (o.id || o.orderId) === this.orderId);
-                if (idx !== -1) {
-                  orders[idx].status = res.order.status;
-                  localStorage.setItem('orders', JSON.stringify(orders));
-                }
-              } catch (e) { }
-
-              this.cdr.detectChanges();
-            }
-          }
-        });
-      } else {
-        const updated = this.getOrderFromStorage();
-        if (updated && updated.status !== this.order?.status) {
-          this.order = updated;
-          this.updateTimeline(updated.status, false);
-          this.cdr.detectChanges();
-        }
-      }
-    }, 15000); // 15 giây
-  }
 
   // ==================== UI HELPERS ====================
   formatMoney(value: number): string {

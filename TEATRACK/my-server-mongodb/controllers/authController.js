@@ -123,7 +123,13 @@ const updateProfile = async (req, res) => {
       return res.status(400).json({ message: 'Cập nhật thất bại' });
     }
 
-    // Lấy thông tin user mới nhất
+    // Notify clients (especially admin)
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('userUpdated', { userId: userId, action: 'profileUpdate' });
+    }
+
+    // Lấy thông tin user mới nhất để trả về
     const user = await User.findUserById(userId);
     const { password, ...userWithoutPassword } = user;
 
@@ -156,8 +162,16 @@ const updateUsername = async (req, res) => {
       return res.status(400).json({ message: 'Cập nhật thất bại' });
     }
 
+    // Notify clients
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('userUpdated', { userId: userId, action: 'usernameUpdate' });
+    }
+
+    // Lấy thông tin user mới nhất để trả về
     const user = await User.findUserById(userId);
     const { password, ...userWithoutPassword } = user;
+
     res.json({ message: 'Cập nhật username thành công', user: userWithoutPassword });
   } catch (error) {
     console.error('Update username error:', error);

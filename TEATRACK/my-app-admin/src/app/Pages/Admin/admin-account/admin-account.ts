@@ -1,5 +1,6 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { io, Socket } from 'socket.io-client';
 
 export interface Account {
   id: string | number;
@@ -42,10 +43,11 @@ const MOCK_ACCOUNTS: Account[] = [
   templateUrl: './admin-account.html',
   styleUrl: './admin-account.css',
 })
-export class AdminAccount implements OnInit {
+export class AdminAccount implements OnInit, OnDestroy {
   accounts: Account[] = [];
   filteredAccounts: Account[] = [];
   selectedIds = new Set<string | number>();
+  private socket: Socket | undefined;
 
   searchQuery = '';
   roleFilter = '';
@@ -93,10 +95,21 @@ export class AdminAccount implements OnInit {
     error: 'assets/icons/lock.png',
   };
 
-  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) {}
+  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('userUpdated', () => {
+      this.fetchUsers();
+    });
+  }
 
   ngOnInit(): void {
     this.fetchUsers();
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 
   get newAccountsThisMonth(): number {
@@ -187,6 +200,14 @@ export class AdminAccount implements OnInit {
     });
   }
 
+  normSrc(path?: string): string {
+    if (!path) return '';
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    const apiBaseUrl = 'http://localhost:3002';
+    if (path.startsWith('/uploads')) return apiBaseUrl + path;
+    return path;
+  }
+
   getInitials(acc: Account): string {
     return acc.name
       .split(' ')
@@ -274,7 +295,7 @@ export class AdminAccount implements OnInit {
     this.editModalTitle = 'CHỈNH SỬA TÀI KHOẢN';
     this.editModalSub = 'Cập nhật thông tin của ';
     this.editModalSubBold = `"${acc.name}" (@${acc.username} )`;
-    this.editAvatarPreview = acc.avatar || '';
+    this.editAvatarPreview = this.normSrc(acc.avatar);
     this.editAvatarFile = null;
     this.editName = acc.name;
     this.editUsername = acc.username;

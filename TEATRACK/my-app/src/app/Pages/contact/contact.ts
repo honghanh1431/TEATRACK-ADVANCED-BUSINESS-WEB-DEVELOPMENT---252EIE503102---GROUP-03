@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { io, Socket } from 'socket.io-client';
 
 @Component({
   selector: 'app-contact',
@@ -8,9 +9,10 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './contact.html',
   styleUrl: './contact.css',
 })
-export class Contact implements OnInit {
+export class Contact implements OnInit, OnDestroy {
   contactForm: FormGroup;
   showSuccessModal = false;
+  private socket: Socket | undefined;
 
   scrollToTop(): void {
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -25,7 +27,7 @@ export class Contact implements OnInit {
     { value: 'other',    label: 'Vấn đề khác'}
   ];
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private ngZone: NgZone) {
     this.contactForm = this.fb.group({
       fullname: ['', Validators.required],
       email:    ['', [Validators.required, Validators.email]],
@@ -34,21 +36,39 @@ export class Contact implements OnInit {
       topic:    ['', Validators.required],
       content:  ['', Validators.required]
     });
+
+    this.socket = io('http://localhost:3002');
+    this.socket.on('agencyUpdated', (data) => {
+      this.ngZone.run(() => {
+        this.processAgencies(data);
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
+
+  processAgencies(data: any[]): void {
+    if (data && data.length) {
+      // Chỉ lấy chi nhánh đang hoạt động
+      this.branches = data
+        .filter(a => a.status === 'active' || !a.status)
+        .map(a => a.name);
+    } else {
+      // fallback
+      this.branches = [
+        '244 đường số 8 - H071',
+        'Bình Dương - BD01'
+      ];
+    }
   }
 
   ngOnInit(): void {
     this.http.get<any[]>('http://localhost:3002/api/agencies').subscribe({
-      next: (data) => {
-        if (data && data.length) {
-          this.branches = data.map(a => a.name);
-        } else {
-          // fallback
-          this.branches = [
-            '244 đường số 8 - H071',
-            'Bình Dương - BD01'
-          ];
-        }
-      },
+      next: (data) => this.processAgencies(data),
       error: (err) => {
         console.error('Failed to load agencies in contact:', err);
         this.branches = [

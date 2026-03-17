@@ -30,6 +30,8 @@ interface Agency {
   status?: string;
 }
 
+import { io, Socket } from 'socket.io-client';
+
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
@@ -39,6 +41,7 @@ interface Agency {
 })
 export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
   private readonly $ = (s: string, r: Document = document) => r.querySelector(s);
+  private socket: Socket | undefined;
 
   ORDERS_ALL: Order[] = [];
   filterState = { orderId: '', search: '' };
@@ -56,7 +59,15 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private http: HttpClient
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('orderCreated', () => {
+      this.fetchOrders();
+    });
+    this.socket.on('orderUpdated', () => {
+      this.fetchOrders();
+    });
+  }
 
   ngOnInit(): void {
     try {
@@ -98,6 +109,9 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     document.removeEventListener('keydown', this.escHandler);
     window.removeEventListener('storage', this.storageHandler);
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 
   private sortOrdersByDateDesc(): void {

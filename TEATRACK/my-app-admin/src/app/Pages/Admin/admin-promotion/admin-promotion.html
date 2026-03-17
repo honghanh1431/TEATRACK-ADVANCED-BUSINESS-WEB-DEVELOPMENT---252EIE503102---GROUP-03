@@ -100,6 +100,7 @@
             <th class="col-min">Đơn tối thiểu</th>
             <th class="col-max">Tối đa</th>
             <th class="col-desc">Mô tả</th>
+            <th class="col-status">Trạng thái</th>
             <th class="col-actions"></th>
           </tr>
         </thead>
@@ -115,6 +116,15 @@
             </td>
             <td class="col-max">{{ v.max != null ? formatNumberWithDot(v.max) + 'đ' : '—' }}</td>
             <td class="col-desc">{{ v.description }}</td>
+            <td class="col-status">
+              <span 
+                class="status-pill" 
+                [ngClass]="v.isActive !== false ? 'status-active' : 'status-inactive'"
+                (click)="$event.stopPropagation(); toggleStatus(v)"
+              >
+                {{ v.isActive !== false ? 'Kích hoạt' : 'Không kích hoạt' }}
+              </span>
+            </td>
             <td class="col-actions">
               <button class="icon-btn" type="button" (click)="openEdit(v)" title="Sửa">
                 <img src="/assets/icons/edit2.png" alt="edit" />
@@ -263,11 +273,68 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label>Trạng thái kích hoạt</label>
+          <select formControlName="isActive" style="color: #0088ff">
+            <option [ngValue]="true">Kích hoạt (Xác minh hợp lệ)</option>
+            <option [ngValue]="false">Không kích hoạt (Vô hiệu hóa)</option>
+          </select>
+        </div>
+
         <div class="modal-footer">
           <button class="btn-danger" type="button" (click)="tryCloseModal()">Hủy bỏ</button>
           <button class="btn-primary" type="submit">{{ editing ? 'Lưu' : 'Thêm' }}</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Verify Status Modal -->
+  <div
+    class="account-modal-overlay account-delete-modal-overlay"
+    [style.display]="verifyOpen ? 'flex' : 'none'"
+    (click)="closeVerify()"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="modal-container modal-confirm"
+      (click)="$event.stopPropagation()"
+      style="max-width: 400px;"
+    >
+      <div class="modal-body modal-confirm-body">
+        <div class="delete-modal-icon-wrap" style="margin-bottom: 20px;">
+          <div class="delete-modal-icon" style="background: rgba(0, 136, 255, 0.1); border-color: rgba(0, 136, 255, 0.3); color: #0088ff;">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="delete-modal-content">
+          <h2 class="delete-modal-title" style="color: #0088ff;">Xác nhận thao tác</h2>
+          <p class="delete-modal-subtitle">
+            Bạn có chắc chắn muốn <strong style="color: #0088ff;">{{ verifyAction }}</strong> mã
+            <strong class="delete-product-name">"{{ verifyTarget?.code }}"</strong> không?
+          </p>
+        </div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-cancel-ghost" (click)="closeVerify()">
+            Hủy
+          </button>
+          <button type="button" class="btn btn-primary-solid" (click)="confirmVerify()" style="background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%); color: #fff; border: none; padding: 11px 22px; border-radius: 999px; font-weight: 700; cursor: pointer; flex: 1; max-width: 160px; box-shadow: 0 4px 14px rgba(0, 136, 255, 0.3);">
+            Xác nhận
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
