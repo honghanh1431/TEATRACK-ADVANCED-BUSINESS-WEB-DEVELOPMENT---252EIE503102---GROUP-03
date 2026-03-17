@@ -1,86 +1,72 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chi nhánh</title>
-  <link rel="icon" type="image/png" href="assets/images/logo-divider.png">
-</head>
-<body>
-  <div id="app-header"></div>
-  <main class="account-page">
-    <!-- Breadcrumb -->
-    <section class="breadcrumb-banner">
-      <h1 class="breadcrumb-title">Các chi nhánh hoạt động</h1>
-      <p class="breadcrumb-path">
-        <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> / <a routerLink="/agency" (click)="scrollToTop()">Chi nhánh</a>
-      </p>
-    </section>
+<main class="account-page">
+  <!-- Breadcrumb -->
+  <section class="breadcrumb-banner">
+    <h1 class="breadcrumb-title">Các chi nhánh hoạt động</h1>
+    <p class="breadcrumb-path">
+      <a routerLink="/" (click)="scrollToTop()">Trang chủ</a> /
+      <a routerLink="/agency" (click)="scrollToTop()">Chi nhánh</a>
+    </p>
+  </section>
 
-    <section class="agency-layout">
-      <!-- COLUMN LEFT: BRANCH LIST (scrollable) -->
-      <div class="agency-left">
-
-        <!-- Loading state -->
-        <div class="branch-loading" *ngIf="agencies.length === 0">
-          <div class="loading-spinner"></div>
-          <p>Đang tải danh sách chi nhánh...</p>
-        </div>
-
-        <!-- Danh sách chi nhánh từ MongoDB -->
-        <article
-          class="branch-card"
-          [class.is-active]="activeAgency === agency"
-          *ngFor="let agency of agencies; let i = index"
-          (click)="selectAgency(agency)"
-        >
-          <img
-            class="branch-thumb"
-            [src]="agency.image || 'assets/icons/chi_nhanh' + (i+1) + '.png'"
-            [alt]="agency.name"
-            onerror="this.src='assets/icons/chi_nhanh1.png'"
-          >
-          <div class="branch-meta">
-            <h3 class="branch-title">
-              <img src="assets/icons/nha.png" class="i">{{ agency.name }}
-            </h3>
-            <p class="branch-addr">
-              <img src="assets/icons/location.png" class="i">{{ agency.address }}
-            </p>
-            <p class="branch-phone">
-              <img src="assets/icons/Phone3.png" class="i">{{ agency.phone }}
-            </p>
-          </div>
-        </article>
-
+  <section class="agency-layout">
+    <!-- COLUMN LEFT: BRANCH LIST (scrollable) -->
+    <div class="agency-left">
+      <!-- Loading state -->
+      <div class="branch-loading" *ngIf="agencies.length === 0">
+        <div class="loading-spinner"></div>
+        <p>Đang tải danh sách chi nhánh...</p>
       </div>
 
-      <!-- COLUMN RIGHT: MAP (sticky) -->
-      <aside class="agency-right">
-        <div class="map-wrap">
-          <!-- Tên chi nhánh đang hiển thị -->
-          <div class="map-label" *ngIf="activeAgency">
-            <img src="assets/icons/location.png" class="i">
-            <span>{{ activeAgency.name }}</span>
-          </div>
-          <!-- Iframe map — src thay đổi khi chọn chi nhánh -->
-          <iframe
-            id="branchMap"
-            class="map-iframe"
-            [src]="mapIframeSrc"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            *ngIf="mapIframeSrc">
-          </iframe>
-          <!-- Placeholder khi chưa load -->
-          <div class="map-placeholder" *ngIf="!mapIframeSrc">
-            <p>Chọn chi nhánh để xem bản đồ</p>
-          </div>
+      <!-- Danh sách chi nhánh từ MongoDB -->
+      <article
+        class="branch-card"
+        [class.is-active]="activeAgency === agency"
+        *ngFor="let agency of agencies; let i = index"
+        (click)="selectAgency(agency)"
+      >
+        <img
+          class="branch-thumb"
+          [src]="agency.image || 'assets/icons/chi_nhanh' + (i + 1) + '.png'"
+          [alt]="agency.name"
+          onerror="this.src = 'assets/icons/chi_nhanh1.png'"
+        />
+        <div class="branch-meta">
+          <h3 class="branch-title">
+            <img src="assets/icons/nha.png" class="i" />{{ agency.name }}
+          </h3>
+          <p class="branch-addr">
+            <img src="assets/icons/location.png" class="i" />{{ agency.address }}
+          </p>
+          <p class="branch-phone">
+            <img src="assets/icons/Phone3.png" class="i" />{{ agency.phone }}
+          </p>
         </div>
-      </aside>
-    </section>
-  </main>
+      </article>
+    </div>
 
-  <div id="app-footer"></div>
-</body>
-</html>
+    <!-- COLUMN RIGHT: MAP (sticky) -->
+    <aside class="agency-right">
+      <div class="map-wrap">
+        <!-- Tên chi nhánh đang hiển thị -->
+        <div class="map-label" *ngIf="activeAgency">
+          <img src="assets/icons/location.png" class="i" />
+          <span>{{ activeAgency.name }}</span>
+        </div>
+        <!-- Iframe map — src thay đổi khi chọn chi nhánh -->
+        <iframe
+          id="branchMap"
+          class="map-iframe"
+          [src]="mapIframeSrc"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          *ngIf="mapIframeSrc"
+        >
+        </iframe>
+        <!-- Placeholder khi chưa load -->
+        <div class="map-placeholder" *ngIf="!mapIframeSrc">
+          <p>Chọn chi nhánh để xem bản đồ</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+</main>

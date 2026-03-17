@@ -1,13 +1,20 @@
-
-.account-page{
-  background:#f2f9fe;
-  color:#0b1320;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+.account-page {
+  background: #f2f9fe;
+  color: #0b1320;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
 }
 
 /* Breadcrumb */
 .breadcrumb-banner {
-  background: #D4EDFC;
+  background: #d4edfc;
   padding: 20px 20px;
   text-align: center;
   position: relative;
@@ -36,41 +43,51 @@
 }
 
 /* ========== RESET / BASE ========== */
-*{box-sizing:border-box}
-html,body{
-  margin:0; padding:0;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color:#1f2937;
-  background:#f4f7fb;
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  color: #1f2937;
 }
 
 /* ========== LAYOUT ========== */
-.agency-layout{
-  max-width:1200px;
-  margin:22px auto;
-  padding:0 16px;
-  display:grid;
+.agency-layout {
+  max-width: 1200px;
+  margin: 22px auto;
+  padding: 0 16px;
+  display: grid;
   grid-template-columns: 1fr 420px; /* trái – phải */
-  gap:22px;
-  /* Align-items stretch để cột trái & phải bằng chiều cao nhau */
+  gap: 22px;
   align-items: start;
 }
 
 /* ========== COLUMN LEFT: list có scroll ========== */
-.agency-left{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  /* Giới hạn chiều cao bằng đúng map height, rồi scroll nội dung */
+.agency-left {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
   max-height: 660px;
   overflow-y: auto;
-  padding-right: 6px;  /* khoảng trống cho scrollbar không che card */
+  padding-right: 6px;
   scroll-behavior: smooth;
 }
 
 /* Custom scrollbar cho cột trái */
 .agency-left::-webkit-scrollbar {
   width: 6px;
+  display: none !important;
 }
 .agency-left::-webkit-scrollbar-track {
   background: #e6eefc;
@@ -106,7 +123,9 @@ html,body{
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ========== CARD CHI NHÁNH ========== */
@@ -118,8 +137,11 @@ html,body{
   border: 1px solid #e6eefc;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(22, 119, 255, .10);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  box-shadow: 0 8px 24px rgba(22, 119, 255, 0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   cursor: pointer;
   padding: 12px;
   /* Đừng shrink khi scroll */
@@ -128,12 +150,12 @@ html,body{
 
 .branch-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 26px rgba(22, 119, 255, .14);
+  box-shadow: 0 10px 26px rgba(22, 119, 255, 0.14);
 }
 
 .branch-card.is-active {
   border: 2px solid #0088ff;
-  box-shadow: 0 12px 28px rgba(19, 94, 230, .16);
+  box-shadow: 0 12px 28px rgba(19, 94, 230, 0.16);
 }
 
 /* Hình thumbnail */
@@ -184,7 +206,7 @@ html,body{
   width: 18px;
   height: 18px;
   object-fit: contain;
-  opacity: .9;
+  opacity: 0.9;
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -208,18 +230,22 @@ html,body{
 }
 
 /* ========== MAP (CỘT PHẢI) ========== */
-.agency-right .map-wrap{
-  position:sticky; top:16px;
-  background:#fff;
-  border:1px solid #e6eefc;
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 8px 24px rgba(22,119,255,.10);
+.agency-right .map-wrap {
+  position: sticky;
+  top: 16px;
+  background: #fff;
+  border: 1px solid #e6eefc;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(22, 119, 255, 0.1);
 }
 
-.map-iframe{
-  width:100%; height:600px; border:0; display:block;
-  cursor:pointer;
+.map-iframe {
+  width: 100%;
+  height: 600px;
+  border: 0;
+  display: block;
+  cursor: pointer;
 }
 
 .map-placeholder {
@@ -232,32 +258,50 @@ html,body{
 }
 
 /* ========== RESPONSIVE ========== */
-@media (max-width:1024px){
-  .agency-layout{
-    grid-template-columns:1fr;
+@media (max-width: 1024px) {
+  .agency-layout {
+    grid-template-columns: 1fr;
     padding: 0 12px;
   }
-  .agency-right .map-wrap{position:relative; top:0;}
-  .map-iframe{height:380px;}
-  .map-placeholder{height:380px;}
+  .agency-right .map-wrap {
+    position: relative;
+    top: 0;
+  }
+  .map-iframe {
+    height: 380px;
+  }
+  .map-placeholder {
+    height: 380px;
+  }
   /* Trên mobile: danh sách cũng scroll, chiều cao giảm */
-  .agency-left{
+  .agency-left {
     max-height: 500px;
   }
-  .branch-thumb{
-    width:120px;
-    height:110px;
+  .branch-thumb {
+    width: 120px;
+    height: 110px;
   }
 }
 
-@media (max-width: 600px){
-  .branch-thumb{
+@media (max-width: 600px) {
+  .branch-thumb {
     width: 90px;
     height: 90px;
   }
-  .branch-title{ font-size: 14px; }
-  .branch-addr, .branch-phone { font-size: 13px; }
-  .agency-left{ max-height: 420px; }
-  .map-iframe{ height: 300px; }
-  .map-placeholder{ height: 300px; }
+  .branch-title {
+    font-size: 14px;
+  }
+  .branch-addr,
+  .branch-phone {
+    font-size: 13px;
+  }
+  .agency-left {
+    max-height: 420px;
+  }
+  .map-iframe {
+    height: 300px;
+  }
+  .map-placeholder {
+    height: 300px;
+  }
 }
