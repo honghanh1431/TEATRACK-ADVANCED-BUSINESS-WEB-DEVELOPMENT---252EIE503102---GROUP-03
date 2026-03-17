@@ -1,5 +1,5 @@
 .account-page {
-  background: #f2f9fe;
+  background: #f3f9fe;
   color: #0b1320;
   font-family:
     Inter,
@@ -10,6 +10,8 @@
     'Helvetica Neue',
     Arial,
     sans-serif;
+  min-height: 100vh;
+  padding-bottom: 48px;
 }
 
 /* Breadcrumb */

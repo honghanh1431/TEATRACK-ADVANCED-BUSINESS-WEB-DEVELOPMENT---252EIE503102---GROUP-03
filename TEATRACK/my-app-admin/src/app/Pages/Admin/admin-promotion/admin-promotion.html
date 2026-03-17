@@ -303,7 +303,7 @@
       style="max-width: 400px;"
     >
       <div class="modal-body modal-confirm-body">
-        <div class="delete-modal-icon-wrap" style="margin-bottom: 20px;">
+        <div class="confirm-modal-icon-wrap" style="margin-bottom: 20px;">
           <div class="delete-modal-icon" style="background: rgba(0, 136, 255, 0.1); border-color: rgba(0, 136, 255, 0.3); color: #0088ff;">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -330,7 +330,7 @@
           <button type="button" class="btn btn-cancel-ghost" (click)="closeVerify()">
             Hủy
           </button>
-          <button type="button" class="btn btn-primary-solid" (click)="confirmVerify()" style="background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%); color: #fff; border: none; padding: 11px 22px; border-radius: 999px; font-weight: 700; cursor: pointer; flex: 1; max-width: 160px; box-shadow: 0 4px 14px rgba(0, 136, 255, 0.3);">
+          <button type="button" class="btn btn-primary-solid" (click)="confirmVerify()" style="background: #0088ff; color: #fff; border: none; padding: 11px 22px; border-radius: 999px; font-weight: 700; cursor: pointer; flex: 1; max-width: 160px; box-shadow: 0 4px 14px rgba(0, 136, 255, 0.3);">
             Xác nhận
           </button>
         </div>
@@ -506,7 +506,7 @@
       />
       <span class="toast-message">
         <span class="toast-bold">{{ t.title }}</span>
-        <span *ngIf="t.sub"> – {{ t.sub }}</span>
+        <span *ngIf="t.sub"> <br/>{{ t.sub }}</span>
       </span>
       <button class="toast-x" type="button" (click)="removeToast(t.id)" aria-label="Đóng">×</button>
     </div>

@@ -456,7 +456,7 @@
   }
 }
 
-/* Modal xác nhận đăng xuất (CSS giống mẫu profile/cart) - Moved out and updated for design */
+/* Modal xác nhận đăng xuất (CSS y chang page-header-2 bên my-app) */
 .header-alert-modal {
   position: fixed;
   inset: 0;
@@ -464,34 +464,33 @@
   place-items: center;
   padding: 24px;
   background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(3px);
   z-index: 10000;
   animation: headerAlertFadeIn 0.2s ease forwards;
 }
 
 .header-alert-modal__dialog {
-  width: min(480px, 100%);
+  width: min(440px, 100%);
   background: #fff;
-  border-radius: 40px; /* Bo cực cong như ảnh */
-  box-shadow: 0 40px 100px rgba(15, 23, 42, 0.25);
-  padding: 40px 40px 35px;
+  border-radius: 24px;
+  box-shadow: 0 34px 84px rgba(15, 23, 42, 0.25);
+  padding: 28px 28px 26px;
   position: relative;
   display: grid;
-  gap: 24px;
+  gap: 18px;
 }
 
 .header-alert-modal__title {
   margin: 0;
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 800;
-  color: #0088ff;
+  color: #0088FF;
   text-align: center;
-  letter-spacing: -0.5px;
 }
 
 .header-alert-modal__message {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   color: #1f2937;
   line-height: 1.5;
   text-align: center;
@@ -501,46 +500,42 @@
 .header-alert-modal__actions {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .header-alert-modal__btn {
   border: none;
   border-radius: 999px;
-  padding: 14px 32px;
+  padding: 12px 20px;
   font-weight: 700;
-  font-size: 16px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 120px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .header-alert-modal__btn--ghost {
-  background: #f1f5f9; /* Màu xám nhạt như ảnh */
-  color: #64748b;
+  background: rgba(148, 163, 184, 0.16);
+  color: #6b7280;
 }
 
 .header-alert-modal__btn--ghost:hover {
-  background: #e2e8f0;
-  transform: translateY(-2px);
+  background: rgba(148, 163, 184, 0.24);
+  transform: translateY(-1px);
 }
 
 .header-alert-modal__btn--primary {
-  background: #0088ff;
+  background: #0088FF;
   color: #fff;
-  box-shadow: 0 10px 25px rgba(0, 136, 255, 0.3);
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
 }
 
 .header-alert-modal__btn--primary:hover {
-  background: #0077e6;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(0, 136, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 @keyframes headerAlertFadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Modal mời đăng nhập (guest bấm giỏ hàng) */

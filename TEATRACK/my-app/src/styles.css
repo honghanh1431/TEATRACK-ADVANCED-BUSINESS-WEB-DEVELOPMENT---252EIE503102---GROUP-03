@@ -218,14 +218,21 @@ textarea:focus {
   background: #0088ff;
   color: #fff;
   box-shadow: 0 14px 32px rgba(37, 99, 235, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 .guest-login-prompt-modal__btn--primary:hover {
   transform: translateY(-1px);
 }
 @keyframes guestLoginPromptFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .price-cart.guest-disabled,
@@ -234,7 +241,6 @@ textarea:focus {
   cursor: pointer;
 }
 
-/* Toast trạng thái đơn (order-tracking) */
 .status-toast {
   position: fixed;
   top: 20px;
@@ -250,7 +256,9 @@ textarea:focus {
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
   max-width: min(360px, calc(100vw - 48px));
   display: flex;
   align-items: center;
@@ -281,12 +289,12 @@ textarea:focus {
 
 #orders table tbody tr:nth-child(odd),
 #products table tbody tr:nth-child(odd) {
-  background: #72D5EC;
+  background: #72d5ec;
   color: #ffffff;
 }
 #orders table tbody tr:nth-child(even),
 #products table tbody tr:nth-child(even) {
-  background: #FFF8EC;
+  background: #fff8ec;
   color: #0088ff;
 }
 #orders table tbody td,
@@ -297,7 +305,6 @@ textarea:focus {
   vertical-align: middle;
   text-align: center;
 }
-/* Cột 2 (Khách / Tên): căn trái – áp dụng cho HTML chèn bằng innerHTML */
 #orders table tbody td:nth-child(2),
 #orders table thead th:nth-child(2),
 #products table tbody td:nth-child(2),
@@ -323,7 +330,6 @@ textarea:focus {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-/* Icon nút sửa/xóa trong bảng admin (HTML chèn bằng innerHTML) */
 #orders table td .btn img,
 #products table td .btn img {
   width: 20px !important;
