@@ -32,7 +32,6 @@ import { Profile } from './Pages/profile/profile';
 import { Registion } from './Pages/registion/registion';
 import { Chatbot } from './Pages/chatbot/chatbot';
 import { ChatbotMarkdownPipe } from './Pages/chatbot/chatbot-markdown.pipe';
-
 @NgModule({
   declarations: [
     App,
