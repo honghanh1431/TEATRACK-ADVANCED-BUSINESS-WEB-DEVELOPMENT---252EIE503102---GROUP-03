@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OrderService } from '../../order.service';
+import { MapTracking } from './map-tracking/map-tracking';
 
 @Component({
   selector: 'app-order-tracking',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, MapTracking],
   templateUrl: './order-tracking.html',
   styleUrls: ['./order-tracking.css'],
 })
