@@ -155,17 +155,30 @@ Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 Để kiểm tra các API yêu cầu xác thực (**🔑 JWT** hoặc **🔒 Admin**), hãy làm theo các bước sau:
 
 ### 1. Lấy Bearer Token
-1. Sử dụng Method `POST` với URL: `http://localhost:3002/api/auth/login` (User) hoặc `/api/auth/admin-login` (Admin).
-2. Trong tab **Body**, chọn **raw** và định dạng **JSON**, nhập tài khoản (`identifier`/`password`).
-3. Gửi request và sao chép chuỗi `token` nhận được trong kết quả trả về.
-
+1. Sử dụng Method "POST" với URL: "http://localhost:3002/api/auth/login" (User) hoặc "/api/auth/admin-login" (Admin).
+2. Trong tab **Body**, chọn **raw** và định dạng **JSON**, nhập tài khoản ("identifier"/"password").
+Ví dụ: 
+      {
+      "identifier": "tên_đăng_nhập_hoặc_email",
+      "password": "mật_khẩu_của_bạn"
+      }
+3. Gửi request và sao chép chuỗi "token" nhận được trong kết quả trả về.
+Nếu đăng nhập thành công, Server sẽ trả về kết quả như sau:
+Ví dụ:
+   {
+   "message": "Login successful",
+   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", 
+   "user": { ... }
+   }
 ### 2. Sử dụng Token trong các Request khác
-1. Chọn API bạn muốn test (ví dụ: `GET /api/auth/profile`).
+1. Chọn API bạn muốn test (ví dụ: "GET /api/auth/profile").
 2. Chuyển sang tab **Authorization**.
 3. Tại mục **Type**, chọn **Bearer Token**.
 4. Dán chuỗi Token vừa copy vào ô **Token**.
 5. Nhấn **Send** để thực hiện yêu cầu.
-
+Bạn cần thêm vào Header của Request:
+Key: "Authorization"
+Value: "Bearer <chuỗi_token_vừa_lấy_được>"
 ---
 
 ## Real-time Updates (Socket.io)
