@@ -2,6 +2,7 @@
 <app-page-header-2 *ngIf="showLayout && headerMode === 'customer'"></app-page-header-2>
 <router-outlet></router-outlet>
 <app-page-footer *ngIf="showLayout"></app-page-footer>
+<app-chatbot *ngIf="showLayout"></app-chatbot>
 <div class="cart-toast" [class.visible]="toastVisible" role="status" aria-live="polite">
   {{ toastPre }}<strong class="cart-toast-name">{{ toastName }}</strong>{{ toastPost }}
 </div>

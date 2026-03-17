@@ -1,0 +1,7 @@
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:after-fetch","message":"after fetch","data":{"ok":true,"status":200,"modelId":"gemini-flash-latest"},"timestamp":1773721635285,"hypothesisId":"A"}
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:before-getReader","message":"before getReader","data":{"bodyUsed":false},"timestamp":1773721635286,"hypothesisId":"A"}
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:onError","message":"chatbot onError","data":{"rawLength":93,"isQuota":true},"timestamp":1773729232925,"hypothesisId":"A"}
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:onError","message":"chatbot onError","data":{"rawLength":93,"isQuota":true},"timestamp":1773729290669,"hypothesisId":"A"}
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:onError","message":"chatbot onError","data":{"rawLength":94,"isQuota":true},"timestamp":1773729334864,"hypothesisId":"A"}
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:onError","message":"chatbot onError","data":{"rawLength":94,"isQuota":true},"timestamp":1773729441097,"hypothesisId":"A"}
+{"sessionId":"cb5bd8","location":"chatbot.service.ts:onError","message":"chatbot onError","data":{"rawLength":94,"isQuota":true},"timestamp":1773729452022,"hypothesisId":"A"}

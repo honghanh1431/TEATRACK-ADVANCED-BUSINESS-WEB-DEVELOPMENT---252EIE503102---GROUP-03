@@ -304,8 +304,8 @@ function initializeWeatherPopup() {
 
             .weather-popup {
                 position: absolute;
-                bottom: 70px;
-                right: 0;
+                bottom: 0px;
+                right: 70px;
                 width: 380px;
                 max-height: 600px;
                 background: white;
@@ -340,19 +340,6 @@ function initializeWeatherPopup() {
 
             .weather-popup.auto-open {
                 animation: popupBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            }
-
-            .weather-popup::-webkit-scrollbar {
-                width: 6px;
-            }
-
-            .weather-popup::-webkit-scrollbar-track {
-                background: #f1f1f1;
-            }
-
-            .weather-popup::-webkit-scrollbar-thumb {
-                background: #0088ff; 
-                border-radius: 3px;
             }
 
             .weather-popup-header {

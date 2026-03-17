@@ -30,6 +30,8 @@ import { ForgotPassword } from './Pages/forgot-password/forgot-password';
 import { OrderHistory } from './Pages/order-history/order-history';
 import { Profile } from './Pages/profile/profile';
 import { Registion } from './Pages/registion/registion';
+import { Chatbot } from './Pages/chatbot/chatbot';
+import { ChatbotMarkdownPipe } from './Pages/chatbot/chatbot-markdown.pipe';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { Registion } from './Pages/registion/registion';
     Profile,
     Agency,
     ForgotPassword,
+    Chatbot,
+    ChatbotMarkdownPipe,
   ],
 
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
