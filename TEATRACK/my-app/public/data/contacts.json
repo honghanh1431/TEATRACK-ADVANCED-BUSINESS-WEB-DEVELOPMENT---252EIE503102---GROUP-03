@@ -1,0 +1,90 @@
+[{
+  "_id": {
+    "$oid": "69b8131f34d6df792ab0cf7c"
+  },
+  "fullname": "Nguyễn Ba Đù",
+  "email": "nguyenbadu@gmail.com",
+  "phone": "0934727978",
+  "branch": "60 đường Nguyễn An Ninh - H246",
+  "topic": "complain",
+  "content": "Tôi đặt đồ uống lúc 14h nhưng phải chờ hơn 30 phút mới nhận được. Nhân viên không báo gì cả và thái độ khá hờ hững khi tôi hỏi.",
+  "time": "16/03/2026 10:23",
+  "status": 0,
+  "read": false,
+  "note": ""
+},
+{
+  "_id": {
+    "$oid": "69b8131f34d6df792ab0cf7d"
+  },
+  "fullname": "Nguyễn Văn An",
+  "email": "nguyenvanan@gmail.com",
+  "phone": "0912345678",
+  "branch": "73 Lương Định Của - H168",
+  "topic": "praise",
+  "content": "Nhân viên tại chi nhánh rất nhiệt tình và chu đáo. Đồ uống ngon, không gian sạch sẽ. Sẽ quay lại thường xuyên!",
+  "time": "16/03/2026 09:45",
+  "status": 2,
+  "read": true,
+  "note": "Đã ghi nhận và cảm ơn khách."
+},
+{
+  "_id": {
+    "$oid": "69b8131f34d6df792ab0cf7e"
+  },
+  "fullname": "Lê Thị Bình",
+  "email": "lethibinh@gmail.com",
+  "phone": "0923456789",
+  "branch": "KTX ĐHQG - H305",
+  "topic": "issued",
+  "content": "Mong quán có thêm tùy chọn đường ít hơn hoặc không đường cho người ăn kiêng. Hiện tại chỉ có ít đường chứ chưa có không đường.",
+  "time": "15/03/2026 20:10",
+  "status": 1,
+  "read": false,
+  "note": ""
+},
+{
+  "_id": {
+    "$oid": "69b8131f34d6df792ab0cf7f"
+  },
+  "fullname": "Trần Văn Cường",
+  "email": "tranvancuong@gmail.com",
+  "phone": "0934567890",
+  "branch": "205 Đường Số 4 - H153",
+  "topic": "complain",
+  "content": "Nước trà sữa hôm nay có mùi lạ, uống vào thấy không ổn. Tôi lo ngại vấn đề an toàn thực phẩm. Mong được kiểm tra lại nguyên liệu.",
+  "time": "15/03/2026 17:32",
+  "status": 1,
+  "read": false,
+  "note": "Đã liên hệ để hỏi thêm."
+},
+{
+  "_id": {
+    "$oid": "69b8131f34d6df792ab0cf80"
+  },
+  "fullname": "Phạm Thị Dung",
+  "email": "phamthidung@gmail.com",
+  "phone": "0945678901",
+  "branch": "29 Đường Số 11 - H109",
+  "topic": "other",
+  "content": "Tôi không tìm thấy thông tin về chương trình thẻ thành viên trên website. Liệu quán có hỗ trợ tích điểm không?",
+  "time": "14/03/2026 13:05",
+  "status": 2,
+  "read": true,
+  "note": "Đã trả lời qua email."
+},
+{
+  "_id": {
+    "$oid": "69b8131f34d6df792ab0cf81"
+  },
+  "fullname": "Hoàng Văn Em",
+  "email": "hoangvanem@gmail.com",
+  "phone": "0956789012",
+  "branch": "205 Đường Số 4 - H153",
+  "topic": "praise",
+  "content": "Trà đào cam sả ngon tuyệt vời! Hương thơm tự nhiên, không quá ngọt. Đây là món yêu thích của cả nhóm mình rồi.",
+  "time": "13/03/2026 11:20",
+  "status": 2,
+  "read": true,
+  "note": ""
+}]

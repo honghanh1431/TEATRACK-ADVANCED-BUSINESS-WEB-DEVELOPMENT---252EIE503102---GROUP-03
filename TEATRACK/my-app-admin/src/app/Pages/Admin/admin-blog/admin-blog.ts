@@ -145,6 +145,11 @@ export class AdminBlog implements OnInit, AfterViewInit {
     if (messageEl) messageEl.textContent = message;
     (modal as HTMLElement).style.display = 'flex';
     setTimeout(() => modal.classList.add('show'), 10);
+
+    // Tự động đóng sau 1.5 giây
+    setTimeout(() => {
+      this.hideSuccess();
+    }, 1500);
   }
 
   hideSuccess(): void {
@@ -446,6 +451,7 @@ export class AdminBlog implements OnInit, AfterViewInit {
         image: this.formImages[0],
         layoutType: String(v.layoutType || 'single'),
         status: (v.status === 'draft' ? 'draft' : 'published') as PostStatus,
+        visible: v.status === 'published', // Nháp thì tự động ẩn
       };
 
       // Cập nhật dữ liệu vào mảng postsAll hiện tại một cách an toàn
@@ -457,7 +463,6 @@ export class AdminBlog implements OnInit, AfterViewInit {
       this.http.put<BlogRow[]>(`${this.BLOG_API}/${this.editingId}`, body).subscribe({
         next: (data) => {
           this.postsAll = (data || []).map((x) => this.hydrate(x));
-          this.persist();
           this.applyFilters();
           this.closeModal();
           this.showSuccess('CẬP NHẬT THÀNH CÔNG');
@@ -486,13 +491,12 @@ export class AdminBlog implements OnInit, AfterViewInit {
       layoutType: String(v.layoutType || 'single'),
       status: (v.status === 'draft' ? 'draft' : 'published') as PostStatus,
       views: 0,
-      visible: true,
+      visible: v.status === 'published', // Nháp thì tự động ẩn
     };
 
     this.http.post<BlogRow[]>(this.BLOG_API, newPost).subscribe({
       next: (data) => {
         this.postsAll = (data || []).map((x) => this.hydrate(x));
-        this.persist();
         this.applyFilters();
         this.closeModal();
         this.showSuccess('THÊM BÀI VIẾT THÀNH CÔNG');
@@ -508,12 +512,21 @@ export class AdminBlog implements OnInit, AfterViewInit {
 
   toggleVisible(p: BlogRow): void {
     const newVal = !p.visible;
-    this.http.put<BlogRow[]>(`${this.BLOG_API}/${p.id}`, { visible: newVal }).subscribe({
+    const updateBody: any = { visible: newVal };
+
+    // Nếu đang là bản nháp mà bật hiển thị -> Tự động chuyển thành 'published'
+    if (newVal && p.status === 'draft') {
+      updateBody.status = 'published';
+      this.toast('ok', 'Bài viết đã được xuất bản');
+    }
+
+    this.http.put<BlogRow[]>(`${this.BLOG_API}/${p.id}`, updateBody).subscribe({
       next: (data) => {
         this.postsAll = (data || []).map((x) => this.hydrate(x));
-        this.persist();
         this.applyFilters();
-        this.toast('ok', newVal ? 'Đã bật hiển thị' : 'Đã tắt hiển thị');
+        if (!updateBody.status) {
+          this.toast('ok', newVal ? 'Đã bật hiển thị' : 'Đã tắt hiển thị');
+        }
         this.cdr.detectChanges();
       },
       error: () => {
@@ -545,7 +558,6 @@ export class AdminBlog implements OnInit, AfterViewInit {
     this.http.delete<BlogRow[]>(`${this.BLOG_API}/${id}`).subscribe({
       next: (data) => {
         this.postsAll = (data || []).map((x) => this.hydrate(x));
-        this.persist();
         this.applyFilters();
         this.closeDelete();
         this.showSuccess('XÓA BÀI VIẾT THÀNH CÔNG');
@@ -606,43 +618,35 @@ export class AdminBlog implements OnInit, AfterViewInit {
   private load(): void {
     this.http.get<BlogRow[]>(this.BLOG_API).subscribe({
       next: (data) => {
-        if (Array.isArray(data) && data.length) {
+        if (Array.isArray(data)) {
           this.postsAll = data.map((x) => this.hydrate(x));
           this.computeStats();
-          this.persist();
           this.applyFilters();
           this.cdr.detectChanges();
-        } else {
-          this.loadLocal();
         }
       },
-      error: () => {
-        this.loadLocal();
+      error: (err) => {
+        console.error('Lỗi tải dữ liệu từ API:', err);
+        this.postsAll = this.seed();
+        this.computeStats();
+        this.applyFilters();
+        this.cdr.detectChanges();
       },
     });
   }
 
   private loadLocal(): void {
-    const raw = localStorage.getItem(this.LS_KEY);
-    if (raw) {
-      try {
-        const arr = JSON.parse(raw) as any[];
-        if (Array.isArray(arr) && arr.length) {
-          this.postsAll = arr.map((x) => this.hydrate(x));
-          this.computeStats();
-          this.applyFilters();
-          return;
-        }
-      } catch {}
-    }
-    this.postsAll = this.seed();
-    this.persist();
-    this.computeStats();
-    this.applyFilters();
+    // Không dùng LocalStorage để lưu bài viết nữa để tránh lỗi QuotaExceededError (do ảnh Base64 quá nặng)
+    // Dữ liệu sẽ được lấy từ API hoặc seed mặc định
+    return;
   }
 
   private persist(): void {
-    localStorage.setItem(this.LS_KEY, JSON.stringify(this.postsAll));
+    // Đã gỡ bỏ lưu LocalStorage vì bài viết chứa ảnh Base64 gây tràn bộ nhớ trình duyệt
+    // Dữ liệu hiện tại đã được lưu an toàn trong MongoDB
+    try {
+      localStorage.removeItem(this.LS_KEY); // Xóa dữ liệu cũ nếu có để giải phóng bộ nhớ
+    } catch {}
   }
 
   private hydrate(x: any): BlogRow {

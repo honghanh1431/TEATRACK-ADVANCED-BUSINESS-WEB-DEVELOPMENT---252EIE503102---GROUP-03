@@ -121,6 +121,15 @@ export class BlogDetail implements OnInit {
         if (this.blog && this.blog.title) {
           this.titleService.setTitle(`${this.blog.title} | ${APP_TITLE_SUFFIX}`);
         }
+        // Increment view count
+        this.http.post(`http://localhost:3002/blog/${this.blogId}/view`, {}).subscribe({
+          next: (updated) => {
+             if (updated && (updated as any).views) {
+               this.blog.views = (updated as any).views;
+             }
+          },
+          error: (err) => console.error('Increment view error:', err)
+        });
         this.loadRelated();
         this.cdr.detectChanges();
       },

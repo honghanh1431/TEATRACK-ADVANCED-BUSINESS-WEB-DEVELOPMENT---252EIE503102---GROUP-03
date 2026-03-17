@@ -81,6 +81,14 @@ interface AdminDashboardData {
   data?: Record<string, Record<string, DashboardSlice>>;
 }
 
+interface Agency {
+  _id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  status?: string;
+}
+
 
 
 @Component({
@@ -98,6 +106,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   filterState = { category: '', search: '' };
   private readonly API_BASE = 'http://localhost:3002';
   private readonly PRODUCTS_API = `${this.API_BASE}/products`;
+  private readonly AGENCIES_API = `${this.API_BASE}/api/agencies`;
   /** value '1' = Tất cả danh mục (trả về '' để không lọc, show cả 6 loại). 2–7 = tên danh mục để lọc. */
   private readonly CATEGORY_ID_TO_NAME: Record<string, string> = {
     '1': '',
@@ -121,6 +130,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   private routerSub?: Subscription;
   private _productFiltersInitialized = false;
   private dashboardData: AdminDashboardData | null = null;
+  private AGENCIES: Agency[] = [];
   private filterListener = () => this.applyDashboardFilter();
   private boundClick = (e: MouseEvent) => this.onDocumentClick(e);
   private boundKeydown = (e: KeyboardEvent) => this.onDocumentKeydown(e);
@@ -219,6 +229,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   refreshData(): void {
     this.fetchOrders();
     this.fetchProducts();
+    this.fetchAgencies();
     this.fetchAgencyStats();
     this.cdr.detectChanges();
   }
@@ -520,12 +531,12 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     }
 
-    const branchMap: Record<string, string> = {
-      all: 'all',
-      '1': '244 đường số 8 - H071',
-      '2': '60 đường Nguyễn An Ninh - H246',
-      '3': '24 đường Lý Thường Kiệt - H033',
-    };
+    const branchMap: Record<string, string> = { all: 'all' };
+    this.AGENCIES.forEach((a, i) => {
+      branchMap[String(i + 1)] = a.name;
+      branchMap[a.name] = a.name; // Hỗ trợ cả name làm key
+    });
+
     const targetAgency = branchMap[branch] || 'all';
 
     const agencyOrders = this.ORDERS_ALL.filter(o => 
@@ -800,12 +811,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const now = new Date();
         month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       }
-      const branchMap: Record<string, string> = {
-        all: 'all',
-        '1': '244 đường số 8 - H071',
-        '2': '60 đường Nguyễn An Ninh - H246',
-        '3': '24 đường Lý Thường Kiệt - H033',
-      };
+      const branchMap: Record<string, string> = { all: 'all' };
+      this.AGENCIES.forEach((a, i) => {
+        branchMap[String(i + 1)] = a.name;
+        branchMap[a.name] = a.name;
+      });
       const targetAgency = branchMap[branch] || 'all';
       agencyOrders = this.ORDERS_ALL.filter(o => targetAgency === 'all' || o.deliveryAgency === targetAgency);
       const parsed = month.split('-').map(Number);
@@ -1058,7 +1068,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       const imageUrl = p.image || p.img || p.imageUrl || p.thumbnail || Admin.PLACEHOLDER_IMG;
       const visible = p.visible !== false;
       const pid = (p?.id ?? '').replace(/"/g, '&quot;');
-      tr.innerHTML = `<td>${p?.id ?? ''}</td><td>${p?.name ?? ''}</td><td>${p?.category ?? p?.type ?? ''}</td><td><img src="${imageUrl}" alt="${(p?.name ?? '').replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='${Admin.PLACEHOLDER_IMG}'"></td><td>${price}</td><td class="col-visible"><label class="visible-check-wrap"><input type="checkbox" class="product-visible-cb" data-product-id="${pid}" ${visible ? 'checked' : ''} aria-label="Hiển thị trên menu"></label></td><td><span class="btns"><button class="btn" data-edit="${pid}"><img src="assets/icons/edit2.png" alt="" aria-hidden="true"></button><button class="btn" data-delete="${pid}"><img src="assets/icons/delete2.png" alt="" aria-hidden="true"></button></span></td>`;
+      tr.innerHTML = `<td>${p?.id ?? ''}</td><td>${p?.name ?? ''}</td><td>${p?.category ?? p?.type ?? ''}</td><td><img src="${imageUrl}" alt="${(p?.name ?? '').replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='${Admin.PLACEHOLDER_IMG}'"></td><td>${price}</td><td class="col-visible"><div class="toggle-container"><label class="switch"><input type="checkbox" class="product-visible-cb" data-product-id="${pid}" ${visible ? 'checked' : ''}><span class="slider round"></span></label></div></td><td><span class="btns"><button class="btn" data-edit="${pid}"><img src="assets/icons/edit2.png" alt="" aria-hidden="true"></button><button class="btn" data-delete="${pid}"><img src="assets/icons/delete2.png" alt="" aria-hidden="true"></button></span></td>`;
       body.appendChild(tr);
     });
     if (body) this.bindVisibleCheckboxes(body as HTMLElement);
@@ -1279,21 +1289,31 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     }
     const agencyDropdown = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
     if (agencyDropdown) {
-      const agencies = Array.from(new Set(this.ORDERS_ALL.map(o => o.deliveryAgency).filter(Boolean)));
-      let optionsHtml = '<option value="">Chưa chọn chi nhánh</option>';
-      if (agencies.length === 0) {
-        ['Trung Dũng, Biên Hòa', 'Chi nhánh Tân Phú', 'Chi nhánh Bình Thạnh', 'Chi nhánh Dĩ An'].forEach(agency => {
-          optionsHtml += `<option value="${agency}">${agency}</option>`;
+      if (this.AGENCIES.length > 0) {
+        let optionsHtml = '<option value="">Chưa chọn chi nhánh</option>';
+        this.AGENCIES.forEach(a => {
+          optionsHtml += `<option value="${a.name}">${a.name}</option>`;
         });
+        agencyDropdown.innerHTML = optionsHtml;
       } else {
-        agencies.forEach(agency => {
-          optionsHtml += `<option value="${agency}">${agency}</option>`;
-        });
+        // Fallback or keep current if AGENCIES not loaded yet
+        const agencies = Array.from(new Set(this.ORDERS_ALL.map(o => o.deliveryAgency).filter(Boolean)));
+        let optionsHtml = '<option value="">Chưa chọn chi nhánh</option>';
+        if (agencies.length === 0) {
+          ['Trung Dũng, Biên Hòa', 'Chi nhánh Tân Phú', 'Chi nhánh Bình Thạnh', 'Chi nhánh Dĩ An'].forEach(agency => {
+            optionsHtml += `<option value="${agency}">${agency}</option>`;
+          });
+        } else {
+          agencies.forEach(agency => {
+            optionsHtml += `<option value="${agency}">${agency}</option>`;
+          });
+        }
+        agencyDropdown.innerHTML = optionsHtml;
       }
-      agencyDropdown.innerHTML = optionsHtml;
-
+      
       // If the order has an agency but it's not in the list, add it
-      if (order.deliveryAgency && !agencies.includes(order.deliveryAgency) && agencies.length > 0) {
+      const currentAgencies = Array.from(agencyDropdown.options).map(o => o.value);
+      if (order.deliveryAgency && !currentAgencies.includes(order.deliveryAgency)) {
         agencyDropdown.innerHTML += `<option value="${order.deliveryAgency}">${order.deliveryAgency}</option>`;
       }
 
@@ -1910,6 +1930,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     });
     this.fetchOrders();
     this.fetchProducts();
+    this.fetchAgencies();
     this.fetchAgencyStats();
     this.initSuccessModal();
     this.initDeleteConfirmModal();
@@ -2168,34 +2189,77 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     this.showAlertModal('Đã xuất báo cáo tổng kết ra file Excel thành công.');
   }
 
+  private fetchAgencies(): void {
+    this.http.get<Agency[]>(this.AGENCIES_API).subscribe({
+      next: (data) => {
+        this.AGENCIES = data || [];
+        this.renderBranchDropdown();
+        this.populateOrderAgencyDropdown();
+        // Cập nhật lại stats nếu cần
+        this.applyDashboardFilter();
+      },
+      error: (err) => {
+        console.error('Fetch agencies error:', err);
+      }
+    });
+  }
+
+  private populateOrderAgencyDropdown(): void {
+    const select = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
+    if (!select) return;
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">Chưa chọn chi nhánh</option>';
+    this.AGENCIES.forEach((a) => {
+      const opt = document.createElement('option');
+      opt.value = a.name;
+      opt.textContent = a.name;
+      if (a.name === currentVal) opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
+
+  private renderBranchDropdown(): void {
+    const ddUserMenu = document.getElementById('ddUserMenu');
+    const branchLabel = document.getElementById('branchLabel');
+    if (!ddUserMenu) return;
+
+    let html = '<button role="menuitem" data-branch="all" type="button">Tất cả các chi nhánh</button>';
+    this.AGENCIES.forEach((a) => {
+      html += `<button role="menuitem" data-branch="${a.name}" type="button">${a.name}</button>`;
+    });
+    ddUserMenu.innerHTML = html;
+
+    const savedBranch = localStorage.getItem('admin_branch') || 'all';
+    if (branchLabel) {
+      if (savedBranch === 'all') {
+        branchLabel.textContent = 'Tất cả các chi nhánh';
+      } else {
+        branchLabel.textContent = savedBranch;
+      }
+    }
+  }
+
   private initTopbarDropdowns(): void {
     const ddUserBtn = document.getElementById('ddUserBtn');
     const ddUserMenu = document.getElementById('ddUserMenu');
     const ddMoreBtn = document.getElementById('ddMoreBtn');
     const ddMoreMenu = document.getElementById('ddMoreMenu');
-    const branchMap: Record<string, string> = {
-      all: 'Tất cả các chi nhánh',
-      '1': '244 đường số 8 - H071',
-      '2': '60 đường Nguyễn An Ninh - H246',
-      '3': '24 đường Lý Thường Kiệt - H033',
-    };
+
     if (ddUserBtn && ddUserMenu) {
       ddUserBtn.innerHTML =
-        'Chi nhánh: <strong id="branchLabel">Tất cả</strong> <span class="caret" aria-hidden="true">▾</span>';
-      ddUserMenu.innerHTML =
-        '<button role="menuitem" data-branch="all" type="button">Tất cả các chi nhánh</button>' +
-        '<button role="menuitem" data-branch="1" type="button">244 đường số 8 - H071</button>' +
-        '<button role="menuitem" data-branch="2" type="button">60 đường Nguyễn An Ninh - H246</button>' +
-        '<button role="menuitem" data-branch="3" type="button">24 đường Lý Thường Kiệt - H033</button>';
-      const branchLabel = document.getElementById('branchLabel');
-      const savedBranch = localStorage.getItem('admin_branch') || 'all';
-      if (branchLabel) branchLabel.textContent = branchMap[savedBranch] || 'Tất cả';
+        'Chi nhánh: <strong id="branchLabel">Tất cả các chi nhánh</strong> <span class="caret" aria-hidden="true">▾</span>';
+      
+      this.renderBranchDropdown();
+
       ddUserMenu.addEventListener('click', (e) => {
         const b = (e.target as HTMLElement).closest('button[role="menuitem"]');
         if (!b) return;
         const val = b.getAttribute('data-branch') || 'all';
         localStorage.setItem('admin_branch', val);
-        if (branchLabel) branchLabel.textContent = branchMap[val] || 'Tất cả';
+        const branchLabel = document.getElementById('branchLabel');
+        if (branchLabel) {
+          branchLabel.textContent = val === 'all' ? 'Tất cả các chi nhánh' : val;
+        }
         window.dispatchEvent(new CustomEvent('admin:filters', { detail: { branch: val } }));
       });
     }

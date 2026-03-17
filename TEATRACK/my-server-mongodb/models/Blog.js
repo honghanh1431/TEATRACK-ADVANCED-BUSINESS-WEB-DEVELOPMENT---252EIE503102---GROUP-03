@@ -55,4 +55,18 @@ const deleteById = async (id) => {
   return findAll();
 };
 
-module.exports = { init, findAll, findById, create, updateById, deleteById, collection };
+const incrementViews = async (id) => {
+  const col = collection();
+  const filterArr = [{ id: String(id) }];
+  try {
+    if (ObjectId.isValid(id)) {
+      filterArr.push({ _id: new ObjectId(id) });
+    }
+  } catch (_) { }
+  const filter = { $or: filterArr };
+  const result = await col.updateOne(filter, { $inc: { views: 1 } });
+  return result.matchedCount > 0 ? findById(id) : null;
+};
+
+module.exports = { init, findAll, findById, create, updateById, deleteById, incrementViews, collection };
+

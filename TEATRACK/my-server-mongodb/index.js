@@ -48,6 +48,8 @@ const Order = require('./models/Order');
 Order.init(database);
 const Cart = require('./models/Cart');
 Cart.init(database);
+const Contact = require('./models/Contact');
+Contact.init(database);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -89,6 +91,9 @@ app.use('/api/cart', cartRoutes);
 const agencyRoutes = require('./routes/agencyRoutes');
 agencyRoutes.init(database);
 app.use('/api/agencies', agencyRoutes.router);
+
+const contactRoutes = require('./routes/contactRoutes');
+app.use('/api/contacts', contactRoutes);
 
 
 app.listen(port, () => {

@@ -406,42 +406,46 @@
           <img src="assets/icons/Cart.png" alt="Cart" class="section-icon" />
           <h3 class="section-title">Thông tin đơn hàng</h3>
         </div>
-        <div class="order-info-grid">
-          <div class="info-row">
-            <span class="info-label">Mã đơn hàng:</span>
-            <span class="info-value" id="order-id">HTNGTD273</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Ngày đặt hàng:</span>
-            <span class="info-value" id="order-date">20/10/2025</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Thời gian:</span>
-            <span class="info-value" id="order-time">07:28 am</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Tình trạng đơn hàng:</span>
-            <div style="display: flex; gap: 12px; align-items: center">
-              <select id="order-status-dropdown" class="status-dropdown">
-                <option value="pending">Xác nhận đơn hàng</option>
-                <option value="processing">Chuẩn bị đơn hàng</option>
-                <option value="ready">Chờ lấy hàng</option>
-                <option value="shipping">Đang giao hàng</option>
-                <option value="completed">Giao thành công</option>
-                <option value="cancelled">Đã hủy</option>
-              </select>
+        <div class="order-info-grid order-info-two-cols">
+          <div class="order-info-col">
+            <div class="info-row">
+              <span class="info-label">MÃ ĐƠN HÀNG:</span>
+              <span class="info-value" id="order-id">HTNGTD273</span>
             </div>
+            <div class="info-row">
+              <span class="info-label">NGÀY ĐẶT HÀNG:</span>
+              <span class="info-value" id="order-date">20/10/2025</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">THỜI GIAN:</span>
+              <span class="info-value" id="order-time">07:28 am</span>
+            </div>
+            <div class="order-info-divider-address"></div>
           </div>
-          <div class="info-row" style="grid-column: 1 / -1;">
-            <span class="info-label">Chi nhánh giao hàng:</span>
-            <div style="display: flex; gap: 12px; align-items: center">
-              <select id="order-agency-dropdown" class="status-dropdown" style="width: 100%">
-                <option value="">Chưa chọn chi nhánh</option>
-              </select>
+          <div class="order-info-col">
+            <div class="info-row">
+              <span class="info-label">TÌNH TRẠNG ĐƠN HÀNG:</span>
+              <div class="info-control">
+                <select id="order-status-dropdown" class="status-dropdown">
+                  <option value="pending">Xác nhận đơn hàng</option>
+                  <option value="processing">Chuẩn bị đơn hàng</option>
+                  <option value="ready">Chờ lấy hàng</option>
+                  <option value="shipping">Đang giao hàng</option>
+                  <option value="completed">Giao thành công</option>
+                  <option value="cancelled">Đã hủy</option>
+                </select>
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="info-label">CHI NHÁNH GIAO HÀNG:</span>
+              <div class="info-control">
+                <select id="order-agency-dropdown" class="status-dropdown" style="width: 100%">
+                  <option value="">Chưa chọn chi nhánh</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
-        <div class="order-info-divider-address"></div>
         <!-- Địa chỉ người nhận - Nằm trong cùng section -->
         <div class="order-info-subsection">
           <div class="subsection-header">
@@ -449,15 +453,15 @@
           </div>
           <div class="order-info-grid">
             <div class="info-row">
-              <span class="info-label">Họ và tên:</span>
+              <span class="info-label">HỌ VÀ TÊN:</span>
               <span class="info-value" id="customer-name">Nguyễn Ba Đù</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Số điện thoại:</span>
+              <span class="info-label">SỐ ĐIỆN THOẠI:</span>
               <span class="info-value" id="customer-phone">0934727978</span>
             </div>
             <div class="info-row full-width">
-              <span class="info-label">Địa chỉ:</span>
+              <span class="info-label">ĐỊA CHỈ:</span>
               <span class="info-value" id="customer-address">Bcons plaza, Thống Nhất, Dĩ An Bình Dương</span>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 export interface Feedback {
-  id: number;
+  id: string; // Đổi sang string để khớp với MongoDB ObjectId
   fullname: string;
   email: string;
   phone: string;
@@ -28,7 +28,7 @@ export interface LogEntry {
 })
 export class AdminContact implements OnInit {
   feedbacks: Feedback[] = [];
-  private readonly dataUrl = '/data/contact-mail.json';
+  private readonly API = 'http://localhost:3002/api/contacts';
 
   //   State 
   filteredFeedbacks: Feedback[] = [];
@@ -54,14 +54,23 @@ export class AdminContact implements OnInit {
 
   //   Lifecycle  
   ngOnInit(): void {
-    this.http.get<Omit<Feedback, 'id'>[]>(this.dataUrl).subscribe({
+    this.loadFeedbacks();
+  }
+
+  loadFeedbacks(): void {
+    this.http.get<Feedback[]>(this.API).subscribe({
       next: (data) => {
-        this.feedbacks = (data || []).map((item, index) => ({
+        this.feedbacks = (data || []).map((item) => ({
           ...item,
-          id: index + 1,
           topic: item.topic || 'other',
         }));
         this.applyFilter();
+        
+        // Cập nhật lại feedback đang chọn nếu có
+        if (this.selectedFeedback) {
+          const updated = this.feedbacks.find(f => f.id === this.selectedFeedback?.id);
+          if (updated) this.selectedFeedback = updated;
+        }
       },
       error: () => {
         this.feedbacks = [];
@@ -76,7 +85,7 @@ export class AdminContact implements OnInit {
   }
 
   countByStatus(status: number): number {
-    return this.feedbacks.filter((f) => f.status === status).length;
+    return this.feedbacks.filter((f) => Number(f.status) === status).length;
   }
 
   //   Filter & search  
@@ -107,20 +116,42 @@ export class AdminContact implements OnInit {
 
   //   Select  
   selectFeedback(fb: Feedback): void {
-    fb.read = true;
+    if (!fb.read) {
+        fb.read = true;
+        this.http.put(`${this.API}/${fb.id}`, { read: true }).subscribe({
+          next: () => this.loadFeedbacks()
+        });
+    }
     this.selectedFeedback = fb;
   }
 
   //   Status change  
   onStatusChange(fb: Feedback): void {
-    // TODO: gọi API cập nhật trạng thái
-    console.log(`Cập nhật trạng thái feedback #${fb.id} → ${this.statusLabel[fb.status]}`);
+    // Ép kiểu về số để đảm bảo so sánh ở Box chính xác ngay lập tức
+    fb.status = Number(fb.status) as any;
+    this.cdr.detectChanges(); 
+
+    this.http.put(`${this.API}/${fb.id}`, { status: fb.status }).subscribe({
+        next: () => {
+            console.log(`Cập nhật trạng thái feedback #${fb.id} → ${this.statusLabel[fb.status]}`);
+            this.loadFeedbacks(); // Reload để đồng bộ database
+        },
+        error: (err) => {
+            console.error('Update status error:', err);
+            this.loadFeedbacks(); // Rollback trạng thái nếu lỗi
+        }
+    });
   }
 
   //   Save note  
   saveNote(fb: Feedback): void {
-    // TODO: gọi API lưu ghi chú
-    console.log(`Lưu ghi chú feedback #${fb.id}:`, fb.note);
+    this.http.put(`${this.API}/${fb.id}`, { note: fb.note }).subscribe({
+        next: () => {
+            this.loadFeedbacks();
+            console.log(`Lưu ghi chú feedback #${fb.id}:`, fb.note);
+        },
+        error: (err) => console.error('Save note error:', err)
+    });
   }
 
   //   Helpers  

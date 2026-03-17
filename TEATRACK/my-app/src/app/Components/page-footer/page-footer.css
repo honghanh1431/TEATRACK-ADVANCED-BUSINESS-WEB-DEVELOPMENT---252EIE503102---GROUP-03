@@ -76,6 +76,23 @@
   list-style: disc inside;     
   padding-left: 0;             
   margin: 0;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+.col.branches ul::-webkit-scrollbar {
+  width: 6px;
+}
+.col.branches ul::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+.col.branches ul::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+.col.branches ul::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 .col.branches li{
   line-height: 1.55;

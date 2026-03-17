@@ -401,6 +401,10 @@
 #posts-table td.col-show {
   text-align: center;
 }
+#posts-table thead th.col-views,
+#posts-table td.col-views {
+  text-align: center;
+}
 #posts-table thead th.col-actions,
 #posts-table td.col-actions {
   text-align: center;

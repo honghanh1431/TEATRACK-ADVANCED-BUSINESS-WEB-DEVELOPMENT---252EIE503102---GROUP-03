@@ -22,6 +22,14 @@ interface Order {
   items?: { name?: string; image?: string; size?: string; quantity?: number; price?: number }[];
 }
 
+interface Agency {
+  _id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  status?: string;
+}
+
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
@@ -41,6 +49,8 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
   private storageHandler = (e: StorageEvent) => this.onStorageOrders(e);
 
   private readonly API_BASE = 'http://localhost:3002';
+  private readonly AGENCIES_API = `${this.API_BASE}/api/agencies`;
+  private AGENCIES: Agency[] = [];
 
   constructor(
     private router: Router,
@@ -59,6 +69,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
 
     this.loadFromStorage();
     this.fetchOrders();
+    this.fetchAgencies();
   }
 
   ngAfterViewInit(): void {
@@ -199,6 +210,32 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     } catch (err) {
       console.error('Global fetch orders error', err);
     }
+  }
+
+  private fetchAgencies(): void {
+    this.http.get<Agency[]>(this.AGENCIES_API).subscribe({
+      next: (data) => {
+        this.AGENCIES = data || [];
+        this.populateOrderAgencyDropdown();
+      },
+      error: (err) => {
+        console.error('Fetch agencies error:', err);
+      }
+    });
+  }
+
+  private populateOrderAgencyDropdown(): void {
+    const select = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
+    if (!select) return;
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">Chưa chọn chi nhánh</option>';
+    this.AGENCIES.forEach((a) => {
+      const opt = document.createElement('option');
+      opt.value = a.name;
+      opt.textContent = a.name;
+      if (a.name === currentVal) opt.selected = true;
+      select.appendChild(opt);
+    });
   }
 
   private processAndRender(orders: Order[]): void {
@@ -525,21 +562,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
 
     const agencyDropdown = document.getElementById('order-agency-dropdown') as HTMLSelectElement | null;
     if (agencyDropdown) {
-      const agencies = Array.from(new Set(this.ORDERS_ALL.map(o => o.deliveryAgency).filter(Boolean)));
-      let optionsHtml = '<option value="">Chưa chọn chi nhánh</option>';
-      if (agencies.length === 0) {
-        ['Trung Dũng, Biên Hòa', 'Chi nhánh Tân Phú', 'Chi nhánh Bình Thạnh', 'Chi nhánh Dĩ An'].forEach(agency => {
-          optionsHtml += `<option value="${agency}">${agency}</option>`;
-        });
-      } else {
-        agencies.forEach(agency => {
-          optionsHtml += `<option value="${agency}">${agency}</option>`;
-        });
-      }
-      agencyDropdown.innerHTML = optionsHtml;
-      if (order.deliveryAgency && !agencies.includes(order.deliveryAgency) && agencies.length > 0) {
-          agencyDropdown.innerHTML += `<option value="${order.deliveryAgency}">${order.deliveryAgency}</option>`;
-      }
+      this.populateOrderAgencyDropdown();
       agencyDropdown.value = order.deliveryAgency || '';
     }
 

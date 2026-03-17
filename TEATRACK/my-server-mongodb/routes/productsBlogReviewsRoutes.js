@@ -105,6 +105,18 @@ blogRouter.delete('/:id', async (req, res) => {
   }
 });
 
+blogRouter.post('/:id/view', async (req, res) => {
+  try {
+    const doc = await Blog.incrementViews(req.params.id);
+    if (!doc) return res.status(404).json({ error: 'Not found' });
+    res.json(doc);
+  } catch (err) {
+    console.error('POST /blog/:id/view', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // --- Reviews (query productId optional) ---
 const reviewsRouter = express.Router();
 reviewsRouter.get('/', async (req, res) => {

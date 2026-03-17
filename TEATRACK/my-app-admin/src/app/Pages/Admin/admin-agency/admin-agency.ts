@@ -160,7 +160,10 @@ export class AdminAgency implements OnInit {
   }
 
   private persist(): void {
-    localStorage.setItem(this.LS_KEY, JSON.stringify(this.agencies));
+    // Không dùng LocalStorage để tránh không đồng bộ với DB
+    try {
+      localStorage.removeItem(this.LS_KEY);
+    } catch (_) {}
   }
 
   onSearchInput(value: string): void {
@@ -246,24 +249,27 @@ export class AdminAgency implements OnInit {
     this.cdr.detectChanges();
   }
 
-  bulkDeactivate(): void {
-    this.selectedIds.forEach((id) => {
-      const a = this.agencies.find((x) => x._id === id);
-      if (a) a.status = 'inactive';
-    });
-    this.persist();
+  async bulkDeactivate(): Promise<void> {
+    const ids = Array.from(this.selectedIds);
+    for (const id of ids) {
+       await this.http.put(`${this.API}/${id}`, { status: 'inactive' }).toPromise();
+    }
+    this.loadAgencies(); // Reload all
     this.selectedIds.clear();
-    this.filterTable();
-    this.toast('success', 'Đã tạm ngưng chi nhánh đã chọn.');
+    this.toast('success', `Đã tạm ngưng ${ids.length} chi nhánh đã chọn.`);
     this.cdr.detectChanges();
   }
 
-  bulkDelete(): void {
-    this.agencies = this.agencies.filter((a) => !this.selectedIds.has(a._id));
-    this.persist();
+  async bulkDelete(): Promise<void> {
+    const ids = Array.from(this.selectedIds);
+    if (!confirm(`Bạn có chắc muốn xoá ${ids.length} chi nhánh đã chọn?`)) return;
+    
+    for (const id of ids) {
+       await this.http.delete(`${this.API}/${id}`).toPromise();
+    }
+    this.loadAgencies(); // Reload all
     this.selectedIds.clear();
-    this.filterTable();
-    this.toast('success', 'Đã xoá chi nhánh đã chọn.');
+    this.toast('success', `Đã xoá ${ids.length} chi nhánh đã chọn.`);
     this.cdr.detectChanges();
   }
 
@@ -330,7 +336,7 @@ export class AdminAgency implements OnInit {
       this.toast('error', 'Vui lòng nhập tên chi nhánh.');
       return;
     }
-    const payload: Partial<Agency> = {
+    const payload: any = {
       name,
       address: this.editAddress.trim(),
       phone: this.editPhone.trim(),
@@ -338,29 +344,30 @@ export class AdminAgency implements OnInit {
       mapEmbed: this.editMapEmbed.trim() || undefined,
       image: this.editImage.trim() || undefined,
     };
+    
     if (this.editingId) {
-      const idx = this.agencies.findIndex((a) => a._id === this.editingId);
-      if (idx !== -1) {
-        this.agencies[idx] = { ...this.agencies[idx], ...payload };
-      }
-      this.toast('success', 'Đã cập nhật chi nhánh.');
-    } else {
-      this.agencies.push({
-        _id: `agency_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-        name: payload.name!,
-        address: payload.address || '',
-        phone: payload.phone || '',
-        status: payload.status || 'active',
-        createdAt: new Date().toISOString(),
-        mapEmbed: payload.mapEmbed,
-        image: payload.image,
+      this.http.put<Agency[]>(`${this.API}/${this.editingId}`, payload).subscribe({
+        next: (data) => {
+          this.agencies = (data || []).map(a => this.normalizeAgency(a));
+          this.filterTable();
+          this.closeEditModal();
+          this.toast('success', 'Đã cập nhật chi nhánh.');
+          this.cdr.detectChanges();
+        },
+        error: () => this.toast('error', 'Lỗi cập nhật chi nhánh.')
       });
-      this.toast('success', 'Đã thêm chi nhánh.');
+    } else {
+      this.http.post<Agency[]>(this.API, payload).subscribe({
+        next: (data) => {
+          this.agencies = (data || []).map(a => this.normalizeAgency(a));
+          this.filterTable();
+          this.closeEditModal();
+          this.toast('success', 'Đã thêm chi nhánh.');
+          this.cdr.detectChanges();
+        },
+        error: () => this.toast('error', 'Lỗi thêm chi nhánh.')
+      });
     }
-    this.persist();
-    this.filterTable();
-    this.closeEditModal();
-    this.cdr.detectChanges();
   }
 
   openDetail(_agency: Agency): void {}
@@ -383,11 +390,16 @@ export class AdminAgency implements OnInit {
   }
 
   toggleStatus(agency: Agency): void {
-    agency.status = agency.status === 'active' ? 'inactive' : 'active';
-    this.persist();
-    this.filterTable();
-    this.toast('success', agency.status === 'active' ? 'Đã kích hoạt.' : 'Đã tạm ngưng.');
-    this.cdr.detectChanges();
+    const newStatus = agency.status === 'active' ? 'inactive' : 'active';
+    this.http.put<Agency[]>(`${this.API}/${agency._id}`, { status: newStatus }).subscribe({
+      next: (data) => {
+        this.agencies = (data || []).map(a => this.normalizeAgency(a));
+        this.filterTable();
+        this.toast('success', newStatus === 'active' ? 'Đã kích hoạt.' : 'Đã tạm ngưng.');
+        this.cdr.detectChanges();
+      },
+      error: () => this.toast('error', 'Lỗi thay đổi trạng thái.')
+    });
   }
 
   openDelete(agency: Agency): void {
@@ -404,12 +416,16 @@ export class AdminAgency implements OnInit {
 
   confirmDelete(): void {
     if (!this.deleteTarget) return;
-    this.agencies = this.agencies.filter((a) => a._id !== this.deleteTarget!._id);
-    this.persist();
-    this.filterTable();
-    this.closeDeleteModal();
-    this.toast('success', 'Đã xoá chi nhánh.');
-    this.cdr.detectChanges();
+    this.http.delete<Agency[]>(`${this.API}/${this.deleteTarget._id}`).subscribe({
+      next: (data) => {
+        this.agencies = (data || []).map(a => this.normalizeAgency(a));
+        this.filterTable();
+        this.closeDeleteModal();
+        this.toast('success', 'Đã xoá chi nhánh.');
+        this.cdr.detectChanges();
+      },
+      error: () => this.toast('error', 'Lỗi xoá chi nhánh.')
+    });
   }
 
   prevPage(): void {

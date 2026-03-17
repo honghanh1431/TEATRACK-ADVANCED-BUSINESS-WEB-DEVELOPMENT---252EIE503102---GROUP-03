@@ -5,7 +5,7 @@
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Breadcrumb (giống blog-list) */
+/* Breadcrumb */
 .breadcrumb-banner {
   background: #D4EDFC;
   padding: 20px 20px;
@@ -34,26 +34,15 @@
 .breadcrumb-path a:hover {
   text-decoration: underline;
 }
+
 /* ========== RESET / BASE ========== */
 *{box-sizing:border-box}
 html,body{
   margin:0; padding:0;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color:#1f2937;                 
-  background:#f4f7fb;          
+  color:#1f2937;
+  background:#f4f7fb;
 }
-
-
-.agency-hero{
-  background:#e7f1ff;
-  border-bottom:1px solid #e6eefc;
-}
-.agency-hero__inner{
-  max-width:1200px; margin:0 auto;
-  padding:20px 16px; text-align:center;
-}
-.agency-hero__inner h1{margin:0 0 6px; font-size:24px; font-weight:800}
-.agency-hero__inner p{margin:0; font-size:14px; color:#6b93cf}
 
 /* ========== LAYOUT ========== */
 .agency-layout{
@@ -61,13 +50,63 @@ html,body{
   margin:22px auto;
   padding:0 16px;
   display:grid;
-  grid-template-columns: 1fr 420px;  /* trái – phải */
+  grid-template-columns: 1fr 420px; /* trái – phải */
   gap:22px;
+  /* Align-items stretch để cột trái & phải bằng chiều cao nhau */
+  align-items: start;
 }
+
+/* ========== COLUMN LEFT: list có scroll ========== */
 .agency-left{
   display:flex;
   flex-direction:column;
   gap:18px;
+  /* Giới hạn chiều cao bằng đúng map height, rồi scroll nội dung */
+  max-height: 660px;
+  overflow-y: auto;
+  padding-right: 6px;  /* khoảng trống cho scrollbar không che card */
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar cho cột trái */
+.agency-left::-webkit-scrollbar {
+  width: 6px;
+}
+.agency-left::-webkit-scrollbar-track {
+  background: #e6eefc;
+  border-radius: 10px;
+}
+.agency-left::-webkit-scrollbar-thumb {
+  background: #90c5ff;
+  border-radius: 10px;
+}
+.agency-left::-webkit-scrollbar-thumb:hover {
+  background: #0088ff;
+}
+
+/* ========== LOADING STATE ========== */
+.branch-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #6b93cf;
+  font-size: 15px;
+  gap: 14px;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e6eefc;
+  border-top-color: #0088ff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ========== CARD CHI NHÁNH ========== */
@@ -83,6 +122,8 @@ html,body{
   transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
   cursor: pointer;
   padding: 12px;
+  /* Đừng shrink khi scroll */
+  flex-shrink: 0;
 }
 
 .branch-card:hover {
@@ -95,55 +136,76 @@ html,body{
   box-shadow: 0 12px 28px rgba(19, 94, 230, .16);
 }
 
-/* Bên trái: hình */
+/* Hình thumbnail */
 .branch-thumb {
   border-radius: 12px;
   overflow: hidden;
-  width: 200px;
-  height: 150px;
+  width: 160px;
+  height: 130px;
   object-fit: cover;
   display: block;
+  flex-shrink: 0;
 }
 
-
-/* Bên phải: chữ */
-.branch-info {
+/* Metadata text */
+.branch-meta {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 6px 4px;
+  min-width: 0;
 }
 
 .branch-title {
-  margin: 0 0 8px;
-  font-size: 18px;
+  margin: 0 0 10px;
+  font-size: 16px;
   font-weight: 700;
   color: #0088ff;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 24px;
-  margin-top: 12px;
+  /* Ngắt dòng nếu tên dài */
+  word-break: break-word;
 }
 
 .branch-addr,
 .branch-phone {
-  margin: 6px 0;
-  font-size: 16px;
+  margin: 5px 0;
+  font-size: 14px;
   color: #4b5563;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.i {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  opacity: .9;
+  align-items: flex-start;
+  gap: 10px;
+  word-break: break-word;
 }
 
+.i {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  opacity: .9;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ========== MAP LABEL ========== */
+.map-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #e7f3ff, #f0f8ff);
+  border-bottom: 1px solid #e6eefc;
+  font-weight: 600;
+  font-size: 14px;
+  color: #0055cc;
+  border-radius: 20px 20px 0 0;
+}
+
+.map-label .i {
+  margin-top: 0;
+}
 
 /* ========== MAP (CỘT PHẢI) ========== */
 .agency-right .map-wrap{
@@ -154,16 +216,48 @@ html,body{
   overflow:hidden;
   box-shadow:0 8px 24px rgba(22,119,255,.10);
 }
+
 .map-iframe{
   width:100%; height:600px; border:0; display:block;
-  cursor:pointer;                
+  cursor:pointer;
 }
 
+.map-placeholder {
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0b4cc;
+  font-size: 15px;
+}
 
+/* ========== RESPONSIVE ========== */
 @media (max-width:1024px){
-  .agency-layout{grid-template-columns:1fr}
-  .agency-right .map-wrap{position:relative}
-  .map-iframe{height:400px}
-  .branch-card{grid-template-columns:220px 1fr}
-  .branch-card__thumb img{height:160px}
+  .agency-layout{
+    grid-template-columns:1fr;
+    padding: 0 12px;
+  }
+  .agency-right .map-wrap{position:relative; top:0;}
+  .map-iframe{height:380px;}
+  .map-placeholder{height:380px;}
+  /* Trên mobile: danh sách cũng scroll, chiều cao giảm */
+  .agency-left{
+    max-height: 500px;
+  }
+  .branch-thumb{
+    width:120px;
+    height:110px;
+  }
+}
+
+@media (max-width: 600px){
+  .branch-thumb{
+    width: 90px;
+    height: 90px;
+  }
+  .branch-title{ font-size: 14px; }
+  .branch-addr, .branch-phone { font-size: 13px; }
+  .agency-left{ max-height: 420px; }
+  .map-iframe{ height: 300px; }
+  .map-placeholder{ height: 300px; }
 }
