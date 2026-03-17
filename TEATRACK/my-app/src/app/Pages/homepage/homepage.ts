@@ -6,6 +6,7 @@ import { ReviewCountService } from '../../review-count.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { io, Socket } from 'socket.io-client';
 
 import Swiper from 'swiper';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -102,6 +103,8 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     } catch { return false; }
   }
 
+  private socket: Socket | undefined;
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient,
@@ -112,6 +115,10 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     this.NAME_TO_SLUG = Object.fromEntries(
       Object.entries(this.CAT_MAP).map(([slug, name]) => [this.normalize(name), slug])
     );
+    this.socket = io('http://localhost:3002');
+    this.socket.on('productUpdated', () => {
+      this.refreshProducts();
+    });
   }
 
   async ngOnInit(): Promise<void> {
@@ -170,6 +177,17 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       window.removeEventListener('user:updated', this.handleUserUpdated);
     }
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
+
+  async refreshProducts(): Promise<void> {
+    this.ALL_PRODUCTS = [];
+    await this.ensureProducts();
+    this.renderTopHot();
+    this.renderHotMenu();
+    this.cdr.detectChanges();
   }
 
   private async ensureProducts(): Promise<void> {

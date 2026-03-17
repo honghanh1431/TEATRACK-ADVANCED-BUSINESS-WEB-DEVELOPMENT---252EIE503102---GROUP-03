@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ROUTE_TITLES, APP_TITLE_SUFFIX, getRouteTitle } from './route-titles';
 import { CartService } from './cart.service';
 import { HttpClient } from '@angular/common/http';
+import { io, Socket } from 'socket.io-client';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ import { HttpClient } from '@angular/common/http';
 export class App implements OnInit, OnDestroy {
   private sub?: Subscription;
   private toastSub?: Subscription;
+  private socket: Socket | undefined;
 
   showLayout = true;
   /** 'guest' = page-header, 'customer' = page-header-2 */
@@ -62,6 +64,36 @@ export class App implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private http: HttpClient
   ) {
+    console.log('App: Initializing Socket.io connection to http://localhost:3002');
+    this.socket = io('http://localhost:3002');
+    
+    this.socket.on('connect', () => {
+      console.log('App: Socket connected!', this.socket?.id);
+    });
+
+    this.socket.on('connect_error', (error) => {
+      console.error('App: Socket connection error:', error);
+    });
+
+    this.socket.on('userUpdated', (data: any) => {
+      console.log('Socket: userUpdated received', data);
+      try {
+        const userRaw = localStorage.getItem('ngogia_user');
+        if (userRaw) {
+          const user = JSON.parse(userRaw);
+          const currentId = user._id || user.id;
+          console.log('Current logged in user ID:', currentId);
+          // Check if the current user is the one that got updated
+          if (data && data.userId && String(currentId) === String(data.userId)) {
+            console.log('Matched! Refreshing profile...');
+            this.refreshUserProfile();
+          }
+        }
+      } catch (err) {
+        console.error('Error handling userUpdated event:', err);
+      }
+    });
+
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const path = event.urlAfterRedirects?.split('?')[0] || '';
@@ -141,6 +173,9 @@ export class App implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (typeof window !== 'undefined') {
       window.removeEventListener('user:logout', this.logoutHandler);
+    }
+    if (this.socket) {
+      this.socket.disconnect();
     }
     this.sub?.unsubscribe();
     this.toastSub?.unsubscribe();

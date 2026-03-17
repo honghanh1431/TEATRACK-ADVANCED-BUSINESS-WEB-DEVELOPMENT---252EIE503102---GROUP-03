@@ -90,16 +90,16 @@
 
           <div class="price-table">
             <div class="price-row">
-              <span class="size-badge" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">M</span>
-              <span class="price-value" id="price-m" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">{{ formatVND(getPriceM(prod)) }}₫</span>
-              <span class="size-badge" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">L</span>
-              <span class="price-value" id="price-l" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">{{ formatVND(getPriceL(prod)) }}₫</span>
+              <span class="size-badge" [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && isVip ? '0.5' : '1'">M</span>
+              <span class="price-value" id="price-m" [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && isVip ? '0.5' : '1'">{{ formatVND(getPriceM(prod)) }}₫</span>
+              <span class="size-badge" [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && isVip ? '0.5' : '1'">L</span>
+              <span class="price-value" id="price-l" [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && isVip ? '0.5' : '1'">{{ formatVND(getPriceL(prod)) }}₫</span>
             </div>
             <div class="vip-row">
-              <span class="size-badge vip" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">VIP</span>
-              <span class="price-value" id="price-vip-m" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">{{ formatVND(getVipPriceM(prod)) }}₫</span>
-              <span class="size-badge vip" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">VIP</span>
-              <span class="price-value" id="price-vip-l" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">{{ formatVND(getVipPriceL(prod)) }}₫</span>
+              <span class="size-badge vip" [style.text-decoration]="!isGuest && !isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && !isVip ? '0.5' : '1'">VIP</span>
+              <span class="price-value" id="price-vip-m" [style.text-decoration]="!isGuest && !isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && !isVip ? '0.5' : '1'">{{ formatVND(getVipPriceM(prod)) }}₫</span>
+              <span class="size-badge vip" [style.text-decoration]="!isGuest && !isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && !isVip ? '0.5' : '1'">VIP</span>
+              <span class="price-value" id="price-vip-l" [style.text-decoration]="!isGuest && !isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && !isVip ? '0.5' : '1'">{{ formatVND(getVipPriceL(prod)) }}₫</span>
             </div>
           </div>
 
@@ -137,7 +137,7 @@
                     >
                       <span class="pill-label">M</span>
                       <span class="pill-sub" id="size-pill-m"
-                        >{{ formatVND(isVip ? getVipPriceM(prod) : getPriceM(prod)) }}đ</span
+                        >{{ formatVND(!isGuest && isVip ? getVipPriceM(prod) : getPriceM(prod)) }}đ</span
                       >
                     </button>
                     <button
@@ -149,7 +149,7 @@
                     >
                       <span class="pill-label">L</span>
                       <span class="pill-sub" id="size-pill-l"
-                        >{{ formatVND(isVip ? getVipPriceL(prod) : getPriceL(prod)) }}đ</span
+                        >{{ formatVND(!isGuest && isVip ? getVipPriceL(prod) : getPriceL(prod)) }}đ</span
                       >
                     </button>
                   </div>

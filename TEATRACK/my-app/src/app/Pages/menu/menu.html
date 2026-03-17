@@ -68,21 +68,21 @@
                 <h3>{{ product.name }}</h3>
                 <div class="price-row">
                     <div class="price-col">
-                        <div class="line size-line" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">
+                        <div class="line size-line" [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && isVip ? '0.5' : '1'">
                             <span class="label">M</span>
                             <span class="value">{{ formatVND(getPriceM(product)) }}đ</span>
                         </div>
-                        <div class="line vip-line" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">
+                        <div class="line vip-line" [style.text-decoration]="!isGuest && !isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && !isVip ? '0.5' : '1'">
                             <span class="label vip">VIP</span>
                             <span class="value">{{ formatVND(getVipPriceM(product)) }}đ</span>
                         </div>
                     </div>
                     <div class="price-col">
-                        <div class="line size-line" [style.text-decoration]="isVip ? 'line-through' : 'none'" [style.opacity]="isVip ? '0.5' : '1'">
+                        <div class="line size-line" [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && isVip ? '0.5' : '1'">
                             <span class="label">L</span>
                             <span class="value">{{ formatVND(getPriceL(product)) }}đ</span>
                         </div>
-                        <div class="line vip-line" [style.text-decoration]="!isVip ? 'line-through' : 'none'" [style.opacity]="!isVip ? '0.5' : '1'">
+                        <div class="line vip-line" [style.text-decoration]="!isGuest && !isVip ? 'line-through' : 'none'" [style.opacity]="!isGuest && !isVip ? '0.5' : '1'">
                             <span class="label vip">VIP</span>
                             <span class="value">{{ formatVND(getVipPriceL(product)) }}đ</span>
                         </div>

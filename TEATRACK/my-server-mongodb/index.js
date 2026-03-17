@@ -50,6 +50,8 @@ const Cart = require('./models/Cart');
 Cart.init(database);
 const Contact = require('./models/Contact');
 Contact.init(database);
+const Promotion = require('./models/Promotion');
+Promotion.init(database);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -62,7 +64,9 @@ app.use((req, res, next) => {
   try {
     await UserCollection.createIndex({ username: 1 }, { unique: true });
     await UserCollection.createIndex({ email: 1 }, { unique: true });
-    console.log('Unique indexes on username and email created');
+    // Thêm index cho promotion code
+    await database.collection("vouchers").createIndex({ code: 1 }, { unique: true });
+    console.log('Unique indexes on username, email and promotion code created');
   } catch (err) {
     console.log('Index creation skipped', err.message);
   }
@@ -75,6 +79,10 @@ app.use('/api/auth', authRoutes);
 // Admin routes (protected)
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);
+
+// Promotions routes
+const promotionRoutes = require('./routes/promotionRoutes');
+app.use('/api/promotions', promotionRoutes);
 
 // Products, Blog, Reviews (chuyển từ my-server in-memory sang MongoDB)
 const { productsRouter, blogRouter, reviewsRouter } = require('./routes/productsBlogReviewsRoutes');
@@ -96,10 +104,30 @@ const contactRoutes = require('./routes/contactRoutes');
 app.use('/api/contacts', contactRoutes);
 
 
-app.listen(port, () => {
-  console.log(`My Server listening on port ${port}`);
+const http = require('http');
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }
+});
+
+// Gắn io vào app để dùng trong routes
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+server.listen(port, () => {
+  console.log(`My Server with Socket.io listening on port ${port}`);
 });
 
 app.get("/", (req, res) => {
-  res.send("This Web server is processed for MongoDB");
+  res.send("This Web server is processed for MongoDB with Real-time Updates");
 });

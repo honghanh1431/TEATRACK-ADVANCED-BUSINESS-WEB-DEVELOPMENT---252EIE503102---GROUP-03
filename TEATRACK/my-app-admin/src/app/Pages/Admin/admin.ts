@@ -91,6 +91,8 @@ interface Agency {
 
 
 
+import { io, Socket } from 'socket.io-client';
+
 @Component({
   selector: 'app-admin',
   standalone: false,
@@ -100,6 +102,7 @@ interface Agency {
 export class Admin implements OnInit, AfterViewInit, OnDestroy {
   ORDERS_ALL: Order[] = [];
   PRODUCTS_ALL: Product[] = [];
+  private socket: Socket | undefined;
 
   currentPage = 1;
   totalPages = 1;
@@ -141,7 +144,23 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('orderCreated', () => {
+      this.fetchOrders();
+      this.fetchAgencyStats();
+    });
+    this.socket.on('orderUpdated', () => {
+      this.fetchOrders();
+      this.fetchAgencyStats();
+    });
+    this.socket.on('productUpdated', () => {
+      this.fetchProducts();
+    });
+    this.socket.on('userUpdated', () => {
+      // Refresh dashboard if needed, or other user lists
+    });
+  }
 
 
   ngOnInit(): void {
@@ -192,6 +211,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (typeof window !== 'undefined') {
       window.removeEventListener('admin:filters', this.filterListener);
       window.removeEventListener('storage', this.storageOrdersHandler);
+    }
+    if (this.socket) {
+      this.socket.disconnect();
     }
     this.chartInstances.forEach((c) => {
       try {

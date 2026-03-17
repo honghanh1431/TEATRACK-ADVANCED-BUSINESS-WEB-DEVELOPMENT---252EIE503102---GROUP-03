@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { io, Socket } from 'socket.io-client';
 import { OrderService } from '../../order.service';
 
 export interface Product {
@@ -44,16 +45,22 @@ export interface TimelineStep {
   templateUrl: './order-history.html',
   styleUrl: './order-history.css',
 })
-export class OrderHistory implements OnInit {
+export class OrderHistory implements OnInit, OnDestroy {
   /** Modal xác nhận huỷ đơn */
   showCancelModal = false;
   orderToCancel: Order | null = null;
+  private socket: Socket | undefined;
 
   constructor(
     private router: Router,
     private orderService: OrderService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('orderUpdated', (data: any) => {
+      this.fetchOrders();
+    });
+  }
 
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -217,6 +224,16 @@ export class OrderHistory implements OnInit {
   }
 
   ngOnInit(): void {
+    this.fetchOrders();
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
+
+  fetchOrders(): void {
     const token = localStorage.getItem('token');
     if (token) {
       this.orderService.getMyOrders().subscribe({

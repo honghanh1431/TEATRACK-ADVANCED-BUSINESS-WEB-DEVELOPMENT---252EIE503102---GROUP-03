@@ -44,6 +44,8 @@ interface MenuState {
   sort: string;
 }
 
+import { io, Socket } from 'socket.io-client';
+
 @Component({
   selector: 'app-menu',
   standalone: false,
@@ -53,6 +55,7 @@ interface MenuState {
 })
 export class Menu implements OnInit, AfterViewInit, OnDestroy {
   private static readonly STATIC_BASE = '/';
+  private socket: Socket | undefined;
 
   // ─── State ────────────────────────────────────────────────────────────────
   allData: Product[] = [];
@@ -94,7 +97,12 @@ export class Menu implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private productState: ProductStateService,
     private reviewCountService: ReviewCountService,
-  ) { }
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('productUpdated', () => {
+      this.fetchProducts();
+    });
+  }
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -112,6 +120,9 @@ export class Menu implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (typeof window !== 'undefined') {
       window.removeEventListener('user:updated', this.handleUserUpdated);
+    }
+    if (this.socket) {
+      this.socket.disconnect();
     }
   }
 

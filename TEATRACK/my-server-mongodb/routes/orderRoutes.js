@@ -11,6 +11,10 @@ router.post('/', verifyToken, async (req, res) => {
 
         // Lưu đơn vào DB
         const createdOrder = await Order.createOrder(userId, orderData);
+        
+        // Notify admin
+        req.app.get('io').emit('orderCreated', { order: createdOrder });
+        
         res.status(201).json(createdOrder);
     } catch (err) {
         console.error('Create order error:', err);
@@ -63,6 +67,10 @@ router.patch('/:id/cancel', verifyToken, async (req, res) => {
         if (result.modifiedCount === 0) {
             return res.status(400).json({ message: 'Không thể hủy đơn hàng này (không tồn tại hoặc đã được xử lý).' });
         }
+
+        // Notify admin that order was cancelled by user
+        req.app.get('io').emit('orderUpdated', { orderId, status: 'canceled', by: 'user' });
+
         res.json({ message: 'Hủy đơn hàng thành công.' });
     } catch (err) {
         console.error('Cancel order error:', err);

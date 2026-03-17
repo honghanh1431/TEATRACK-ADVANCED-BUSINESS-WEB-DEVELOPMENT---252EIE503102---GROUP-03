@@ -22,10 +22,12 @@ const verifyToken = async (req, res, next) => {
 
     // Attach user info to request (without password)
     const { password, ...userWithoutPassword } = user;
+    console.log('verifyToken: Successfully verified token for userId:', decoded.userId);
     req.user = userWithoutPassword;
 
     next();
   } catch (error) {
+    console.error('verifyToken: Error occurred:', error);
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ message: 'Invalid token' });
     }

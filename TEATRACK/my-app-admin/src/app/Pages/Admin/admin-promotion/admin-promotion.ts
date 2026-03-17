@@ -6,12 +6,14 @@ import { HttpClient } from '@angular/common/http';
 export type VoucherType = 'amount' | 'percent' | 'perItem';
 
 export interface VoucherRow {
+  _id?: string;
   code: string;
   type: VoucherType;
   value: number;
   minSubtotal?: number;
   max?: number;
   description: string;
+  isActive?: boolean;
 }
 
 interface ToastItem {
@@ -22,6 +24,8 @@ interface ToastItem {
   closing?: boolean;
 }
 
+import { io, Socket } from 'socket.io-client';
+
 @Component({
   selector: 'app-admin-promotion',
   standalone: true,
@@ -30,8 +34,8 @@ interface ToastItem {
   styleUrls: ['./admin-promotion.css'],
 })
 export class AdminPromotion implements OnInit {
-  readonly VOUCHER_STORAGE_KEY = 'ngogia_vouchers';
-  private readonly DATA_URL = '/data/vouchers.json';
+  private readonly API_URL = 'http://localhost:3002/api/promotions';
+  private socket: Socket | undefined;
 
   stats = {
     total: 0,
@@ -50,7 +54,7 @@ export class AdminPromotion implements OnInit {
 
   modalOpen = false;
   editing = false;
-  editingCode = '';
+  editingId = '';
 
   form!: FormGroup;
 
@@ -61,11 +65,20 @@ export class AdminPromotion implements OnInit {
   alertMessage = '';
   toasts: ToastItem[] = [];
 
+  verifyOpen = false;
+  verifyTarget: VoucherRow | null = null;
+  verifyAction = '';
+
   constructor(
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
-  ) {}
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('promotionUpdated', () => {
+      this.load();
+    });
+  }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -75,10 +88,15 @@ export class AdminPromotion implements OnInit {
       minSubtotal: [null as number | null],
       max: [null as number | null],
       description: ['', [Validators.required]],
+      isActive: [true],
     });
     this.load();
-    this.applyFilters();
-    this.cdr.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 
   get totalPages(): number {
@@ -104,58 +122,28 @@ export class AdminPromotion implements OnInit {
     this.applyFilters();
   }
 
+  get headers() {
+    const token = localStorage.getItem('token');
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  }
+
   private load(): void {
-    this.http.get<VoucherRow[]>(this.DATA_URL).subscribe({
+    this.http.get<VoucherRow[]>(`${this.API_URL}/admin`, this.headers).subscribe({
       next: (data) => {
-        let list = Array.isArray(data) ? data : [];
-        try {
-          const stored = localStorage.getItem(this.VOUCHER_STORAGE_KEY);
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed) && parsed.length) list = this.normalizeList(parsed);
-          }
-        } catch (_) {}
-        this.vouchersAll = list;
+        this.vouchersAll = data || [];
         this.computeStats();
         this.applyFilters();
         this.cdr.detectChanges();
       },
-      error: () => {
-        try {
-          const stored = localStorage.getItem(this.VOUCHER_STORAGE_KEY);
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) this.vouchersAll = this.normalizeList(parsed);
-          }
-        } catch (_) {}
-        if (this.vouchersAll.length === 0) {
-          this.vouchersAll = [
-            { code: 'NGOGIAFS', type: 'amount', value: 10000, minSubtotal: 50000, description: 'Giảm 10.000đ cho đơn từ 50.000đ' },
-            { code: 'NGOVIP15', type: 'percent', value: 15, minSubtotal: 80000, max: 40000, description: 'Giảm 15% tối đa 40.000đ cho đơn từ 80.000đ' },
-            { code: '123456789', type: 'perItem', value: 3000, description: 'Giảm 3.000đ trên mỗi món trong giỏ hàng' },
-          ];
-          this.persist();
-        }
-        this.computeStats();
-        this.applyFilters();
-        this.cdr.detectChanges();
+      error: (err) => {
+        console.error('Load promotions error:', err);
+        this.toast('err', 'Lỗi', 'Không thể tải danh sách mã giảm giá từ server.');
       },
     });
-  }
-
-  private normalizeList(arr: any[]): VoucherRow[] {
-    return (arr || []).map((v) => ({
-      code: String(v?.code ?? '').trim().toUpperCase(),
-      type: (v?.type === 'percent' ? 'percent' : v?.type === 'perItem' ? 'perItem' : 'amount') as VoucherType,
-      value: Number(v?.value) ?? 0,
-      minSubtotal: v?.minSubtotal != null ? Number(v.minSubtotal) : undefined,
-      max: v?.max != null ? Number(v.max) : undefined,
-      description: String(v?.description ?? '').trim(),
-    })).filter((v) => v.code);
-  }
-
-  private persist(): void {
-    localStorage.setItem(this.VOUCHER_STORAGE_KEY, JSON.stringify(this.vouchersAll));
   }
 
   private computeStats(): void {
@@ -184,7 +172,7 @@ export class AdminPromotion implements OnInit {
 
   openAdd(): void {
     this.editing = false;
-    this.editingCode = '';
+    this.editingId = '';
     this.form.reset({
       code: '',
       type: 'amount',
@@ -192,6 +180,7 @@ export class AdminPromotion implements OnInit {
       minSubtotal: null,
       max: null,
       description: '',
+      isActive: true,
     });
     this.form.get('code')?.enable();
     this.modalOpen = true;
@@ -200,7 +189,7 @@ export class AdminPromotion implements OnInit {
 
   openEdit(v: VoucherRow): void {
     this.editing = true;
-    this.editingCode = v.code;
+    this.editingId = v._id || '';
     this.form.reset({
       code: v.code,
       type: v.type,
@@ -208,6 +197,7 @@ export class AdminPromotion implements OnInit {
       minSubtotal: v.minSubtotal ?? null,
       max: v.max ?? null,
       description: v.description,
+      isActive: v.isActive !== false,
     });
     this.form.get('code')?.enable();
     this.modalOpen = true;
@@ -217,7 +207,7 @@ export class AdminPromotion implements OnInit {
   tryCloseModal(): void {
     this.modalOpen = false;
     this.editing = false;
-    this.editingCode = '';
+    this.editingId = '';
     this.cdr.detectChanges();
   }
 
@@ -234,44 +224,80 @@ export class AdminPromotion implements OnInit {
       return;
     }
     const raw = this.form.getRawValue();
-    const code = String(raw.code ?? '').trim().toUpperCase();
-    const type = (raw.type === 'percent' ? 'percent' : raw.type === 'perItem' ? 'perItem' : 'amount') as VoucherType;
-    const value = Number(raw.value) || 0;
-    const minSubtotal = raw.minSubtotal != null && raw.minSubtotal !== '' ? Number(raw.minSubtotal) : undefined;
-    const max = raw.max != null && raw.max !== '' ? Number(raw.max) : undefined;
-    const description = String(raw.description ?? '').trim();
+    const payload = {
+      code: String(raw.code ?? '').trim().toUpperCase(),
+      type: (raw.type === 'percent' ? 'percent' : raw.type === 'perItem' ? 'perItem' : 'amount') as VoucherType,
+      value: Number(raw.value) || 0,
+      minSubtotal: raw.minSubtotal != null && raw.minSubtotal !== '' ? Number(raw.minSubtotal) : 0,
+      max: raw.max != null && raw.max !== '' ? Number(raw.max) : null,
+      description: String(raw.description ?? '').trim(),
+      isActive: !!raw.isActive,
+    };
 
-    if (this.editing && this.editingCode) {
-      const idx = this.vouchersAll.findIndex((x) => x.code === this.editingCode);
-      if (idx === -1) {
-        this.toast('err', 'Lỗi', 'Không tìm thấy voucher.');
-        return;
-      }
-      if (code !== this.editingCode && this.vouchersAll.some((x) => x.code === code)) {
-        this.toast('err', 'Trùng mã', 'Mã voucher đã tồn tại.');
-        return;
-      }
-      this.vouchersAll[idx] = { code, type, value, minSubtotal, max, description };
-      this.persist();
-      this.computeStats();
-      this.applyFilters();
-      this.tryCloseModal();
-      this.showSuccess('CẬP NHẬT VOUCHER THÀNH CÔNG');
-      this.cdr.detectChanges();
+    if (this.editing && this.editingId) {
+      this.http.put(`${this.API_URL}/${this.editingId}`, payload, this.headers).subscribe({
+        next: () => {
+          this.load();
+          this.tryCloseModal();
+          this.showSuccess('CẬP NHẬT VOUCHER THÀNH CÔNG');
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.toast('err', 'Lỗi', err.error?.message || 'Không thể cập nhật voucher.');
+        }
+      });
       return;
     }
 
-    if (this.vouchersAll.some((x) => x.code === code)) {
-      this.toast('err', 'Trùng mã', 'Mã voucher đã tồn tại.');
-      return;
-    }
-    this.vouchersAll.push({ code, type, value, minSubtotal, max, description });
-    this.persist();
-    this.computeStats();
-    this.applyFilters();
-    this.tryCloseModal();
-    this.showSuccess('THÊM VOUCHER THÀNH CÔNG');
+    this.http.post(this.API_URL, payload, this.headers).subscribe({
+      next: () => {
+        this.load();
+        this.tryCloseModal();
+        this.showSuccess('THÊM VOUCHER THÀNH CÔNG');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toast('err', 'Lỗi', err.error?.message || 'Không thể thêm voucher.');
+      }
+    });
+  }
+
+  changeDetect(): void {
     this.cdr.detectChanges();
+  }
+
+  toggleStatus(v: VoucherRow): void {
+    if (!v._id) return;
+    this.verifyTarget = v;
+    this.verifyAction = v.isActive === false ? 'Kích hoạt' : 'Vô hiệu hóa';
+    this.verifyOpen = true;
+    this.cdr.detectChanges();
+  }
+
+  closeVerify(): void {
+    this.verifyOpen = false;
+    this.verifyTarget = null;
+    this.verifyAction = '';
+    this.cdr.detectChanges();
+  }
+
+  confirmVerify(): void {
+    if (!this.verifyTarget || !this.verifyTarget._id) return;
+    const v = this.verifyTarget;
+    const nextActive = v.isActive === false;
+
+    this.http.put(`${this.API_URL}/${v._id}`, { isActive: nextActive }, this.headers).subscribe({
+      next: () => {
+        v.isActive = nextActive;
+        this.toast('ok', 'Cập nhật thành công', `Mã ${v.code} hiện tại là: ${nextActive ? 'Kích hoạt' : 'Không kích hoạt'}`);
+        this.closeVerify();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toast('err', 'Lỗi', err.error?.message || 'Không thể cập nhật trạng thái.');
+        this.closeVerify();
+      }
+    });
   }
 
   openDelete(v: VoucherRow): void {
@@ -291,15 +317,19 @@ export class AdminPromotion implements OnInit {
   }
 
   confirmDelete(): void {
-    if (!this.deleteTarget) return;
-    const code = this.deleteTarget.code;
-    this.vouchersAll = this.vouchersAll.filter((v) => v.code !== code);
-    this.persist();
-    this.computeStats();
-    this.applyFilters();
-    this.closeDelete();
-    this.showSuccess('XÓA VOUCHER THÀNH CÔNG');
-    this.cdr.detectChanges();
+    if (!this.deleteTarget || !this.deleteTarget._id) return;
+    
+    this.http.delete(`${this.API_URL}/${this.deleteTarget._id}`, this.headers).subscribe({
+      next: () => {
+        this.load();
+        this.closeDelete();
+        this.showSuccess('XÓA VOUCHER THÀNH CÔNG');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toast('err', 'Lỗi', err.error?.message || 'Không thể xóa voucher.');
+      }
+    });
   }
 
   showSuccess(message = 'THÀNH CÔNG'): void {

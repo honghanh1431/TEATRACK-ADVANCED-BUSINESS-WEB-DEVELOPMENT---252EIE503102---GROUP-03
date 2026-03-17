@@ -1,5 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { io, Socket } from 'socket.io-client';
 
 export interface Feedback {
   id: string; // Đổi sang string để khớp với MongoDB ObjectId
@@ -26,9 +27,10 @@ export interface LogEntry {
   templateUrl: './admin-contact.html',
   styleUrl: './admin-contact.css',
 })
-export class AdminContact implements OnInit {
+export class AdminContact implements OnInit, OnDestroy {
   feedbacks: Feedback[] = [];
   private readonly API = 'http://localhost:3002/api/contacts';
+  private socket: Socket | undefined;
 
   //   State 
   filteredFeedbacks: Feedback[] = [];
@@ -50,11 +52,22 @@ export class AdminContact implements OnInit {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.socket = io('http://localhost:3002');
+    this.socket.on('contactUpdated', () => {
+      this.loadFeedbacks();
+    });
+  }
 
   //   Lifecycle  
   ngOnInit(): void {
     this.loadFeedbacks();
+  }
+
+  ngOnDestroy(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 
   loadFeedbacks(): void {

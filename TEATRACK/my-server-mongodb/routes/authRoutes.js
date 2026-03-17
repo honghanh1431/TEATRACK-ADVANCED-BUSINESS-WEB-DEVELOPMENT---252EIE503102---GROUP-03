@@ -17,12 +17,20 @@ router.post('/reset-password', resetPassword);
 // GET profile - lấy thông tin đầy đủ từ MongoDB
 router.get('/profile', verifyToken, async (req, res) => {
   try {
+    console.log('GET /profile: Request received.');
     // middleware đã fetch user rồi, trả về luôn không cần query lại
+    if (!req.user) {
+      console.error('GET /profile: req.user is missing after verifyToken middleware!');
+      return res.status(500).json({ message: 'User data missing from request after authentication' });
+    }
+    console.log('GET /profile: req.user found, userId:', req.user._id);
+    // Ensure userWithoutPassword is correctly defined from req.user
     const { password, ...userWithoutPassword } = req.user;
+    console.log('GET /profile: Returning user profile (without password).');
     res.json({ user: userWithoutPassword });
   } catch (err) {
-    console.error('Get profile error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('GET /profile error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 

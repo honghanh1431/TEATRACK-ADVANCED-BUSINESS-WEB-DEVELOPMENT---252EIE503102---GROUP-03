@@ -55,6 +55,8 @@ interface Totals {
   grand: number;
 }
 
+import { io, Socket } from 'socket.io-client';
+
 @Component({
   selector: 'app-cart',
   standalone: true,
@@ -63,6 +65,8 @@ interface Totals {
   styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit, OnDestroy {
+  private socket: Socket | undefined;
+
   constructor(
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -70,7 +74,24 @@ export class Cart implements OnInit, OnDestroy {
     private cartService: CartService,
     private orderService: OrderService,
     private http: HttpClient,
-  ) { }
+  ) {
+    // Khởi tạo socket connection để nhận cập nhật voucher thời gian thực
+    this.socket = io('http://localhost:3002');
+    this.socket.on('promotionUpdated', (data) => {
+      console.log('Promotion updated in real-time:', data);
+      this.ngZone.run(() => {
+        this.loadVoucherRules();
+      });
+    });
+    this.socket.on('agencyUpdated', (data) => {
+      console.log('Agencies updated in real-time:', data);
+      this.ngZone.run(() => {
+        // Cập nhật và lọc chi nhánh ngay lập tức
+        this.agencies = (data || []).filter((a: any) => a.status === 'active' || !a.status);
+        this.cdr.detectChanges();
+      });
+    });
+  }
   // Storage keys
   private readonly STORAGE_KEY = 'cart_items';
   private readonly COUPON_KEY = 'ngogia_coupon';
@@ -334,7 +355,7 @@ export class Cart implements OnInit, OnDestroy {
   }
 
   private loadVoucherRules(): void {
-    const buildRules = (list: Array<{ code: string; type: string; value: number; minSubtotal?: number; max?: number; description: string }>): Record<string, CouponRule> => {
+    const buildRules = (list: any[]): Record<string, CouponRule> => {
       const out: Record<string, CouponRule> = {};
       for (const v of list || []) {
         const code = String(v?.code || '').trim().toUpperCase();
@@ -350,20 +371,14 @@ export class Cart implements OnInit, OnDestroy {
       }
       return out;
     };
-    this.http.get<Array<{ code: string; type: string; value: number; minSubtotal?: number; max?: number; description: string }>>('/data/vouchers.json').subscribe({
+    this.http.get<any[]>(`${this.API_BASE}/api/promotions`).subscribe({
       next: (data) => {
-        let list = Array.isArray(data) ? data : [];
-        try {
-          const stored = localStorage.getItem(this.VOUCHER_STORAGE_KEY);
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed) && parsed.length) list = parsed;
-          }
-        } catch (_) {}
-        this.couponRules = buildRules(list);
+        this.couponRules = buildRules(data);
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.warn('Cannot load vouchers from server:', err);
+        // Fallback to local storage or defaults if needed
         try {
           const stored = localStorage.getItem(this.VOUCHER_STORAGE_KEY);
           if (stored) {
@@ -371,6 +386,7 @@ export class Cart implements OnInit, OnDestroy {
             if (Array.isArray(parsed)) this.couponRules = buildRules(parsed);
           }
         } catch (_) {}
+        
         if (Object.keys(this.couponRules).length === 0) {
           this.couponRules = buildRules([
             { code: 'NGOGIAFS', type: 'amount', value: 10000, minSubtotal: 50000, description: 'Giảm 10.000đ cho đơn từ 50.000đ' },
@@ -387,6 +403,9 @@ export class Cart implements OnInit, OnDestroy {
     window.removeEventListener('storage', this.handleStorageEvent);
     window.removeEventListener('user-login', this.handleUserLogin);
     window.removeEventListener('user:updated', this.handleUserUpdated);
+    if (this.socket) {
+      this.socket.disconnect();
+    }
     this.clearScanTimers();
   }
 
@@ -520,9 +539,10 @@ export class Cart implements OnInit, OnDestroy {
 
   /** Load danh sách chi nhánh từ API */
   private loadAgencies(): void {
-    this.http.get<{ _id: string; name: string }[]>(`${this.API_BASE}/api/agencies`).subscribe({
+    this.http.get<any[]>(`${this.API_BASE}/api/agencies`).subscribe({
       next: (data) => {
-        this.agencies = data || [];
+        // Chỉ lấy chi nhánh đang hoạt động
+        this.agencies = (data || []).filter(a => a.status === 'active' || !a.status);
         this.cdr.markForCheck();
       },
       error: (err) => console.warn('Cannot load agencies:', err)

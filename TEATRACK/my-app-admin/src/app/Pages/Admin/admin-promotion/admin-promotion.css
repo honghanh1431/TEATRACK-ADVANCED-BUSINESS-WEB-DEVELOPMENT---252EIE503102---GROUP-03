@@ -1069,3 +1069,51 @@
 #admin-promotion-toast-wrap .toast--error {
   background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
 }
+/* Status Pill */
+.status-pill {
+  display: inline-flex;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  white-space: nowrap;
+  justify-content: center;
+  align-items: center;
+  line-height: 1.5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.status-active {
+  background: #ffffff;
+  color: #0088ff;
+  border: 1.5px solid #0088ff;
+}
+
+.status-active:hover {
+  background: #0088ff;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 136, 255, 0.2);
+}
+
+.status-inactive {
+  background: #ffffff;
+  color: #64748b;
+  border: 1.5px solid #cbd5e1;
+}
+
+.status-inactive:hover {
+  background: #64748b;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
+}
+
+.col-status {
+  text-align: center;
+  width: 160px; /* Increase width for longer text */
+  min-width: 160px;
+}

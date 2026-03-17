@@ -21,6 +21,9 @@
               <button type="button" class="btn-edit" (click)="triggerAvatarInput()">
                 <img src="assets/icons/edit3.png" alt="Edit" />
               </button>
+              <button type="button" class="btn-remove" (click)="removeAvatar()" *ngIf="avatarPreviewUrl !== 'assets/icons/user.png'">
+                <img src="assets/icons/delete.png" alt="Remove" />
+              </button>
               <input
                 #avatarInput
                 type="file"
@@ -148,15 +151,52 @@
     <div class="profile-modal__form">
       <label>
         <span>{{ tKey('admin.account.modal.currentPassword') }}</span>
-        <input type="password" [(ngModel)]="currentPassword" [placeholder]="tKey('admin.account.modal.currentPasswordPlaceholder')" />
+        <div class="password-input-wrapper">
+          <input [type]="showCurrentPassword ? 'text' : 'password'" [(ngModel)]="currentPassword" [placeholder]="tKey('admin.account.modal.currentPasswordPlaceholder')" />
+          <button type="button" class="btn-toggle-view" (click)="togglePasswordVisibility('current')">
+            <!-- SVG Eye / Eye Off -->
+            <svg *ngIf="!showCurrentPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showCurrentPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
       </label>
       <label>
         <span>{{ tKey('admin.account.modal.newPassword') }}</span>
-        <input type="password" [(ngModel)]="newPassword" [placeholder]="tKey('admin.account.modal.newPasswordPlaceholder')" />
+        <div class="password-input-wrapper">
+          <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newPassword" [placeholder]="tKey('admin.account.modal.newPasswordPlaceholder')" />
+          <button type="button" class="btn-toggle-view" (click)="togglePasswordVisibility('new')">
+            <svg *ngIf="!showNewPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showNewPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
       </label>
       <label>
         <span>{{ tKey('admin.account.modal.confirmPassword') }}</span>
-        <input type="password" [(ngModel)]="confirmPassword" [placeholder]="tKey('admin.account.modal.confirmPasswordPlaceholder')" />
+        <div class="password-input-wrapper">
+          <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" [placeholder]="tKey('admin.account.modal.confirmPasswordPlaceholder')" />
+          <button type="button" class="btn-toggle-view" (click)="togglePasswordVisibility('confirm')">
+            <svg *ngIf="!showConfirmPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showConfirmPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
       </label>
       <div class="profile-modal__actions">
         <button type="button" class="profile-modal__btn profile-modal__btn--ghost" (click)="closePasswordModal()">{{ tKey('admin.account.modal.cancel') }}</button>
@@ -166,7 +206,7 @@
   </div>
 </div>
 
-<!-- Alert "Chức năng đang phát triển" -->
+<!-- Alert (Giống ảnh yêu cầu) -->
 <div
   class="profile-alert-overlay"
   *ngIf="showFeatureAlert"
@@ -175,17 +215,30 @@
   aria-modal="true"
   aria-labelledby="profile-alert-title"
 >
-  <div class="profile-alert-dialog profile-alert-dialog--info" (click)="$event.stopPropagation()">
-    <div class="profile-alert-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M9 12l2 2 4-4"></path>
-      </svg>
-    </div>
+  <div class="profile-alert-dialog" (click)="$event.stopPropagation()">
     <h3 class="profile-alert-title" id="profile-alert-title">Thông báo</h3>
     <p class="profile-alert-message">{{ featureAlertMessage }}</p>
     <div class="profile-alert-actions">
       <button type="button" class="profile-alert-btn profile-alert-btn--primary" (click)="closeFeatureAlert()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal (Xác nhận gỡ ảnh...) -->
+<div
+  class="profile-alert-overlay"
+  *ngIf="showConfirmModal"
+  (click)="closeConfirmModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="profile-confirm-title"
+>
+  <div class="profile-alert-dialog" (click)="$event.stopPropagation()">
+    <h3 class="profile-alert-title" id="profile-confirm-title">Xác nhận</h3>
+    <p class="profile-alert-message">{{ confirmMessage }}</p>
+    <div class="profile-alert-actions">
+      <button type="button" class="profile-alert-btn profile-alert-btn--ghost" (click)="closeConfirmModal()">Đóng</button>
+      <button type="button" class="profile-alert-btn profile-alert-btn--primary" (click)="confirmAction ? confirmAction() : null; closeConfirmModal()">Xác nhận</button>
     </div>
   </div>
 </div>

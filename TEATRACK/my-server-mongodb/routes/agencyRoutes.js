@@ -33,6 +33,10 @@ router.post('/', async (req, res) => {
         if (doc._id) delete doc._id;
         await collection().insertOne(doc);
         const list = await collection().find({}).sort({ name: 1 }).toArray();
+
+        const io = req.app.get('io');
+        if (io) io.emit('agencyUpdated', list);
+
         res.json(list);
     } catch (err) {
         console.error('Post agencies error:', err);
@@ -56,6 +60,10 @@ router.put('/:id', async (req, res) => {
 
         await collection().updateOne(filter, { $set: body });
         const list = await collection().find({}).sort({ name: 1 }).toArray();
+
+        const io = req.app.get('io');
+        if (io) io.emit('agencyUpdated', list);
+
         res.json(list);
     } catch (err) {
         console.error('Put agencies error:', err);
@@ -76,6 +84,10 @@ router.delete('/:id', async (req, res) => {
 
         await collection().deleteOne(filter);
         const list = await collection().find({}).sort({ name: 1 }).toArray();
+
+        const io = req.app.get('io');
+        if (io) io.emit('agencyUpdated', list);
+
         res.json(list);
     } catch (err) {
         console.error('Delete agencies error:', err);
