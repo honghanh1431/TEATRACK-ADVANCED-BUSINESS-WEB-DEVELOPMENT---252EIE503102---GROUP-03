@@ -29,6 +29,14 @@ Dự án này là một hệ thống đầy đủ bao gồm trang web cho khách
 
 Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 
+### Chú thích
+
+| Ký hiệu  | Ý nghĩa                              |
+|----------|--------------------------------------|
+| —        | Public, không cần xác thực           |
+| 🔑 JWT   | Yêu cầu Bearer Token người dùng      |
+| 🔒 Admin | Yêu cầu Token quản trị viên          |
+
 ## 1. Xác thực & Người dùng — `/api/auth`
 
 | Method   | Endpoint               | Mô tả                             | Auth    |
@@ -112,13 +120,27 @@ Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 
 ---
 
-### Chú thích
 
-| Ký hiệu  | Ý nghĩa                              |
-|----------|--------------------------------------|
-| —        | Public, không cần xác thực           |
-| 🔑 JWT   | Yêu cầu Bearer Token người dùng      |
-| 🔒 Admin | Yêu cầu Token quản trị viên          |
+
+---
+
+## 🧪 Hướng dẫn Test API bằng Postman
+
+Để kiểm tra các API yêu cầu xác thực (**🔑 JWT** hoặc **🔒 Admin**), hãy làm theo các bước sau:
+
+### 1. Lấy Bearer Token
+1. Sử dụng Method `POST` với URL: `http://localhost:3002/api/auth/login` (User) hoặc `/api/auth/admin-login` (Admin).
+2. Trong tab **Body**, chọn **raw** và định dạng **JSON**, nhập tài khoản (`identifier`/`password`).
+3. Gửi request và sao chép chuỗi `token` nhận được trong kết quả trả về.
+
+### 2. Sử dụng Token trong các Request khác
+1. Chọn API bạn muốn test (ví dụ: `GET /api/auth/profile`).
+2. Chuyển sang tab **Authorization**.
+3. Tại mục **Type**, chọn **Bearer Token**.
+4. Dán chuỗi Token vừa copy vào ô **Token**.
+5. Nhấn **Send** để thực hiện yêu cầu.
+
+---
 
 ##  Real-time Updates (Socket.io)
 
