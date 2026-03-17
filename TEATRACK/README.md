@@ -4,6 +4,29 @@ Dự án này là một hệ thống đầy đủ bao gồm trang web cho khách
 
 ---
 
+## 🛠️ Công nghệ sử dụng
+
+| Thành phần | Công nghệ |
+|------------|-----------|
+| Backend | Node.js, Express 5, MongoDB (Mongoose) |
+| Client | Angular |
+| Admin | Angular |
+| Realtime | Socket.io |
+| Xác thực | JWT, bcrypt |
+| Gửi email | Nodemailer (OTP, quên mật khẩu) |
+
+---
+
+## 🌐 Địa chỉ truy cập (sau khi chạy)
+
+| Ứng dụng | URL |
+|----------|-----|
+| Trang khách hàng | http://localhost:4200 |
+| Trang quản trị | http://localhost:4201 |
+| API Backend | http://localhost:3002 |
+
+---
+
 ## 📂 Cấu trúc dự án
 
 - my-app: Ứng dụng dành cho khách hàng (Angular). Cổng mặc định: 4200.
@@ -25,7 +48,10 @@ Dự án này là một hệ thống đầy đủ bao gồm trang web cho khách
 
 ---
 
-## Tổng hợp danh sách API (Base URL: "http://localhost:3002")
+## Tổng hợp danh sách API
+
+**Base URL:** `http://localhost:3002`  
+Lưu ý: Auth, Admin, Orders, Cart, Promotions, Agencies, Contacts dùng prefix `/api`; Products, Blog, Reviews không có prefix `/api` (ví dụ: `GET /products`, `GET /blog`).
 
 Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 
@@ -120,13 +146,22 @@ Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 | 🔑 JWT   | Yêu cầu Bearer Token người dùng      |
 | 🔒 Admin | Yêu cầu Token quản trị viên          |
 
-##  Real-time Updates (Socket.io)
+## Real-time Updates (Socket.io)
 
 Hệ thống sử dụng Socket.io tại cổng **3002** để cập nhật trạng thái đơn hàng, thông tin người dùng và khuyến mãi ngay lập tức mà không cần tải lại trang.
 
 ---
 
-##  Nhóm thực hiện
+## Xử lý lỗi thường gặp
+
+- **MongoDB connection failed:** Đảm bảo MongoDB đang chạy (`mongod` hoặc MongoDB Service), và đúng địa chỉ `mongodb://127.0.0.1:27017`.
+- **Port already in use:** Nếu cổng 3002 / 4200 / 4201 bị chiếm, tắt process đang dùng hoặc đổi port trong cấu hình từng ứng dụng.
+- **Không đăng nhập được Admin:** Chạy `node createAdmin.js` trong thư mục `my-server-mongodb` để tạo tài khoản mặc định (Admin123 / admin123).
+- **Collection "users" chưa có:** Tạo database "TeaTrack" và collection "users" trong MongoDB (hoặc để server tạo khi chạy `createAdmin.js` / đăng ký user đầu tiên).
+
+---
+
+## Nhóm thực hiện
 - Nhóm: 02
    + Thành viên: Nguyễn Thị Hồng Hạnh - K234111431
    + Thành viên: Nguyễn Hoàng Đức - K234111430
