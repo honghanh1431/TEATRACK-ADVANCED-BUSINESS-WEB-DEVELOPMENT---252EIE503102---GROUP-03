@@ -51,7 +51,8 @@ export class PageHeaderAdmin implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadUserData();
+    // Defer loadUserData to avoid NG0100 ExpressionChangedAfterItHasBeenCheckedError
+    setTimeout(() => this.loadUserData(), 0);
     this.updateProductsActive();
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
@@ -176,9 +177,14 @@ export class PageHeaderAdmin implements OnInit, OnDestroy, AfterViewInit {
   confirmLogout(): void {
     localStorage.removeItem('authAdmin');
     localStorage.removeItem('ngogia_user');
+    localStorage.removeItem('token');
     localStorage.removeItem('cart_items');
     localStorage.removeItem('ngogia_shipping');
     localStorage.removeItem('ngogia_coupon');
+    // Reset avatar về mặc định ngay lập tức để tránh broken image
+    this.adminAvatar = 'assets/icons/user.png';
+    this.adminName = 'Tài khoản';
+    this.cdr.detectChanges();
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('cart:updated'));
       window.dispatchEvent(new CustomEvent('user:logout'));

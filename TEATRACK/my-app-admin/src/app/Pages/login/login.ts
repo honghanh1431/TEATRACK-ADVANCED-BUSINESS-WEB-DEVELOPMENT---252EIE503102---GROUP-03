@@ -110,10 +110,7 @@ export class Login implements OnInit {
         // Lưu token và thông tin user
         localStorage.setItem('token', res.token);
         localStorage.setItem('ngogia_user', JSON.stringify(res.user));
-        localStorage.setItem('authAdmin', JSON.stringify({
-          name: res.user.username,
-          role: 'admin'
-        }));
+        localStorage.setItem('authAdmin', JSON.stringify(res.user));
         window.dispatchEvent(new Event('user-login'));
         this.router.navigate(['/admin-dashboard']).then(() => this.cdr.detectChanges());
       },

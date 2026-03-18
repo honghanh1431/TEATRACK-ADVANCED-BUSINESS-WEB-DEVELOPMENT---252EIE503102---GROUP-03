@@ -1053,22 +1053,38 @@
               <div class="price-row">
                 <div class="price-col">
                   <div class="line size-line">
-                    <span class="label">M</span>
-                    <span class="value">{{ formatVND(getPriceM(p)) }}đ</span>
+                    <span class="label"
+                      [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isGuest && isVip ? '0.5' : '1'">M</span>
+                    <span class="value"
+                      [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isGuest && isVip ? '0.5' : '1'">{{ formatVND(getPriceM(p)) }}đ</span>
                   </div>
-                  <div class="line vip-line">
-                    <span class="label vip">VIP</span>
-                    <span class="value">{{ formatVND(getVipPriceM(p)) }}đ</span>
+                  <div class="line vip-line" *ngIf="!isGuest">
+                    <span class="label vip"
+                      [style.text-decoration]="!isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isVip ? '0.5' : '1'">VIP</span>
+                    <span class="value"
+                      [style.text-decoration]="!isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isVip ? '0.5' : '1'">{{ formatVND(getVipPriceM(p)) }}đ</span>
                   </div>
                 </div>
                 <div class="price-col">
                   <div class="line size-line">
-                    <span class="label">L</span>
-                    <span class="value">{{ formatVND(getPriceL(p)) }}đ</span>
+                    <span class="label"
+                      [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isGuest && isVip ? '0.5' : '1'">L</span>
+                    <span class="value"
+                      [style.text-decoration]="!isGuest && isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isGuest && isVip ? '0.5' : '1'">{{ formatVND(getPriceL(p)) }}đ</span>
                   </div>
-                  <div class="line vip-line">
-                    <span class="label vip">VIP</span>
-                    <span class="value">{{ formatVND(getVipPriceL(p)) }}đ</span>
+                  <div class="line vip-line" *ngIf="!isGuest">
+                    <span class="label vip"
+                      [style.text-decoration]="!isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isVip ? '0.5' : '1'">VIP</span>
+                    <span class="value"
+                      [style.text-decoration]="!isVip ? 'line-through' : 'none'"
+                      [style.opacity]="!isVip ? '0.5' : '1'">{{ formatVND(getVipPriceL(p)) }}đ</span>
                   </div>
                 </div>
                 <button

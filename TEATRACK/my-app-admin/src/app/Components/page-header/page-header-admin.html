@@ -10,7 +10,7 @@
       <div class="user" id="user-box" #userBox [class.open]="userMenuOpen">
         <button class="user-btn" id="user-btn" type="button" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen"
           aria-controls="user-menu" (click)="toggleUserMenu($event)">
-          <img class="avatar" id="user-avatar" [src]="adminAvatar" alt="User">
+          <img class="avatar" id="user-avatar" [src]="adminAvatar" alt="User" (error)="adminAvatar='assets/icons/user.png'">
           <span class="name" id="user-name" data-user-chip>{{ adminName }}</span>
           <span class="caret">▾</span>
         </button>
