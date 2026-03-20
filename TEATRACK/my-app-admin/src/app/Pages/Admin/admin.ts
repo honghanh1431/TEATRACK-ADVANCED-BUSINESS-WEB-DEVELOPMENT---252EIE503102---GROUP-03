@@ -362,36 +362,24 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     });
     this.chartInstances = [];
     if (revCostCtx) {
-      const lineChart = new Chart(revCostCtx, {
-        type: 'line',
+      const barChart = new Chart(revCostCtx, {
+        type: 'bar',
         data: {
           labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
           datasets: [
             {
               label: 'Doanh thu',
-              data: [35, 25, 32, 38, 28, 42, 20, 80, 62, 69, 48, 32, 47, 59, 49],
-              borderColor: '#ffffff',
-              backgroundColor: 'transparent',
-              borderWidth: 4,
-              tension: 0.3,
-              pointBackgroundColor: '#ffffff',
-              pointBorderColor: '#0088ff',
-              pointRadius: 6,
-              pointHoverRadius: 6,
-              fill: true,
+              data: [35, 25, 32, 38, 28, 42, 20, 80, 62, 69, 48, 32],
+              backgroundColor: '#ffffff',
+              borderRadius: 6,
+              barThickness: 15,
             },
             {
               label: 'Chi Phí',
-              data: [32, 22, 28, 35, 25, 38, 18, 60, 58, 50, 45, 30, 45, 48, 18],
-              borderColor: '#00eeffff',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              borderWidth: 4,
-              tension: 0.4,
-              pointBackgroundColor: '#0088ff',
-              pointBorderColor: '#ffffff',
-              pointRadius: 6,
-              pointHoverRadius: 6,
-              fill: true,
+              data: [32, 22, 28, 35, 25, 38, 18, 60, 58, 50, 45, 30],
+              backgroundColor: '#00eeffff',
+              borderRadius: 6,
+              barThickness: 15,
             },
           ],
         },
@@ -429,8 +417,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
                 font: { size: 14, weight: 700 },
               },
               beginAtZero: true,
-              max: 100,
-              ticks: { color: '#fff', font: { size: 14, weight: 700 }, stepSize: 20 },
+              ticks: { color: '#fff', font: { size: 14, weight: 700 } },
               grid: { color: 'rgba(255, 255, 255, 0.2)', drawBorder: false },
               border: { display: false },
             },
@@ -449,7 +436,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           interaction: { intersect: false, mode: 'index' },
         },
       });
-      this.chartInstances.push(lineChart);
+      this.chartInstances.push(barChart);
     }
     if (catPieCtx) {
       const categoryData = [25, 9, 20, 6, 6, 4];
@@ -611,11 +598,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    const lineChart = this.chartInstances[0];
-    if (lineChart) {
-      lineChart.data.datasets[0].data = monthlyRevenue.map(v => v / 1000000);
-      lineChart.data.datasets[1].data = monthlyCost.map(v => v / 1000000);
-      lineChart.update();
+    const revCostChart = this.chartInstances[0];
+    if (revCostChart) {
+      revCostChart.data.datasets[0].data = monthlyRevenue.map(v => v / 1000000);
+      revCostChart.data.datasets[1].data = monthlyCost.map(v => v / 1000000);
+      revCostChart.update();
     }
 
     const pieChart = this.chartInstances[1];
