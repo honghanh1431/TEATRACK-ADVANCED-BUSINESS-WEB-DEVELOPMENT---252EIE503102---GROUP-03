@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const { MongoClient } = require('mongodb');
 
 async function createAdmin() {
-  const client = new MongoClient('mongodb://127.0.0.1:27017');
+  const client = new MongoClient('mongodb+srv://ducnh234112e_db_user:Duc123@cluster0.x5mauqs.mongodb.net/TeaTrack?retryWrites=true&w=majority&appName=Cluster0');
   try {
     await client.connect();
     const db = client.db('TeaTrack');
@@ -14,6 +14,7 @@ async function createAdmin() {
       email: 'admin@teatrack.com',
       password: await bcrypt.hash('admin123', 10),
       role: 'admin',
+      status: 'active',
       phone: '',
       address: '',
       createdAt: new Date()
