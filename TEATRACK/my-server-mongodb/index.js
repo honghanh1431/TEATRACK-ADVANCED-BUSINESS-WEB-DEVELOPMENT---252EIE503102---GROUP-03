@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 3002;
+const port = process.env.PORT || 3002;
 const path = require('path');
 const fs = require('fs');
 
@@ -28,9 +28,14 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB connection
 const { MongoClient, ObjectId } = require("mongodb");
-const client = new MongoClient("mongodb://127.0.0.1:27017");
-client.connect();
-const database = client.db("TeaTrack");
+const mongoUri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/TeaTrack";
+const client = new MongoClient(mongoUri);
+
+client.connect()
+  .then(() => console.log("✅ Kết nối MongoDB thành công!"))
+  .catch(err => console.error("❌ Lỗi kết nối MongoDB:", err));
+
+const database = client.db(); // Lấy db từ connection string hoặc mặc định
 const UserCollection = database.collection("users");
 
 // Pass database to models
