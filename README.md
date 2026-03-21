@@ -23,7 +23,7 @@ Dự án này là một hệ thống đầy đủ bao gồm trang web cho khách
 |----------|-----|
 | Trang khách hàng | http://localhost:4200 |
 | Trang quản trị | http://localhost:4201 |
-| API Backend | http://localhost:3002 |
+| API Backend | https://teatrack-advanced-business-web.onrender.com |
 
 ---
 
@@ -50,7 +50,7 @@ Dự án này là một hệ thống đầy đủ bao gồm trang web cho khách
 
 ## Tổng hợp danh sách API
 
-**Base URL:** `http://localhost:3002`  
+**Base URL:** `https://teatrack-advanced-business-web.onrender.com`  
 Lưu ý: Auth, Admin, Orders, Cart, Promotions, Agencies, Contacts dùng prefix `/api`; Products, Blog, Reviews không có prefix `/api` (ví dụ: `GET /products`, `GET /blog`).
 
 Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
@@ -155,7 +155,7 @@ Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 Để kiểm tra các API yêu cầu xác thực (**🔑 JWT** hoặc **🔒 Admin**), hãy làm theo các bước sau:
 
 ### 1. Lấy Bearer Token
-1. Sử dụng Method "POST" với URL: "http://localhost:3002/api/auth/login" (User) hoặc "/api/auth/admin-login" (Admin).
+1. Sử dụng Method "POST" với URL: "https://teatrack-advanced-business-web.onrender.com/api/auth/login" (User) hoặc "/api/auth/admin-login" (Admin).
 2. Trong tab **Body**, chọn **raw** và định dạng **JSON**, nhập tài khoản ("identifier"/"password").
 Ví dụ: 
       {

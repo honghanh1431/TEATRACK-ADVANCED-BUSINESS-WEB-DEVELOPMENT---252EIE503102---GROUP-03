@@ -56,7 +56,7 @@ export class OrderHistory implements OnInit, OnDestroy {
     private orderService: OrderService,
     private cdr: ChangeDetectorRef
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('orderUpdated', (data: any) => {
       this.fetchOrders();
     });

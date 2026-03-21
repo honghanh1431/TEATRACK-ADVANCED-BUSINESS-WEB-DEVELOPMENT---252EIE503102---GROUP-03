@@ -98,7 +98,7 @@ export class Menu implements OnInit, AfterViewInit, OnDestroy {
     private productState: ProductStateService,
     private reviewCountService: ReviewCountService,
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('productUpdated', () => {
       this.fetchProducts();
     });
@@ -148,7 +148,7 @@ export class Menu implements OnInit, AfterViewInit, OnDestroy {
 
   // ─── Fetch ────────────────────────────────────────────────────────────────
   private fetchProducts(): void {
-    const url = `http://localhost:3002/products`;
+    const url = `https://teatrack-advanced-business-web.onrender.com/products`;
     this.http.get<Product[]>(url).subscribe({
       next: (data) => {
         this.allData = (data || []).filter((item) => item.visible !== false);

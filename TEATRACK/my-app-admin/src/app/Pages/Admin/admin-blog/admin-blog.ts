@@ -112,8 +112,8 @@ export class AdminBlog implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private readonly LS_KEY = 'admin_blog_posts_v2';
-  private readonly API_BASE = 'http://localhost:3002';
-  private readonly BLOG_API = 'http://localhost:3002/blog';
+  private readonly API_BASE = 'https://teatrack-advanced-business-web.onrender.com';
+  private readonly BLOG_API = 'https://teatrack-advanced-business-web.onrender.com/blog';
 
   constructor(
     private fb: FormBuilder,
@@ -121,7 +121,7 @@ export class AdminBlog implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private zone: NgZone,
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('blogUpdated', (data: any) => {
       // Nếu là sự kiện cập nhật lượt xem, ta cập nhật trực tiếp để tránh load lại toàn bộ danh sách
       if (data && data.action === 'view' && data.id) {
@@ -299,8 +299,8 @@ export class AdminBlog implements OnInit, AfterViewInit, OnDestroy {
       const okStatus = this.status ? p.status === this.status : true;
       const okQuery = q
         ? (p.title || '').toLowerCase().includes(q) ||
-          (p.excerpt || '').toLowerCase().includes(q) ||
-          (p.code || '').toLowerCase().includes(q)
+        (p.excerpt || '').toLowerCase().includes(q) ||
+        (p.code || '').toLowerCase().includes(q)
         : true;
       return okStatus && okQuery;
     });
@@ -369,22 +369,22 @@ export class AdminBlog implements OnInit, AfterViewInit, OnDestroy {
 
   hasChanges(): boolean {
     if (!this.initialFormValue) return false;
-    
+
     // Check form changes
     const currentForm = this.form.value;
     for (const key of Object.keys(this.initialFormValue)) {
       if (currentForm[key] !== this.initialFormValue[key]) return true;
     }
-    
+
     // Check thumbnail changes
     if (this.formThumbnail !== this.initialThumbnail) return true;
-    
+
     // Check images array changes
     if (this.formImages.length !== this.initialImages.length) return true;
     for (let i = 0; i < this.formImages.length; i++) {
       if (this.formImages[i] !== this.initialImages[i]) return true;
     }
-    
+
     return false;
   }
 
@@ -671,7 +671,7 @@ export class AdminBlog implements OnInit, AfterViewInit, OnDestroy {
     // Dữ liệu hiện tại đã được lưu an toàn trong MongoDB
     try {
       localStorage.removeItem(this.LS_KEY); // Xóa dữ liệu cũ nếu có để giải phóng bộ nhớ
-    } catch {}
+    } catch { }
   }
 
   private hydrate(x: any): BlogRow {

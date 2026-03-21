@@ -29,7 +29,7 @@ export class PageHeaderAdmin implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('navBar') navBarRef?: ElementRef<HTMLElement>;
 
   constructor(private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef, private ngZone: NgZone) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
   }
 
   private updateProductsActive(): void {
@@ -113,7 +113,7 @@ export class PageHeaderAdmin implements OnInit, OnDestroy, AfterViewInit {
   refreshAdminProfile(): void {
     const token = localStorage.getItem('token');
     if (!token) return;
-    this.http.get<any>('http://localhost:3002/api/auth/profile', {
+    this.http.get<any>('https://teatrack-advanced-business-web.onrender.com/api/auth/profile', {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: (res) => {
@@ -141,7 +141,7 @@ export class PageHeaderAdmin implements OnInit, OnDestroy, AfterViewInit {
   normSrc(path?: string): string {
     if (!path) return 'assets/icons/user.png';
     if (path.startsWith('http') || path.startsWith('data:')) return path;
-    const apiBaseUrl = 'http://localhost:3002';
+    const apiBaseUrl = 'https://teatrack-advanced-business-web.onrender.com';
     if (path.startsWith('/uploads')) return apiBaseUrl + path;
     return path;
   }

@@ -29,7 +29,7 @@ export interface LogEntry {
 })
 export class AdminContact implements OnInit, OnDestroy {
   feedbacks: Feedback[] = [];
-  private readonly API = 'http://localhost:3002/api/contacts';
+  private readonly API = 'https://teatrack-advanced-business-web.onrender.com/api/contacts';
   private socket: Socket | undefined;
 
   //   State 
@@ -53,7 +53,7 @@ export class AdminContact implements OnInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('contactUpdated', () => {
       this.loadFeedbacks();
     });
@@ -78,7 +78,7 @@ export class AdminContact implements OnInit, OnDestroy {
           topic: item.topic || 'other',
         }));
         this.applyFilter();
-        
+
         // Cập nhật lại feedback đang chọn nếu có
         if (this.selectedFeedback) {
           const updated = this.feedbacks.find(f => f.id === this.selectedFeedback?.id);
@@ -130,10 +130,10 @@ export class AdminContact implements OnInit, OnDestroy {
   //   Select  
   selectFeedback(fb: Feedback): void {
     if (!fb.read) {
-        fb.read = true;
-        this.http.put(`${this.API}/${fb.id}`, { read: true }).subscribe({
-          next: () => this.loadFeedbacks()
-        });
+      fb.read = true;
+      this.http.put(`${this.API}/${fb.id}`, { read: true }).subscribe({
+        next: () => this.loadFeedbacks()
+      });
     }
     this.selectedFeedback = fb;
   }
@@ -142,28 +142,28 @@ export class AdminContact implements OnInit, OnDestroy {
   onStatusChange(fb: Feedback): void {
     // Ép kiểu về số để đảm bảo so sánh ở Box chính xác ngay lập tức
     fb.status = Number(fb.status) as any;
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges();
 
     this.http.put(`${this.API}/${fb.id}`, { status: fb.status }).subscribe({
-        next: () => {
-            console.log(`Cập nhật trạng thái feedback #${fb.id} → ${this.statusLabel[fb.status]}`);
-            this.loadFeedbacks(); // Reload để đồng bộ database
-        },
-        error: (err) => {
-            console.error('Update status error:', err);
-            this.loadFeedbacks(); // Rollback trạng thái nếu lỗi
-        }
+      next: () => {
+        console.log(`Cập nhật trạng thái feedback #${fb.id} → ${this.statusLabel[fb.status]}`);
+        this.loadFeedbacks(); // Reload để đồng bộ database
+      },
+      error: (err) => {
+        console.error('Update status error:', err);
+        this.loadFeedbacks(); // Rollback trạng thái nếu lỗi
+      }
     });
   }
 
   //   Save note  
   saveNote(fb: Feedback): void {
     this.http.put(`${this.API}/${fb.id}`, { note: fb.note }).subscribe({
-        next: () => {
-            this.loadFeedbacks();
-            console.log(`Lưu ghi chú feedback #${fb.id}:`, fb.note);
-        },
-        error: (err) => console.error('Save note error:', err)
+      next: () => {
+        this.loadFeedbacks();
+        console.log(`Lưu ghi chú feedback #${fb.id}:`, fb.note);
+      },
+      error: (err) => console.error('Save note error:', err)
     });
   }
 

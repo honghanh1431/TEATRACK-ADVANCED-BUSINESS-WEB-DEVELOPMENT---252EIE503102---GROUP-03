@@ -32,7 +32,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
     private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const savedLang = localStorage.getItem('lang') || 'vi';
@@ -59,29 +59,29 @@ export class ForgotPassword implements OnInit, OnDestroy {
   private showMessage(type: 'error' | 'success', msg: string) {
     if (this.messageTimer) clearTimeout(this.messageTimer);
     if (this.hideTimer) clearTimeout(this.hideTimer);
-    this.isHiding = false; 
+    this.isHiding = false;
 
-  if (type === 'error') {
-    this.errorMessage = msg;
-    this.successMessage = '';
-  } else {
-    this.successMessage = msg;
-    this.errorMessage = '';
-  }
+    if (type === 'error') {
+      this.errorMessage = msg;
+      this.successMessage = '';
+    } else {
+      this.successMessage = msg;
+      this.errorMessage = '';
+    }
 
-  if (msg) {
-    this.messageTimer = setTimeout(() => {
-      this.isHiding = true; 
-      this.cdr.detectChanges();
-
-      this.hideTimer = setTimeout(() => {
-        this.errorMessage = '';
-        this.successMessage = '';
-        this.isHiding = false;
+    if (msg) {
+      this.messageTimer = setTimeout(() => {
+        this.isHiding = true;
         this.cdr.detectChanges();
-      }, 150);
-    }, 1500);
-  }
+
+        this.hideTimer = setTimeout(() => {
+          this.errorMessage = '';
+          this.successMessage = '';
+          this.isHiding = false;
+          this.cdr.detectChanges();
+        }, 150);
+      }, 1500);
+    }
   }
 
   ngOnDestroy() {
@@ -95,7 +95,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
       return;
     }
     this.isLoading = true;
-    this.http.post<{ message: string }>('http://localhost:3002/api/auth/forgot-password', { email: this.email, lang: this.currentLang })
+    this.http.post<{ message: string }>('https://teatrack-advanced-business-web.onrender.com/api/auth/forgot-password', { email: this.email, lang: this.currentLang })
       .subscribe({
         next: (res) => {
           console.log('Thành công:', res);
@@ -119,7 +119,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
       return;
     }
     this.isLoading = true;
-    this.http.post<{ message: string }>('http://localhost:3002/api/auth/verify-otp', { email: this.email, otp: this.otp, lang: this.currentLang })
+    this.http.post<{ message: string }>('https://teatrack-advanced-business-web.onrender.com/api/auth/verify-otp', { email: this.email, otp: this.otp, lang: this.currentLang })
       .subscribe({
         next: (res) => {
           this.isLoading = false;
@@ -150,7 +150,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.http.post<{ message: string }>('http://localhost:3002/api/auth/reset-password', {
+    this.http.post<{ message: string }>('https://teatrack-advanced-business-web.onrender.com/api/auth/reset-password', {
       email: this.email,
       newPassword: this.newPassword,
       lang: this.currentLang
@@ -173,7 +173,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
     if (this.step > 1) this.step--;
   }
   closeModalAndNavigate() {
-  this.showSuccessModal = false;
-  this.router.navigate(['/login']);
+    this.showSuccessModal = false;
+    this.router.navigate(['/login']);
   }
 }

@@ -107,7 +107,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   currentPage = 1;
   totalPages = 1;
   filterState = { category: '', search: '' };
-  private readonly API_BASE = 'http://localhost:3002';
+  private readonly API_BASE = 'https://teatrack-advanced-business-web.onrender.com';
   private readonly PRODUCTS_API = `${this.API_BASE}/products`;
   private readonly AGENCIES_API = `${this.API_BASE}/api/agencies`;
   /** value '1' = Tất cả danh mục (trả về '' để không lọc, show cả 6 loại). 2–7 = tên danh mục để lọc. */
@@ -145,7 +145,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('orderCreated', () => {
       this.fetchOrders();
       this.fetchAgencyStats();
@@ -548,7 +548,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const targetAgency = branchMap[branch] || 'all';
 
-    const agencyOrders = this.ORDERS_ALL.filter(o => 
+    const agencyOrders = this.ORDERS_ALL.filter(o =>
       targetAgency === 'all' || o.deliveryAgency === targetAgency
     );
 
@@ -580,19 +580,19 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       const y = d.getFullYear();
       const m = d.getMonth();
       const rev = Number(o.total) || Number((o as any).totalAmount) || 0;
-      
+
       if (y === selYear) {
         monthlyRevenue[m] += rev;
         monthlyCost[m] += rev * 0.7; // Giả lập chi phí 70%
-        
+
         if (m + 1 === selMonth) {
           (o.items || []).forEach((item: any) => {
-             const cat = getProductCategory(item.productId || item.id, item.name || item.productName || '');
-             const qty = item.qty ?? item.quantity ?? 1;
-             const price = item.price || 0;
-             const itemRev = qty * price;
-             categoryRevenue[cat] = (categoryRevenue[cat] || 0) + itemRev;
-             totalPieRev += itemRev;
+            const cat = getProductCategory(item.productId || item.id, item.name || item.productName || '');
+            const qty = item.qty ?? item.quantity ?? 1;
+            const price = item.price || 0;
+            const itemRev = qty * price;
+            categoryRevenue[cat] = (categoryRevenue[cat] || 0) + itemRev;
+            totalPieRev += itemRev;
           });
         }
       }
@@ -619,15 +619,15 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         const colors = ['#0088ff', '#1e5a9e', '#e8e8e8', '#1596D5', '#72D5EC', '#ffffff'];
         pieChart.data.datasets[0].backgroundColor = labels.map((_, i) => colors[i % colors.length]);
       }
-      
+
       let formatTotal = totalPieRev.toString();
       let unit = 'VND';
       if (totalPieRev >= 1000000) {
-          formatTotal = (totalPieRev/1000000).toFixed(1);
-          unit = 'Tr VND';
+        formatTotal = (totalPieRev / 1000000).toFixed(1);
+        unit = 'Tr VND';
       } else if (totalPieRev >= 1000) {
-          formatTotal = (totalPieRev/1000).toFixed(1);
-          unit = 'K VND';
+        formatTotal = (totalPieRev / 1000).toFixed(1);
+        unit = 'K VND';
       }
 
       if (pieChart.options) {
@@ -635,7 +635,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       }
       pieChart.update();
     }
-    
+
     this.updateOrdersStats(agencyOrders, selYear, selMonth);
   }
 
@@ -840,8 +840,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     let lastMonthYear = selYear;
     let lastMonthVal = selMonth - 1;
     if (lastMonthVal === 0) {
-       lastMonthVal = 12;
-       lastMonthYear--;
+      lastMonthVal = 12;
+      lastMonthYear--;
     }
     const prevMonthOrders = agencyOrders.filter((o) => {
       const d = new Date(o.date || o.createdAt || 0);
@@ -886,42 +886,42 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const sRevenue = document.getElementById('sRevenue');
     if (sRevenue) sRevenue.textContent = this.fmtMoney(currentRevenue);
-    
+
     const sRevenueDeltaEl = document.getElementById('sRevenueDelta');
     if (sRevenueDeltaEl) {
       sRevenueDeltaEl.textContent = fmtDelta(revenueDelta);
       setDeltaColor(sRevenueDeltaEl, revenueDelta);
     }
-    
+
     const sRevenueDeltaAbs = document.getElementById('sRevenueDeltaAbs');
     if (sRevenueDeltaAbs) sRevenueDeltaAbs.textContent = fmtRevenueAbs(revenueDiff) + ' tháng này';
 
     const sOrders = document.getElementById('sOrders');
     if (sOrders) sOrders.textContent = currentMonthOrders.length + ' ĐƠN';
-    
+
     const sOrdersDeltaEl = document.getElementById('sOrdersDelta');
     if (sOrdersDeltaEl) {
       sOrdersDeltaEl.textContent = fmtDelta(ordersDelta);
       setDeltaColor(sOrdersDeltaEl, ordersDelta);
     }
-    
+
     const sOrdersDeltaAbs = document.getElementById('sOrdersDeltaAbs');
     if (sOrdersDeltaAbs) sOrdersDeltaAbs.textContent = (ordersDiff >= 0 ? '+' : '') + ordersDiff + ' tháng này';
 
     const sCustomers = document.getElementById('sCustomers');
     if (sCustomers) sCustomers.textContent = currentProductsSold + ' SẢN PHẨM';
-    
+
     const sCustomersDeltaEl = document.getElementById('sCustomersDelta');
     if (sCustomersDeltaEl) {
       sCustomersDeltaEl.textContent = fmtDelta(productsSoldDelta);
       setDeltaColor(sCustomersDeltaEl, productsSoldDelta);
     }
-    
+
     const sCustomersDeltaAbs = document.getElementById('sCustomersDeltaAbs');
     if (sCustomersDeltaAbs) {
       const absStr = Math.abs(productsSoldDiff) >= 1000
-          ? (productsSoldDiff >= 0 ? '+' : '-') + (Math.abs(productsSoldDiff) / 1000).toFixed(1) + 'k'
-          : (productsSoldDiff >= 0 ? '+' : '') + productsSoldDiff;
+        ? (productsSoldDiff >= 0 ? '+' : '-') + (Math.abs(productsSoldDiff) / 1000).toFixed(1) + 'k'
+        : (productsSoldDiff >= 0 ? '+' : '') + productsSoldDiff;
       sCustomersDeltaAbs.textContent = absStr + ' tháng này';
     }
   }
@@ -1319,7 +1319,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         }
         agencyDropdown.innerHTML = optionsHtml;
       }
-      
+
       // If the order has an agency but it's not in the list, add it
       const currentAgencies = Array.from(agencyDropdown.options).map(o => o.value);
       if (order.deliveryAgency && !currentAgencies.includes(order.deliveryAgency)) {
@@ -2257,7 +2257,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (ddUserBtn && ddUserMenu) {
       ddUserBtn.innerHTML =
         'Chi nhánh: <strong id="branchLabel">Tất cả các chi nhánh</strong> <span class="caret" aria-hidden="true">▾</span>';
-      
+
       this.renderBranchDropdown();
 
       ddUserMenu.addEventListener('click', (e) => {

@@ -31,7 +31,7 @@ export class BlogList implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private titleService: Title
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('blogUpdated', () => {
       this.loadBlogs();
     });
@@ -73,7 +73,7 @@ export class BlogList implements OnInit, OnDestroy {
   }
 
   loadBlogs(): void {
-    this.http.get<any[]>('http://localhost:3002/blog').subscribe({
+    this.http.get<any[]>('https://teatrack-advanced-business-web.onrender.com/blog').subscribe({
       next: (data) => {
         this.blogsArray = (data || []).filter(b => b.visible !== false);
         this.totalPages = Math.max(1, Math.ceil(this.blogsArray.length / PAGE_SIZE));

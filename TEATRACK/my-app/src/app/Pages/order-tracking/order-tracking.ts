@@ -54,7 +54,7 @@ export class OrderTracking implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private orderService: OrderService,
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('orderUpdated', (data: any) => {
       if (this.orderId && (data?.id === this.orderId || !data?.id)) {
         this.loadOrderData();

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root'
 })
 export class OrderService {
-    private apiUrl = 'http://localhost:3002/api/orders';
+    private apiUrl = 'https://teatrack-advanced-business-web.onrender.com/api/orders';
 
     constructor(private http: HttpClient) { }
 

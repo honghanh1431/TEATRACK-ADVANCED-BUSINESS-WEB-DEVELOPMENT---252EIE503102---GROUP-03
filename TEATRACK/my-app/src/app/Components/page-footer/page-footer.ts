@@ -21,9 +21,9 @@ export class PageFooter implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
-  ) { 
+  ) {
     if (isPlatformBrowser(this.platformId)) {
-      this.socket = io('http://localhost:3002');
+      this.socket = io('https://teatrack-advanced-business-web.onrender.com');
       this.socket.on('agencyUpdated', (data) => {
         this.ngZone.run(() => {
           this.processAgencies(data);
@@ -46,7 +46,7 @@ export class PageFooter implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.http.get<any[]>('http://localhost:3002/api/agencies').subscribe({
+      this.http.get<any[]>('https://teatrack-advanced-business-web.onrender.com/api/agencies').subscribe({
         next: (data) => this.processAgencies(data),
         error: (err) => console.warn('Footer agencies fetch error:', err)
       });

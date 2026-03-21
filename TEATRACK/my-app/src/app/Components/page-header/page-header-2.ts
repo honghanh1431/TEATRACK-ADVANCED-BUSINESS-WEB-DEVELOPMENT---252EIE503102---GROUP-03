@@ -28,7 +28,7 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   /** Username từ ngogia_user (đăng nhập/đăng ký), hiển thị thay "Tài khoản" */
   get userName(): string {
@@ -124,7 +124,7 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
           }
         }
       }
-    } catch (_) {}
+    } catch (_) { }
     this.cartCount = count;
     this.cartTotalStr = total.toLocaleString('vi-VN') + 'đ';
     this.cdr.detectChanges();
@@ -139,7 +139,7 @@ export class PageHeader2 implements AfterViewInit, OnDestroy {
 
         // Cập nhật avatar
         if (user.avatar) {
-          const apiBaseUrl = 'http://localhost:3002'; // Nên chuyển vào environment
+          const apiBaseUrl = 'https://teatrack-advanced-business-web.onrender.com'; // Nên chuyển vào environment
           if (user.avatar.startsWith('/uploads')) {
             this.avatarSrc = apiBaseUrl + user.avatar;
           } else {

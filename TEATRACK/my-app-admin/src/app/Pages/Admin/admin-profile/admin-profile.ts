@@ -14,8 +14,8 @@ export class AdminProfile implements OnInit, OnDestroy {
   email = '';
   avatarPreviewUrl = 'assets/icons/user.png';
   userId = '';
-  private apiUrl = 'http://localhost:3002/api/auth';
-  private apiBaseUrl = 'http://localhost:3002';
+  private apiUrl = 'https://teatrack-advanced-business-web.onrender.com/api/auth';
+  private apiBaseUrl = 'https://teatrack-advanced-business-web.onrender.com';
   currencyDisplay = 'VND (Việt Nam đồng)';
   smsEnabled = true;
 
@@ -45,7 +45,7 @@ export class AdminProfile implements OnInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAdminProfile();
@@ -91,7 +91,7 @@ export class AdminProfile implements OnInit, OnDestroy {
   private onStorageChange(e: StorageEvent): void {
     if (e.key === 'app.lang' && e.newValue) {
       this.currentLang = e.newValue;
-      this.loadTranslations(e.newValue).then(() => this.cdr.detectChanges()).catch(() => {});
+      this.loadTranslations(e.newValue).then(() => this.cdr.detectChanges()).catch(() => { });
     }
   }
 
@@ -228,12 +228,12 @@ export class AdminProfile implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           if (this.currentEditField === 'fullName') this.fullName = value;
           else if (this.currentEditField === 'email') this.email = value;
-          
+
           localStorage.setItem('ngogia_user', JSON.stringify(res.user));
           localStorage.setItem('authAdmin', JSON.stringify(res.user));
           // Emit event to update header
           window.dispatchEvent(new CustomEvent('user:updated'));
-          
+
           this.closeEditModal();
           this.cdr.detectChanges();
           this.showAlert(this.tKey('admin.account.modal.updateSuccess'));

@@ -96,7 +96,7 @@ export class AdminAccount implements OnInit, OnDestroy {
   };
 
   constructor(private cdr: ChangeDetectorRef, private http: HttpClient) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('userUpdated', () => {
       this.fetchUsers();
     });
@@ -171,7 +171,7 @@ export class AdminAccount implements OnInit, OnDestroy {
       return;
     }
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    this.http.get<{users: any[]}>('http://localhost:3002/api/admin/users', { headers }).subscribe({
+    this.http.get<{ users: any[] }>('https://teatrack-advanced-business-web.onrender.com/api/admin/users', { headers }).subscribe({
       next: (res) => {
         if (res.users && Array.isArray(res.users)) {
           this.accounts = res.users.map(u => ({
@@ -203,7 +203,7 @@ export class AdminAccount implements OnInit, OnDestroy {
   normSrc(path?: string): string {
     if (!path) return '';
     if (path.startsWith('http') || path.startsWith('data:')) return path;
-    const apiBaseUrl = 'http://localhost:3002';
+    const apiBaseUrl = 'https://teatrack-advanced-business-web.onrender.com';
     if (path.startsWith('/uploads')) return apiBaseUrl + path;
     return path;
   }
@@ -352,11 +352,11 @@ export class AdminAccount implements OnInit, OnDestroy {
         role: acc.role,
         ...(this.editAvatarPreview ? { avatar: this.editAvatarPreview } : {})
       };
-      
+
       const token = localStorage.getItem('token');
       if (token) {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-        this.http.put(`http://localhost:3002/api/admin/users/${this.targetId}`, payload, { headers }).subscribe({
+        this.http.put(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${this.targetId}`, payload, { headers }).subscribe({
           next: () => console.log('User saved to DB'),
           error: (err) => console.error('Failed saving user', err)
         });
@@ -409,12 +409,12 @@ export class AdminAccount implements OnInit, OnDestroy {
     const name = this.deleteTargetName;
     this.accounts = this.accounts.filter((a) => a.id !== this.targetId);
     this.selectedIds.delete(this.targetId);
-    
+
     // Sync with backend
     const token = localStorage.getItem('token');
     if (token && this.targetId) {
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      this.http.delete(`http://localhost:3002/api/admin/users/${this.targetId}`, { headers }).subscribe({
+      this.http.delete(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${this.targetId}`, { headers }).subscribe({
         next: () => console.log('User deleted from DB'),
         error: (err) => console.error('Failed to delete user', err)
       });
@@ -447,18 +447,18 @@ export class AdminAccount implements OnInit, OnDestroy {
     if (this.targetId == null) return;
     const name = this.lockTargetName;
     const acc = this.accounts.find((a) => a.id === this.targetId)!;
-    
+
     // Attempt local update
     acc.status = this.lockAction === 'lock' ? 'locked' : 'active';
-    
+
     // In real app, call PUT /api/admin/users/:id
     const token = localStorage.getItem('token');
     if (token && this.targetId) {
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
       // Using generic update since status isn't individually exposed, but depends on backend support
-      this.http.put(`http://localhost:3002/api/admin/users/${this.targetId}`, { status: acc.status }, { headers }).subscribe();
+      this.http.put(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${this.targetId}`, { status: acc.status }, { headers }).subscribe();
     }
-    
+
     this.showLockModal = false;
     this.targetId = null;
     this.filterTable();
@@ -486,7 +486,7 @@ export class AdminAccount implements OnInit, OnDestroy {
     const token = localStorage.getItem('token');
     if (token && typeof this.targetId === 'string') {
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      this.http.put(`http://localhost:3002/api/admin/users/${this.targetId}/role`, { role: 'vip customer' }, { headers }).subscribe({
+      this.http.put(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${this.targetId}/role`, { role: 'vip customer' }, { headers }).subscribe({
         next: () => console.log('Role updated on server'),
         error: (err) => console.error('Failed to update role on server', err)
       });
@@ -511,18 +511,18 @@ export class AdminAccount implements OnInit, OnDestroy {
   bulkVip(): void {
     const token = localStorage.getItem('token');
     const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
-    
+
     this.selectedIds.forEach((id) => {
       const a = this.accounts.find((x) => x.id === id);
       if (a) {
         a.role = 'vip customer';
         // Sync with backend
         if (headers && typeof id === 'string') {
-          this.http.put(`http://localhost:3002/api/admin/users/${id}/role`, { role: 'vip customer' }, { headers }).subscribe();
+          this.http.put(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${id}/role`, { role: 'vip customer' }, { headers }).subscribe();
         }
       }
     });
-    
+
     const n = this.selectedIds.size;
     this.selectedIds.clear();
     this.filterTable();
@@ -543,7 +543,7 @@ export class AdminAccount implements OnInit, OnDestroy {
         a.status = 'locked';
         // Sync with backend
         if (headers && id) {
-          this.http.put(`http://localhost:3002/api/admin/users/${id}`, { status: 'locked' }, { headers }).subscribe();
+          this.http.put(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${id}`, { status: 'locked' }, { headers }).subscribe();
         }
       }
     });
@@ -565,7 +565,7 @@ export class AdminAccount implements OnInit, OnDestroy {
     if (headers) {
       this.selectedIds.forEach((id) => {
         if (id) {
-          this.http.delete(`http://localhost:3002/api/admin/users/${id}`, { headers }).subscribe();
+          this.http.delete(`https://teatrack-advanced-business-web.onrender.com/api/admin/users/${id}`, { headers }).subscribe();
         }
       });
     }

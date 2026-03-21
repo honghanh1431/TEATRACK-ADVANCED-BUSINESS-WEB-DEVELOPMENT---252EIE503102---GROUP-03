@@ -16,12 +16,12 @@ export class Agency implements OnInit, AfterViewInit, OnDestroy {
   private socket: Socket | undefined;
 
   constructor(
-    private http: HttpClient, 
-    private cdr: ChangeDetectorRef, 
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private ngZone: NgZone
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('agencyUpdated', (data) => {
       this.ngZone.run(() => {
         this.processAgencies(data);
@@ -34,7 +34,7 @@ export class Agency implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:3002/api/agencies').subscribe({
+    this.http.get<any[]>('https://teatrack-advanced-business-web.onrender.com/api/agencies').subscribe({
       next: (data) => this.processAgencies(data),
       error: (err) => console.error('Failed to load agencies:', err)
     });
@@ -43,10 +43,10 @@ export class Agency implements OnInit, AfterViewInit, OnDestroy {
   processAgencies(data: any[]): void {
     // Chỉ hiện chi nhánh 'active' hoặc không có status (mặc định active)
     this.agencies = (data || []).filter(a => a.status === 'active' || !a.status);
-    
+
     // Nếu activeAgency hiện tại bị deactivate hoặc không còn tồn tại, chọn cái đầu tiên
-    const stillExists = this.agencies.find(a => 
-      (a._id && this.activeAgency?._id && a._id === this.activeAgency._id) || 
+    const stillExists = this.agencies.find(a =>
+      (a._id && this.activeAgency?._id && a._id === this.activeAgency._id) ||
       (a.id && this.activeAgency?.id && a.id === this.activeAgency.id)
     );
 

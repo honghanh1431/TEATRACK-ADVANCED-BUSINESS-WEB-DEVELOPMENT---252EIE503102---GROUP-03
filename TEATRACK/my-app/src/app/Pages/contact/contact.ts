@@ -22,22 +22,22 @@ export class Contact implements OnInit, OnDestroy {
 
   topics = [
     { value: 'complain', label: 'Than phiền' },
-    { value: 'praise',   label: 'Khen ngợi'  },
-    { value: 'issued',   label: 'Đề xuất'    },
-    { value: 'other',    label: 'Vấn đề khác'}
+    { value: 'praise', label: 'Khen ngợi' },
+    { value: 'issued', label: 'Đề xuất' },
+    { value: 'other', label: 'Vấn đề khác' }
   ];
 
   constructor(private fb: FormBuilder, private http: HttpClient, private ngZone: NgZone) {
     this.contactForm = this.fb.group({
       fullname: ['', Validators.required],
-      email:    ['', [Validators.required, Validators.email]],
-      phone:    ['', Validators.required],
-      branch:   ['', Validators.required],
-      topic:    ['', Validators.required],
-      content:  ['', Validators.required]
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      branch: ['', Validators.required],
+      topic: ['', Validators.required],
+      content: ['', Validators.required]
     });
 
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('agencyUpdated', (data) => {
       this.ngZone.run(() => {
         this.processAgencies(data);
@@ -67,7 +67,7 @@ export class Contact implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:3002/api/agencies').subscribe({
+    this.http.get<any[]>('https://teatrack-advanced-business-web.onrender.com/api/agencies').subscribe({
       next: (data) => this.processAgencies(data),
       error: (err) => {
         console.error('Failed to load agencies in contact:', err);
@@ -87,8 +87,8 @@ export class Contact implements OnInit, OnDestroy {
       this.contactForm.markAllAsTouched();
       return;
     }
-    
-    this.http.post('http://localhost:3002/api/contacts', this.contactForm.value).subscribe({
+
+    this.http.post('https://teatrack-advanced-business-web.onrender.com/api/contacts', this.contactForm.value).subscribe({
       next: () => {
         console.log('Feedback submitted:', this.contactForm.value);
         this.contactForm.reset();

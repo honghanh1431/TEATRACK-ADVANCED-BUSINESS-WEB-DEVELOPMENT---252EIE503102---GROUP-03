@@ -20,7 +20,7 @@ export interface Agency {
   styleUrl: './admin-agency.css',
 })
 export class AdminAgency implements OnInit {
-  private readonly API = 'http://localhost:3002/api/agencies';
+  private readonly API = 'https://teatrack-advanced-business-web.onrender.com/api/agencies';
   private readonly LS_KEY = 'admin_agencies';
 
   agencies: Agency[] = [];
@@ -81,7 +81,7 @@ export class AdminAgency implements OnInit {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAgencies();
@@ -98,7 +98,7 @@ export class AdminAgency implements OnInit {
               const parsed = JSON.parse(stored) as Agency[];
               if (Array.isArray(parsed)) this.agencies = parsed;
             }
-          } catch (_) {}
+          } catch (_) { }
         }
         if (!this.agencies.length) this.agencies = this.getSeedAgencies();
         this.persist();
@@ -112,7 +112,7 @@ export class AdminAgency implements OnInit {
             const parsed = JSON.parse(stored) as Agency[];
             if (Array.isArray(parsed)) this.agencies = parsed;
           }
-        } catch (_) {}
+        } catch (_) { }
         if (!this.agencies.length) this.agencies = this.getSeedAgencies();
         this.persist();
         this.filterTable();
@@ -163,7 +163,7 @@ export class AdminAgency implements OnInit {
     // Không dùng LocalStorage để tránh không đồng bộ với DB
     try {
       localStorage.removeItem(this.LS_KEY);
-    } catch (_) {}
+    } catch (_) { }
   }
 
   onSearchInput(value: string): void {
@@ -252,7 +252,7 @@ export class AdminAgency implements OnInit {
   async bulkDeactivate(): Promise<void> {
     const ids = Array.from(this.selectedIds);
     for (const id of ids) {
-       await this.http.put(`${this.API}/${id}`, { status: 'inactive' }).toPromise();
+      await this.http.put(`${this.API}/${id}`, { status: 'inactive' }).toPromise();
     }
     this.loadAgencies(); // Reload all
     this.selectedIds.clear();
@@ -263,9 +263,9 @@ export class AdminAgency implements OnInit {
   async bulkDelete(): Promise<void> {
     const ids = Array.from(this.selectedIds);
     if (!confirm(`Bạn có chắc muốn xoá ${ids.length} chi nhánh đã chọn?`)) return;
-    
+
     for (const id of ids) {
-       await this.http.delete(`${this.API}/${id}`).toPromise();
+      await this.http.delete(`${this.API}/${id}`).toPromise();
     }
     this.loadAgencies(); // Reload all
     this.selectedIds.clear();
@@ -344,7 +344,7 @@ export class AdminAgency implements OnInit {
       mapEmbed: this.editMapEmbed.trim() || undefined,
       image: this.editImage.trim() || undefined,
     };
-    
+
     if (this.editingId) {
       this.http.put<Agency[]>(`${this.API}/${this.editingId}`, payload).subscribe({
         next: (data) => {
@@ -370,7 +370,7 @@ export class AdminAgency implements OnInit {
     }
   }
 
-  openDetail(_agency: Agency): void {}
+  openDetail(_agency: Agency): void { }
 
   openMap(agency: Agency): void {
     this.mapTarget = agency;

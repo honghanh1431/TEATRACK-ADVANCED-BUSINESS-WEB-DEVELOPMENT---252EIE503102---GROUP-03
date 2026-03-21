@@ -84,7 +84,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly NAME_TO_SLUG: Record<string, string>;
 
-  private readonly API_PRODUCTS = 'http://localhost:3002/products';
+  private readonly API_PRODUCTS = 'https://teatrack-advanced-business-web.onrender.com/products';
 
   getSelectedCategoryName(): string {
     return this.selectedSlug ? (this.CAT_MAP[this.selectedSlug] || '') : '';
@@ -115,7 +115,7 @@ export class Homepage implements OnInit, AfterViewInit, OnDestroy {
     this.NAME_TO_SLUG = Object.fromEntries(
       Object.entries(this.CAT_MAP).map(([slug, name]) => [this.normalize(name), slug])
     );
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('productUpdated', () => {
       this.refreshProducts();
     });

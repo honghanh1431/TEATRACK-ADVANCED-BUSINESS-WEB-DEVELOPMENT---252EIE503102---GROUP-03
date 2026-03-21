@@ -47,7 +47,7 @@ export interface ProductItem {
 
 const REVIEW_PAGE_SIZE = 4;
 /** Base URL API đánh giá (my-server port 3100); bỏ trống nếu chỉ dùng local */
-const REVIEWS_API_BASE = 'http://localhost:3002';
+const REVIEWS_API_BASE = 'https://teatrack-advanced-business-web.onrender.com';
 /** localStorage key lưu danh sách review đã thích (mảng key) */
 const REVIEW_LIKED_STORAGE_KEY = 'teatrack_review_liked';
 
@@ -162,7 +162,7 @@ export class Product implements OnInit, OnDestroy {
     private productState: ProductStateService,
     private reviewCountService: ReviewCountService,
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('productUpdated', () => {
       // Reload product data if ID matches
       const pid = this.route.snapshot.paramMap.get('id') ?? this.route.snapshot.queryParamMap.get('pid');
@@ -231,7 +231,7 @@ export class Product implements OnInit, OnDestroy {
       this.product = null;
       this.cdr.detectChanges();
     }
-    this.http.get<ProductItem[]>('http://localhost:3002/products').subscribe({
+    this.http.get<ProductItem[]>('https://teatrack-advanced-business-web.onrender.com/products').subscribe({
       next: (data) => {
         this.allProducts = data;
         let found: ProductItem | null = null;

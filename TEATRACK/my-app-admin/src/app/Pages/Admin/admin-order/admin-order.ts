@@ -51,7 +51,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
   private escHandler = (e: KeyboardEvent) => this.onEscKey(e);
   private storageHandler = (e: StorageEvent) => this.onStorageOrders(e);
 
-  private readonly API_BASE = 'http://localhost:3002';
+  private readonly API_BASE = 'https://teatrack-advanced-business-web.onrender.com';
   private readonly AGENCIES_API = `${this.API_BASE}/api/agencies`;
   private AGENCIES: Agency[] = [];
 
@@ -60,7 +60,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private http: HttpClient
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('orderCreated', () => {
       this.fetchOrders();
     });
@@ -641,7 +641,7 @@ export class AdminOrder implements OnInit, AfterViewInit, OnDestroy {
     if (order._id) {
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
-      
+
       const payload: any = { status: newStatus };
       if (newAgency !== undefined) payload.deliveryAgency = newAgency;
 

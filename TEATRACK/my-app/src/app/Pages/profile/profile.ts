@@ -56,8 +56,8 @@ export class Profile implements OnInit, OnDestroy {
     { label: 'Hotline', icon: 'assets/icons/phone.png', href: 'tel:02723979518', display: '02-723-979-518' },
   ];
 
-  private apiUrl = 'http://localhost:3002/api/auth';
-  private apiBaseUrl = 'http://localhost:3002'; // dùng để ghép với đường dẫn ảnh từ server
+  private apiUrl = 'https://teatrack-advanced-business-web.onrender.com/api/auth';
+  private apiBaseUrl = 'https://teatrack-advanced-business-web.onrender.com'; // dùng để ghép với đường dẫn ảnh từ server
 
   showLogoutModal = false;
   showAvatarModal = false;

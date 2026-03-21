@@ -115,18 +115,18 @@ export class BlogDetail implements OnInit {
   }
 
   private loadBlog() {
-    this.http.get<any>(`http://localhost:3002/blog/${this.blogId}`).subscribe({
+    this.http.get<any>(`https://teatrack-advanced-business-web.onrender.com/blog/${this.blogId}`).subscribe({
       next: (data) => {
         this.blog = data;
         if (this.blog && this.blog.title) {
           this.titleService.setTitle(`${this.blog.title} | ${APP_TITLE_SUFFIX}`);
         }
         // Increment view count
-        this.http.post(`http://localhost:3002/blog/${this.blogId}/view`, {}).subscribe({
+        this.http.post(`https://teatrack-advanced-business-web.onrender.com/blog/${this.blogId}/view`, {}).subscribe({
           next: (updated) => {
-             if (updated && (updated as any).views) {
-               this.blog.views = (updated as any).views;
-             }
+            if (updated && (updated as any).views) {
+              this.blog.views = (updated as any).views;
+            }
           },
           error: (err) => console.error('Increment view error:', err)
         });
@@ -176,7 +176,7 @@ export class BlogDetail implements OnInit {
   }
 
   private loadRelated() {
-    this.http.get<any[]>('http://localhost:3002/blog').subscribe({
+    this.http.get<any[]>('https://teatrack-advanced-business-web.onrender.com/blog').subscribe({
       next: (data) => {
         const others = (data || [])
           .filter(b => b.id !== this.blogId && b.visible !== false)

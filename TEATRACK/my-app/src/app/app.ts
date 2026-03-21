@@ -64,9 +64,9 @@ export class App implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private http: HttpClient
   ) {
-    console.log('App: Initializing Socket.io connection to http://localhost:3002');
-    this.socket = io('http://localhost:3002');
-    
+    console.log('App: Initializing Socket.io connection to https://teatrack-advanced-business-web.onrender.com');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
+
     this.socket.on('connect', () => {
       console.log('App: Socket connected!', this.socket?.id);
     });
@@ -153,7 +153,7 @@ export class App implements OnInit, OnDestroy {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    this.http.get<{ user: any }>('http://localhost:3002/api/auth/profile', {
+    this.http.get<{ user: any }>('https://teatrack-advanced-business-web.onrender.com/api/auth/profile', {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: (res) => {
@@ -166,7 +166,7 @@ export class App implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       },
-      error: () => {}
+      error: () => { }
     });
   }
 

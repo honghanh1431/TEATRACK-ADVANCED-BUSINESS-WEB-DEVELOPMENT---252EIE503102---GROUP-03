@@ -76,7 +76,7 @@ export class Cart implements OnInit, OnDestroy {
     private http: HttpClient,
   ) {
     // Khởi tạo socket connection để nhận cập nhật voucher thời gian thực
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('promotionUpdated', (data) => {
       console.log('Promotion updated in real-time:', data);
       this.ngZone.run(() => {
@@ -209,7 +209,7 @@ export class Cart implements OnInit, OnDestroy {
   // Agency (chi nhánh giao hàng)
   agencies: { _id: string; name: string }[] = [];
   selectedAgency = '';
-  private readonly API_BASE = 'http://localhost:3002';
+  private readonly API_BASE = 'https://teatrack-advanced-business-web.onrender.com';
 
   // State variables
   cartItems: CartItem[] = [];
@@ -385,8 +385,8 @@ export class Cart implements OnInit, OnDestroy {
             const parsed = JSON.parse(stored);
             if (Array.isArray(parsed)) this.couponRules = buildRules(parsed);
           }
-        } catch (_) {}
-        
+        } catch (_) { }
+
         if (Object.keys(this.couponRules).length === 0) {
           this.couponRules = buildRules([
             { code: 'NGOGIAFS', type: 'amount', value: 10000, minSubtotal: 50000, description: 'Giảm 10.000đ cho đơn từ 50.000đ' },

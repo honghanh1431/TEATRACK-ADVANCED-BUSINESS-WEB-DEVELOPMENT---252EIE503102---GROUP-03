@@ -20,7 +20,7 @@ const STORAGE_KEY = 'cart_items';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private readonly apiUrl = 'http://localhost:3002/api/cart';
+  private readonly apiUrl = 'https://teatrack-advanced-business-web.onrender.com/api/cart';
 
   constructor(private http: HttpClient) { }
 

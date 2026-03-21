@@ -207,7 +207,7 @@ export class Registion implements OnInit {
       address: this.address.trim()
     };
 
-    this.http.post<{ message: string; user: any }>('http://localhost:3002/api/auth/register', userData)
+    this.http.post<{ message: string; user: any }>('https://teatrack-advanced-business-web.onrender.com/api/auth/register', userData)
       .subscribe({
         next: () => {
           this.isLoading = false;

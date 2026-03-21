@@ -34,7 +34,7 @@ import { io, Socket } from 'socket.io-client';
   styleUrls: ['./admin-promotion.css'],
 })
 export class AdminPromotion implements OnInit {
-  private readonly API_URL = 'http://localhost:3002/api/promotions';
+  private readonly API_URL = 'https://teatrack-advanced-business-web.onrender.com/api/promotions';
   private socket: Socket | undefined;
 
   stats = {
@@ -74,7 +74,7 @@ export class AdminPromotion implements OnInit {
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
   ) {
-    this.socket = io('http://localhost:3002');
+    this.socket = io('https://teatrack-advanced-business-web.onrender.com');
     this.socket.on('promotionUpdated', () => {
       this.load();
     });
@@ -318,7 +318,7 @@ export class AdminPromotion implements OnInit {
 
   confirmDelete(): void {
     if (!this.deleteTarget || !this.deleteTarget._id) return;
-    
+
     this.http.delete(`${this.API_URL}/${this.deleteTarget._id}`, this.headers).subscribe({
       next: () => {
         this.load();
