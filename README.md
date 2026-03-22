@@ -17,13 +17,27 @@ Dự án này là một hệ thống đầy đủ bao gồm trang web cho khách
 
 ---
 
-## 🌐 Địa chỉ truy cập (sau khi chạy)
+## 🌐 Địa chỉ truy cập
 
+### 🚀 Bản Deploy (Online)
+| Thành phần | URL |
+|------------|-----|
+| **Trang Khách Hàng** | [https://teatrackcustomer-sable.vercel.app/](https://teatrackcustomer-sable.vercel.app/) |
+| **Trang Quản Trị** | [https://teatrackadmin-zeta.vercel.app/](https://teatrackadmin-zeta.vercel.app/) |
+| **API Backend** | [https://teatrack-advanced-business-web.onrender.com](https://teatrack-advanced-business-web.onrender.com) |
+
+### 💻 Chạy Local (Máy bộ)
 | Ứng dụng | URL |
 |----------|-----|
-| Trang khách hàng | http://localhost:4200 |
-| Trang quản trị | http://localhost:4201 |
-| API Backend | https://teatrack-advanced-business-web.onrender.com |
+| Trang khách hàng | `http://localhost:4200` |
+| Trang quản trị | `http://localhost:4201` |
+| API Backend | `http://localhost:3002` |
+
+---
+
+## 🔐 Tài khoản thử nghiệm (Admin)
+- **Tài khoản:** `Admin123`
+- **Mật khẩu:** `admin123`
 
 ---
 
@@ -155,13 +169,16 @@ Dưới đây là danh sách toàn bộ các Endpoint API của hệ thống:
 Để kiểm tra các API yêu cầu xác thực (**🔑 JWT** hoặc **🔒 Admin**), hãy làm theo các bước sau:
 
 ### 1. Lấy Bearer Token
-1. Sử dụng Method "POST" với URL: "https://teatrack-advanced-business-web.onrender.com/api/auth/login" (User) hoặc "/api/auth/admin-login" (Admin).
-2. Trong tab **Body**, chọn **raw** và định dạng **JSON**, nhập tài khoản ("identifier"/"password").
+1. Sử dụng Method `POST` với URL: `https://teatrack-advanced-business-web.onrender.com/api/auth/login` (User) hoặc `/api/auth/admin-login` (Admin).
+2. Trong tab **Body**, chọn **raw** và định dạng **JSON**, nhập tài khoản (`identifier`/`password`).
+   - Admin mặc định: `Admin123` / `admin123`
 Ví dụ: 
-      {
-      "identifier": "tên_đăng_nhập_hoặc_email",
-      "password": "mật_khẩu_của_bạn"
-      }
+```json
+{
+  "identifier": "Admin123",
+  "password": "admin123"
+}
+```
 3. Gửi request và sao chép chuỗi "token" nhận được trong kết quả trả về.
 Nếu đăng nhập thành công, Server sẽ trả về kết quả như sau:
 Ví dụ:
