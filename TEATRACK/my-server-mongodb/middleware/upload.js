@@ -1,37 +1,29 @@
 // middleware/upload.js
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
-const path = require('path');
 
-// Cấu hình nơi lưu file và tên file
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/avatars/'); // thư mục lưu ảnh
-  },
-  filename: (req, file, cb) => {
-    // Tạo tên file duy nhất: thời gian + số ngẫu nhiên + phần mở rộng
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, 'avatar-' + uniqueSuffix + ext);
+// Cấu hình Cloudinary (Lấy thông tin từ .env)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Cấu hình Cloudinary Storage cho multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'teatrack_avatars', // Thư mục lưu trên Cloudinary
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    public_id: (req, file) => 'avatar-' + Date.now() + '-' + Math.round(Math.random() * 1e9),
+    transformation: [{ width: 500, height: 500, crop: 'limit' }] // Tự động tối ưu kích thước
   }
 });
 
-// Lọc file chỉ chấp nhận ảnh
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb(new Error('Chỉ chấp nhận file ảnh (jpeg, jpg, png, gif, webp)'));
-  }
-};
-
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // giới hạn 5MB
-  fileFilter: fileFilter
+  limits: { fileSize: 5 * 1024 * 1024 } // Giới hạn 5MB
 });
 
 module.exports = upload;

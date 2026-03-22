@@ -85,8 +85,8 @@ const updateProfile = async (req, res) => {
     // Xử lý avatar
     let avatarPath;
     if (req.file) {
-      // Trường hợp 1: có upload file mới
-      avatarPath = '/uploads/avatars/' + req.file.filename;
+      // Trường hợp 1: có upload file mới từ Cloudinary
+      avatarPath = req.file.path; 
     } else if (req.body.avatar !== undefined) {
       // Trường hợp 2: không có file nhưng có trường avatar (có thể là '' để xóa)
       avatarPath = req.body.avatar;
